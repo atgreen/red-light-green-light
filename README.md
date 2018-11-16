@@ -103,7 +103,7 @@ This is a 'dev' policy:
 
     policy dev {
       url: https://github.com/atgreen/my-dev-rlgl-policy.git
-      credetials: admin-creds
+      credentials: admin-creds
     }
 
 The repo identied above contain XFAIL, FAIL and PASS files.
@@ -119,7 +119,7 @@ Policies can have expiration dates:
 
     policy dev {
       url: https://github.com/atgreen/my-dev-rlgl-policy.git
-      credetials: admin-creds
+      credentials: admin-creds
       expires: 2019-02-01
     }
 
