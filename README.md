@@ -41,14 +41,14 @@ Here are the basic concepts:
   stop the pipeline, or Green Light, meaning proceed with the
   pipeline.
 
-    $ rlgl test --policy=dev $ID my-test-report.html
-    green
+     $ rlgl test --policy=dev $ID my-test-report.html
+     green
 
-    $ rlgl test --policy=global-prod $ID oval-scan.xml
-    red
+     $ rlgl test --policy=global-prod $ID oval-scan.xml
+     red
    
-    $ rlgl test --policy=my-proj $ID gcc.log
-    green
+     $ rlgl test --policy=my-proj $ID gcc.log
+     green
 
 That's it!
 
