@@ -1,4 +1,4 @@
-rlgl - Red Light Green Light
+`rlgl` - Red Light Green Light
 ===============================
 
 Problem Statement
@@ -38,7 +38,7 @@ $ ID=$(rlgl start)
 ```
 
 - As the pipeline proceeds, test results are generated (scans, unit
-  tests, etc).  For each test report generated, rlgl evaluates the
+  tests, etc).  For each test report generated, `rlgl` evaluates the
   report against the stated policy, resulting in a Red Light, meaning
   stop the pipeline, or Green Light, meaning proceed with the
   pipeline.
@@ -87,7 +87,7 @@ PASS contains matchers for known test passes.  These are removed from
 the test results.
 
 Any remaining entries in the test results are recorded as UNKNOWN.
-Rlgl interprets these as failures, but they are reported as UNKNOWN in
+`rlgl` interprets these as failures, but they are reported as UNKNOWN in
 order aim for 100% coverage of the PASS/FAIL scans.
 
 The XFAIL, FAIL, PASS files are maintained in a git repo.  The git
