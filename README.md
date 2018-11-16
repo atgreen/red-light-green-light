@@ -33,7 +33,7 @@ Here are the basic concepts:
   what flows down the pipeline along with the various build/deploy
   artefacts.  They would be attached as artefact metadata.
 
-   $ ID=$(rlgl start)
+    $ ID=$(rlgl start)
 
 - As the pipeline proceeds, test results are generated (scans, unit
   tests, etc).  For each test report generated, rlgl evaluates the
@@ -41,14 +41,14 @@ Here are the basic concepts:
   stop the pipeline, or Green Light, meaning proceed with the
   pipeline.
 
-   $ rlgl test --policy=dev $ID my-test-report.html
-   green
+    $ rlgl test --policy=dev $ID my-test-report.html
+    green
 
-   $ rlgl test --policy=global-prod $ID oval-scan.xml
-   red
+    $ rlgl test --policy=global-prod $ID oval-scan.xml
+    red
    
-   $ rlgl test --policy=my-proj $ID gcc.log
-   green
+    $ rlgl test --policy=my-proj $ID gcc.log
+    green
 
 That's it!
 
@@ -93,25 +93,25 @@ Managing Policy
 
 This is a 'dev' policy:
 
-policy dev {
-  url: https://github.com/atgreen/my-dev-rlgl-policy.git
-  credetials: admin-creds
-}
+    policy dev {
+      url: https://github.com/atgreen/my-dev-rlgl-policy.git
+      credetials: admin-creds
+    }
 
 The repo identied above contain XFAIL, FAIL and PASS files.
 
 Policies can be composed of multiple policies by merging the contents of XFAIL, FAIL and PASS.
 
-policy dev {
-  policy: dev
-  policy: special-dev
-}
+    policy dev {
+      policy: dev
+      policy: special-dev
+    }
 
 Policies can have expiration dates:
 
-policy dev {
-  url: https://github.com/atgreen/my-dev-rlgl-policy.git
-  credetials: admin-creds
-  expires: 2019-02-01
-}
+    policy dev {
+      url: https://github.com/atgreen/my-dev-rlgl-policy.git
+      credetials: admin-creds
+      expires: 2019-02-01
+    }
 
