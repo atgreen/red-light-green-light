@@ -33,7 +33,9 @@ Here are the basic concepts:
   what flows down the pipeline along with the various build/deploy
   artefacts.  They would be attached as artefact metadata.
 
-    $ ID=$(rlgl start)
+```
+$ ID=$(rlgl start)
+```
 
 - As the pipeline proceeds, test results are generated (scans, unit
   tests, etc).  For each test report generated, rlgl evaluates the
@@ -41,14 +43,20 @@ Here are the basic concepts:
   stop the pipeline, or Green Light, meaning proceed with the
   pipeline.
 
+```
      $ rlgl test --policy=dev $ID my-test-report.html
      green
+```
 
+```
      $ rlgl test --policy=global-prod $ID oval-scan.xml
      red
+```
    
+```
      $ rlgl test --policy=my-proj $ID gcc.log
      green
+```
 
 That's it!
 
