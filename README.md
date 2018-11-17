@@ -1,9 +1,8 @@
 `rlgl` - Red Light Green Light
 ===============================
 
-**Red Light Green Light** is an enterprise grade client/server based
-policy management and enforcement tool for quality gates for use in
-CI/CD pipelines.
+**Red Light Green Light** is a policy management and enforcement tool
+  designed to accelerate your CI/CD pipelines.
 
 
 Problem Statement
@@ -13,7 +12,7 @@ Modern DevOps pipelines require Quality Gating mechanisms in order to
 fully automate the promotion of software artifacts from dev all the
 way through to prod.  These Quality Gates are responsible for deciding
 whether or not a deployable artifact (config files, software builds,
-container images, VM images, etc) should proceed to the next state of
+container images, VM images, etc) should proceed to the next stage of
 a CI/CD pipeline.
 
 Many tools are available to evaluate the quality of deployable
