@@ -50,8 +50,8 @@ $ ID=$(rlgl start)
 
 - As the pipeline proceeds, test results are generated (scans, unit
   tests, etc).  For each test report generated, `rlgl` evaluates the
-  report against the stated policy, resulting in a Red Light, meaning
-  stop the pipeline, or Green Light, meaning proceed with the
+  report against the stated policy, resulting in a **Red Light**, meaning
+  stop the pipeline, or **Green Light**, meaning proceed with the
   pipeline.
 
 ```shell
