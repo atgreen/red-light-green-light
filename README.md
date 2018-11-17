@@ -80,7 +80,7 @@ simply as this: a json object.  That's it.  No special schema is
 defined.
 
 Policy is also defined in plain text divided into three files: `XFAIL`,
-FAIL, and `PASS`.  Each of these files contains a list of json matching
+`FAIL`, and `PASS`.  Each of these files contains a list of json matching
 expressions to match again the canonical test results.  They are
 evaluated this order: `XFAIL`, `FAIL`, `PASS`.
 
