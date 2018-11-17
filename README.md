@@ -22,7 +22,7 @@ tools introduces problems:
  - policies are locked within proprietery tools
 
 Policy Drive Quality Gates with Red Light Green Light
-====================================
+------------------------------
 
 The idea behind Red Light Green Light is that we decouple the test
 evaluation policies from the underlying testing tools, in a way that
@@ -102,16 +102,14 @@ auditable.
 
 
 Policy in Detail
-================
+---------------
 
 As mentioned above, a `rlgl` policy consists of three separate files:
 `XFAIL`, `FAIL` and `PASS`. Each file 
 
 
-
-
 Managing Policy
-================
+------------
 
 This is a 'dev' policy:
 
