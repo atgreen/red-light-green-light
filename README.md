@@ -21,7 +21,7 @@ tools introduces problems:
  - no centralized, auditable policy management
  - policies are locked within proprietery tools
 
-Policy Drive Quality Gates with Red Light Green Light
+Policy Drive Quality Gates
 ------------------------------
 
 The idea behind Red Light Green Light is that we decouple the test
@@ -106,6 +106,21 @@ Policy in Detail
 
 As mentioned above, a `rlgl` policy consists of three separate files:
 `XFAIL`, `FAIL` and `PASS`. Each file 
+
+Each file contains JSON matchmaking expressions as defined here:
+https://github.com/chancancode/json_expressions.
+
+For example, to mark a CVE failure as an exception, we add the
+following to our XFAIL file:
+
+    # Ignore this failure in out container images
+    { cve: "CVE-2014-4043" }
+
+To ignore all CVEs with a score of less than 7 we add the following to
+our XFAIL file:
+
+    # Ignore everything but the most critical CVEs.
+    { score: "0..6" }
 
 
 Managing Policy
