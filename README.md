@@ -85,10 +85,10 @@ allowing to pass anyway.  These are your exceptions.  Any matching
 json objects are removed from the test results before processing with
 FAIL.
 
-FAIL contains matchers for tests results that are definitely failures.
+`FAIL` contains matchers for tests results that are definitely failures.
 The are removed from the test results before processing with `PASS`.
 
-PASS contains matchers for known test passes.  These are removed from
+`PASS` contains matchers for known test passes.  These are removed from
 the test results.
 
 Any remaining entries in the test results are recorded as UNKNOWN.
