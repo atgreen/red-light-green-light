@@ -1,6 +1,11 @@
 `rlgl` - Red Light Green Light
 ===============================
 
+Red Light Green Light is an enterprise grade client/server based
+policy management and enforcement tool for quality gates for use in a
+CI/CD pipeline.
+
+
 Problem Statement
 ----------------
 
