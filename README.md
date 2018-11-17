@@ -21,6 +21,9 @@ tools introduces problems:
  - no centralized, auditable policy management
  - policies are locked within proprietery tools
 
+Policy Drive Quality Gates with Red Light Green Light
+====================================
+
 The idea behind Red Light Green Light is that we decouple the test
 evaluation policies from the underlying testing tools, in a way that
 they are:
@@ -72,30 +75,39 @@ convert it into a canonical form.  The canonical form is defined
 simply as this: a json object.  That's it.  No special schema is
 defined.
 
-Policy is also defined in plain text divided into three files: XFAIL,
-FAIL, and PASS.  Each of these files contains a list of json matching
+Policy is also defined in plain text divided into three files: `XFAIL`,
+FAIL, and `PASS`.  Each of these files contains a list of json matching
 expressions to match again the canonical test results.  They are
-evaluated this order: XFAIL, FAIL, PASS.
+evaluated this order: `XFAIL`, `FAIL`, `PASS`.
 
-XFAIL contains matchers for test results we are expecting to fail and
+`XFAIL` contains matchers for test results we are expecting to fail and
 allowing to pass anyway.  These are your exceptions.  Any matching
 json objects are removed from the test results before processing with
 FAIL.
 
 FAIL contains matchers for tests results that are definitely failures.
-The are removed from the test results before processing with PASS.
+The are removed from the test results before processing with `PASS`.
 
 PASS contains matchers for known test passes.  These are removed from
 the test results.
 
 Any remaining entries in the test results are recorded as UNKNOWN.
 `rlgl` interprets these as failures, but they are reported as UNKNOWN in
-order aim for 100% coverage of the PASS/FAIL scans.
+order aim for 100% coverage of the `PASS`/FAIL scans.
 
-The XFAIL, FAIL, PASS files are maintained in a git repo.  The git
+The `XFAIL`, `FAIL`, `PASS` files are maintained in a git repo.  The git
 repo (and credentials) are identified by the policy ID.  Changing
 policy requires modifying the policy in git, which is logged and
 auditable.
+
+
+Policy in Detail
+================
+
+As mentioned above, a `rlgl` policy consists of three separate files:
+`XFAIL`, `FAIL` and `PASS`. Each file 
+
+
 
 
 Managing Policy
@@ -108,9 +120,10 @@ This is a 'dev' policy:
       credentials: admin-creds
     }
 
-The repo identied above contain XFAIL, FAIL and PASS files.
+The repo identied above contain `XFAIL`, `FAIL` and `PASS` files.
 
-Policies can be composed of multiple policies by merging the contents of XFAIL, FAIL and PASS.
+Policies can be composed of multiple policies by merging the contents
+of `XFAIL`, `FAIL` and `PASS`.
 
     policy dev {
       policy: dev
