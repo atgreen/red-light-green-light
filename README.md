@@ -21,7 +21,7 @@ tools introduces problems:
  - no centralized, auditable policy management
  - policies are locked within proprietery tools
 
-Policy Drive Quality Gates
+Policy Driven Quality Gates
 ------------------------------
 
 The idea behind Red Light Green Light is that we decouple the test
