@@ -6,18 +6,22 @@ Problem Statement
 
 Modern DevOps pipelines require Quality Gating mechanisms in order to
 fully automate the promotion of software artifacts from dev all the
-way through to prod.  These Quality Gates are responsible for
-evaluating deployable artifacts (config files, software builds,
-container images, VM images, etc) as they go through a CI/CD pipeline,
-to determine if they meet some minimum acceptable quality bar.
+way through to prod.  These Quality Gates are responsible for deciding
+whether or not a deployable artifact (config files, software builds,
+container images, VM images, etc) should proceed to the next state of
+a CI/CD pipeline.
 
-There are many tools available to evaluate the quality of a deployable
-artefact, including container image scanners, unit test harnesses,
-config file linters, etc.  The problem is that each one of the tools
-generates custom output reports.  Some even provide custom mechnanisms
-to control the evaluation process (eg. which test failures to ignore).
+Many tools are available to evaluate the quality of deployable
+artifacts, including container image scanners, unit test harnesses,
+config file linters, etc.  But dealing with multiple quality testing
+tools introduces problems:
 
-The idea behind Red Light Green Light is that we decouple of the test
+ - bespoke gating mechanisms must be created to evaluate test results
+ - different tools require different exception processes and policy management
+ - no centralized, auditable policy management
+ - policies are locked within proprietery tools
+
+The idea behind Red Light Green Light is that we decouple the test
 evaluation policies from the underlying testing tools, in a way that
 they are:
 
@@ -29,9 +33,9 @@ they are:
 
 Here are the basic concepts:
 
-- Each deployable artefact is given a Player ID.  The Player ID is
+- Each deployable artifact is given a Player ID.  The Player ID is
   what flows down the pipeline along with the various build/deploy
-  artefacts.  They would be attached as artefact metadata.
+  artifacts.  They would be attached as artifact metadata.
 
 ```
 $ ID=$(rlgl start)
@@ -58,12 +62,10 @@ $ rlgl test --policy=my-proj $ID gcc.log
 green
 ```
 
-That's it!
-
-The client side is very easy.   
-
+That's it!   The client side is very easy.   
 
 The server side, where policy is evaluated, is where the magic is.
+
 
 The first step is to identify the type of report we're evaluating and
 convert it into a canonical form.  The canonical form is defined
