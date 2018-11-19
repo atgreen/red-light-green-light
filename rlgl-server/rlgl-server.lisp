@@ -1,0 +1,55 @@
+;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
+;;;
+;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;;                         
+;;; Rlgl-Server is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3, or (at your
+;;; option) any later version.
+;;;
+;;; Rlgl-Server is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;;; General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with Rlgl-Server; see the file COPYING3.  If not see
+;;; <http://www.gnu.org/licenses/>.
+
+;; Top level for rlgl-server
+
+(in-package :rlgl-server)
+
+;; Our API....
+
+;;; HTTP API ROUTES: ----------------------------------------------------------
+(snooze:defroute hello (:get "text/plain")
+  "Hello there")
+
+;;; END ROUTE DEFINITIONS -----------------------------------------------------
+
+
+;;; HTTP SERVER CONTROL: ------------------------------------------------------
+(defparameter *handler* nil)
+
+(defmacro start-server (&key (handler '*handler*) (port 8080))
+  "Initialize an HTTP handler"
+  (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
+  `(setf handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
+
+(defmacro stop-server (&key (handler '*handler*))
+  "Shutdown the HTTP handler"
+  `(hunchentoot:stop ,handler))
+
+;;; END SERVER CONTROL --------------------------------------------------------
+
+(defun start-rlgl-server (arg)
+  "Start the web application and have the main thread sleep forever,
+  unless INTERACTIVE is non-nil."
+  (start-server)
+  (loop
+     (sleep 3000)))
+
+(defun stop-rlgl-server ()
+  "Stop the web application."
+  (stop-server))
