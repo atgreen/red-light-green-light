@@ -1,15 +1,21 @@
 package main
 
 import (
+  "bytes"
+  "encoding/json"
   "fmt"
   "log"
   "os"
   "time"
+  "io/ioutil"
+  "net/http"
 
   "github.com/urfave/cli"
 )
 
 func main() {
+  var policy string
+
   app := cli.NewApp()
 
   app.Commands = []cli.Command{
@@ -27,16 +33,70 @@ func main() {
       Aliases: []string{"s"},
       Usage:   "create a Player ID",
       Action:  func(c *cli.Context) error {
-        fmt.Println("start task: ", c.Args().First())
+
+  	response, err := http.Get("http://localhost:8080/start")
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+	
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(responseData))
+
         return nil
       },
     },
     {
-      Name:    "test",
-      Aliases: []string{"t"},
+      Name:    "evaluate",
+      Aliases: []string{"e"},
       Usage:   "evaluate test results",
+      Flags: []cli.Flag{
+        cli.StringFlag{
+		Name: "policy",
+		Value: "default",
+		Usage: "evaluation policy",
+		Destination: &policy,
+		},
+      },
+
       Action:  func(c *cli.Context) error {
-        fmt.Println("test task: ", c.Args().First())
+
+      if c.NArg() == 0 {
+            fmt.Print("ERROR: Missing report\n")
+      	    return nil
+	 }
+
+      file, err := os.Open(c.Args().Get(0));
+      defer file.Close();
+
+      res, err := http.Post("http://localhost:8080/upload", "application/octet-stream", file);
+      if err != nil {
+      	 // panic(err)
+	 }
+	 defer res.Body.Close();
+	 message, _ := ioutil.ReadAll(res.Body)
+	 // check that it is OK?
+
+          values := map[string]string{"name": file.Name(), "ref": string(message[:])}
+	  jsonValue, _ := json.Marshal(values)
+
+	 response, err := http.Post("http://localhost:8080/evaluate/", "application/json", bytes.NewBuffer(jsonValue))
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+	
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(responseData))
+
         return nil
       },
     },
@@ -53,7 +113,7 @@ func main() {
 	    }
   app.Usage = "Red Light Green Light"
   app.Action = func(c *cli.Context) error {
-    fmt.Println("boom! I say!")
+
     return nil
   }
 

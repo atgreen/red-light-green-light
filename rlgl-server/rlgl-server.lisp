@@ -20,11 +20,35 @@
 
 (in-package :rlgl-server)
 
-;; Our API....
+(defvar *player-count* 5555)
 
-;;; HTTP API ROUTES: ----------------------------------------------------------
-(snooze:defroute hello (:get "text/plain")
-  "Hello there")
+;; ----------------------------------------------------------------------------
+;; Storage backends
+
+(defclass storage-backend ()
+  ((key :initarg :key :reader key)))
+
+(defvar *storage-driver*
+  (make-instance 'local-storage-backend))
+(init *storage-driver*)
+
+;; ----------------------------------------------------------------------------
+;; API routes
+
+(snooze:defroute start (:get :text/plain)
+  (setf *player-count* (+ 10 *player-count*))
+  (format nil "~A" *player-count*))
+
+(snooze:defroute evaluate (:post :application/json)
+  (let ((json
+	 (json:decode-json-from-string
+	  (funcall
+	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
+    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json)))))
+      (format nil "~A~%" doc))))
+
+(snooze:defroute upload (:post :application/octet-stream)
+		 (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 

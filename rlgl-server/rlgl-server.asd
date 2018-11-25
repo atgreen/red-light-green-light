@@ -22,6 +22,7 @@
            :version "0"
   :serial t
   :components ((:file "package")
+	       (:file "storage-local")
 	       (:file "rlgl-server"))
-  :depends-on (:snooze :hunchentoot))
+  :depends-on (:snooze :cl-json :zs3 :hunchentoot))
 
