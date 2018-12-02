@@ -2,18 +2,18 @@
 ;;;
 ;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
 ;;;                         
-;;; Rlgl-Server is free software; you can redistribute it and/or modify it
+;;; rlgl-server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
 ;;; the Free Software Foundation; either version 3, or (at your
 ;;; option) any later version.
 ;;;
-;;; Rlgl-Server is distributed in the hope that it will be useful, but
+;;; rlgl-server is distributed in the hope that it will be useful, but
 ;;; WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ;;; General Public License for more details.
 ;;;
 ;;; You should have received a copy of the GNU General Public License
-;;; along with Rlgl-Server; see the file COPYING3.  If not see
+;;; along with rlgl-server; see the file COPYING3.  If not see
 ;;; <http://www.gnu.org/licenses/>.
 
 ;; Top level for rlgl-server
@@ -33,6 +33,12 @@
 (init *storage-driver*)
 
 ;; ----------------------------------------------------------------------------
+;; Parsing backends
+
+(defclass report-parser ()
+  ((name :initarg :name :reader name)))
+
+;; ----------------------------------------------------------------------------
 ;; API routes
 
 (snooze:defroute start (:get :text/plain)
@@ -45,19 +51,56 @@
 	  (funcall
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
     (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json)))))
-      (format nil "~A~%" doc))))
+      (let ((pdoc (plump:parse doc))
+	    (tests (list)))
+	(lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a" 
+		  (combine (attr :href) (text))
+		  (map-apply #'(lambda (url text)
+				 (setf tests
+				       (cons
+					(list (cons "id" text)
+					      (cons "url" url)) tests)))))
+	(json:encode-json-to-string tests)))))
 
 (snooze:defroute upload (:post :application/octet-stream)
 		 (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
+;;; Read JSON pattern ---------------------------------------------------------
+
+(defun read-json-patterns (filename)
+  (let ((patterns (list))
+	(lineno 0))
+    (with-open-file (stream filename)
+      (do ((line (string-trim '(#\Space #\Tab) (read-line stream nil))
+		 (read-line stream nil)))
+          ((null line))
+	(incf lineno)
+	(if (and (> (length line) 0)
+		 (null (find (char line 0) "#;-")))
+	    (let ((json (json:decode-json-from-string line)))
+	      (setf patterns (cons (cons lineno json) patterns))))))
+    patterns))
+ 
+;;; ---------------------------------------------------------------------------
+
+(defvar *policy-xfail*)
+(defvar *policy-fail*)
+(defvar *policy-pass*)
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
 (defmacro start-server (&key (handler '*handler*) (port 8080))
   "Initialize an HTTP handler"
+
+  (setf snooze:*catch-errors* :verbose)
+
+  (setf *policy-xfail* (read-json-patterns "XFAIL"))
+  (setf *policy-fail* (read-json-patterns "FAIL"))
+  (setf *policy-pass* (read-json-patterns "PASS"))
+  
   (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
   `(setf handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
 

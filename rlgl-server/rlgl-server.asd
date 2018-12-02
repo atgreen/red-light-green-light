@@ -23,6 +23,7 @@
   :serial t
   :components ((:file "package")
 	       (:file "storage-local")
+	       (:file "parser-oscap-oval")
 	       (:file "rlgl-server"))
-  :depends-on (:snooze :cl-json :zs3 :hunchentoot))
+  :depends-on (:snooze :cl-json :plump :lquery :hunchentoot))
 
