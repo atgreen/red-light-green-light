@@ -69,20 +69,55 @@
 
 ;;; Read JSON pattern ---------------------------------------------------------
 
+;; Read policy files.  Ignore all blank lines and comments, which are
+;; lines starting with #, ; or -.  Each json matcher should be on a
+;; single line of text.  Record the line number of each matcher along
+;; with the matcher.
+
+(defclass policy-matcher ()
+  ((githash :initarg :githash :reader githash)
+   (lineno  :initarg :lineno  :reader lineno)
+   (matcher :initarg :matcher :reader matcher)
+   (log-entry :reader log-entry)))
+
+(defvar *git-log-table* (make-hash-table :test 'equal))
+
 (defun read-json-patterns (filename)
-  (let ((patterns (list))
-	(lineno 0))
-    (with-open-file (stream filename)
-      (do ((line (string-trim '(#\Space #\Tab) (read-line stream nil))
-		 (read-line stream nil)))
-          ((null line))
-	(incf lineno)
-	(if (and (> (length line) 0)
-		 (null (find (char line 0) "#;-")))
-	    (let ((json (json:decode-json-from-string line)))
-	      (setf patterns (cons (cons lineno json) patterns))))))
-    patterns))
- 
+  (let ((patterns (list)))
+    (let ((matcher-lines (inferior-shell:run/lines
+			  (format nil "git blame -s -l ~A" filename))))
+      (mapc (lambda (matcher-line)
+	      (let ((githash (subseq matcher-line 0 40)))
+		(multiple-value-bind (lineno location)
+		    (read-from-string (subseq matcher-line 40))
+		  (let ((line (string-trim '(#\Space #\Tab)
+					   (subseq matcher-line (+ 41 location)))))
+		    (if (and (> (length line) 0)
+			     (null (find (char line 0) "#;-")))
+			(let ((json (json:decode-json-from-string line)))
+			  (setf patterns (cons (make-instance 'policy-matcher
+							      :githash githash
+							      :lineno lineno
+							      :matcher json)
+					       patterns))))))))
+	    matcher-lines)
+
+      ;; Now go through git logs
+      (mapc (lambda (matcher)
+	      (let ((log-entry (gethash (githash matcher) *git-log-table*)))
+		(if (null log-entry)
+		    (progn
+		      (setf log-entry (inferior-shell:run/lines
+				       (format nil "git log -r ~A ~A"
+					       (githash matcher) filename)))
+		      (setf (gethash (githash matcher) *git-log-table*) log-entry)))
+		(setf (slot-value matcher 'log-entry) log-entry)))
+	    patterns)
+
+      patterns)))
+
+; (read-json-patterns "XFAIL")
+
 ;;; ---------------------------------------------------------------------------
 
 (defvar *policy-xfail*)
