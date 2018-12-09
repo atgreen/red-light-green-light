@@ -39,10 +39,19 @@
   ((name :initarg :name :reader name)))
 
 ;; ----------------------------------------------------------------------------
+;; Policy
+
+(defclass policy ()
+  ((xfail-matchers :reader xfail-matchers)
+   (pass-matchers  :reader pass-matchers)
+   (fail-matchers  :reader fail-matchers))
+  )
+
+;; ----------------------------------------------------------------------------
 ;; API routes
 
 (snooze:defroute start (:get :text/plain)
-  (setf *player-count* (+ 10 *player-count*))
+  (setf *player-count* (+ 1 *player-count*))
   (format nil "~A" *player-count*))
 
 (snooze:defroute evaluate (:post :application/json)
@@ -80,6 +89,9 @@
    (matcher :initarg :matcher :reader matcher)
    (log-entry :reader log-entry)))
 
+(defclass regex-policy-matcher (policy-matcher)
+  ())
+
 (defvar *git-log-table* (make-hash-table :test 'equal))
 
 (defun read-json-patterns (filename)
@@ -95,7 +107,7 @@
 		    (if (and (> (length line) 0)
 			     (null (find (char line 0) "#;-")))
 			(let ((json (json:decode-json-from-string line)))
-			  (setf patterns (cons (make-instance 'policy-matcher
+			  (setf patterns (cons (make-instance 'regex-policy-matcher
 							      :githash githash
 							      :lineno lineno
 							      :matcher json)
@@ -116,28 +128,54 @@
 
       patterns)))
 
-; (read-json-patterns "XFAIL")
+(defvar *policy* (make-instance 'policy))
+(setf (slot-value *policy* 'xfail-matchers) (read-json-patterns "XFAIL"))
+(setf (slot-value *policy* 'pass-matchers) (read-json-patterns "PASS"))
+(setf (slot-value *policy* 'fail-matchers) (read-json-patterns "FAIL"))
 
 ;;; ---------------------------------------------------------------------------
 
-(defvar *policy-xfail*)
-(defvar *policy-fail*)
-(defvar *policy-pass*)
+(defvar *a* '((:a . "1") (:b . "2") (:c . "3")))
+(defvar *b* '((:c . "3")))
 
+(defun match-pair-in-alist (pair alist)
+  "Given a cons PAIR, return non-NIL if that PAIR matches
+in ALIST, where a match means the CDRs are EQUALP."
+  (let ((c (assoc (car pair) alist)))
+    (and c (equalp (cdr pair) (cdr c)))))
+
+(defun match-candidate-pattern (candidate pattern)
+  "Given a CANDIDATE alist, return T if PATTERN matches CANDIDATE."
+  (not (find-if-not (lambda (v)
+		      (match-pair-in-alist v candidate))
+		    pattern)))
+
+;(defmethod match ((matcher regex-polixy-matcher) candidate)
+;  (match-candidate-pattern candidate (matcher matcher)))
+
+(defun apply-matchers (matchers result)
+  (mapcar (lambda (matcher)
+	    (if (match-candidate-pattern result matcher)
+		result
+		nil))
+	  matchers))
+
+(defun apply-policy (policy result-list)
+  (mapcar (lambda (result)
+	    ;;
+	    )
+	  result-list))
+	  
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
-(defmacro start-server (&key (handler '*handler*) (port 8080))
+(defmacro start-server (&key (handler '*handler*) (port 8081))
   "Initialize an HTTP handler"
 
   (setf snooze:*catch-errors* :verbose)
 
-  (setf *policy-xfail* (read-json-patterns "XFAIL"))
-  (setf *policy-fail* (read-json-patterns "FAIL"))
-  (setf *policy-pass* (read-json-patterns "PASS"))
-  
   (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
-  `(setf handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
+  `(setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -149,8 +187,11 @@
   "Start the web application and have the main thread sleep forever,
   unless INTERACTIVE is non-nil."
   (start-server)
-  (loop
-     (sleep 3000)))
+  ;; If ARG is NIL, then exit right away.  This is used by the
+  ;; testsuite.
+  (if arg
+      (loop
+	 (sleep 3000))))
 
 (defun stop-rlgl-server ()
   "Stop the web application."
