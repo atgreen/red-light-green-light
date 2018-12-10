@@ -68,8 +68,11 @@
 				 (setf tests
 				       (cons
 					(list (cons "id" text)
-					      (cons "url" url)) tests)))))
-	(json:encode-json-to-string tests)))))
+					      (cons "url" url))
+					tests)))))
+	(if (null tests)
+	    "ERROR"
+	    (json:encode-json-to-string tests))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
 		 (store-document *storage-driver* (hunchentoot:raw-post-data)))
