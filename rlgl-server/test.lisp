@@ -27,7 +27,7 @@
 	 (drakma:http-request "http://localhost:8081/upload"
 			      :method :post
 			      :content-type "application/octet-stream"
-			      :content #p"./test.lisp")))
+			      :content #p"../test/report.html")))
     (like upload-ref "rlgl-[A-Z0-9]+")
     (setf *upload-ref* upload-ref)))
     
