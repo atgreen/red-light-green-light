@@ -22,10 +22,11 @@
            :version "0"
   :serial t
   :components ((:file "matcher")
+	       (:file "policy")
 	       (:file "package")
 	       (:file "storage-local")
 	       (:file "parser-oscap-oval")
 	       (:file "rlgl-server"))
-  :depends-on (:snooze :cl-json :plump :lquery :inferior-shell :hunchentoot))
+  :depends-on (:snooze :cl-json :plump :lquery :inferior-shell :cl-fad :hunchentoot))
 
 

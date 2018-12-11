@@ -19,7 +19,7 @@
 ;;;; package.lisp
 
 (defpackage #:rlgl-server
-  (:use #:snooze #:cl #:matcher)
+  (:use #:snooze #:cl #:matcher #:policy)
   (:shadow #:package)
   (:export #:start-rlgl-server #:stop-rlgl-server))
 
