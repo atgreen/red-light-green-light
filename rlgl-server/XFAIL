@@ -4,7 +4,7 @@
 # patterns for things we expect to fail and we'll ignore.
 
 # Let's ignore every CVS from 2018
-{ "id": "CVE-2018-*" }
+{ "id": "CVE-2018-10881" }
 
 # Ignore all moderate severity issues
 { "severity": "moderate" }
