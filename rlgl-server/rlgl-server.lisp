@@ -86,12 +86,6 @@
 ;; single line of text.  Record the line number of each matcher along
 ;; with the matcher.
 
-(defclass policy-matcher ()
-  ((githash :initarg :githash :reader githash)
-   (lineno  :initarg :lineno  :reader lineno)
-   (matcher :initarg :matcher :reader matcher)
-   (log-entry :reader log-entry)))
-
 (defclass regex-policy-matcher (policy-matcher)
   ())
 
@@ -137,24 +131,6 @@
 (setf (slot-value *policy* 'fail-matchers) (read-json-patterns "FAIL"))
 
 ;;; ---------------------------------------------------------------------------
-
-(defvar *a* '((:a . "1") (:b . "2") (:c . "3")))
-(defvar *b* '((:c . "3")))
-
-(defun match-pair-in-alist (pair alist)
-  "Given a cons PAIR, return non-NIL if that PAIR matches
-in ALIST, where a match means the CDRs are EQUALP."
-  (let ((c (assoc (car pair) alist)))
-    (and c (equalp (cdr pair) (cdr c)))))
-
-(defun match-candidate-pattern (candidate pattern)
-  "Given a CANDIDATE alist, return T if PATTERN matches CANDIDATE."
-  (not (find-if-not (lambda (v)
-		      (match-pair-in-alist v candidate))
-		    pattern)))
-
-;(defmethod match ((matcher regex-polixy-matcher) candidate)
-;  (match-candidate-pattern candidate (matcher matcher)))
 
 (defun apply-matchers (matchers result)
   (mapcar (lambda (matcher)

@@ -21,7 +21,8 @@
   :author "Anthony Green <green@moxielogic.com>"
            :version "0"
   :serial t
-  :components ((:file "package")
+  :components ((:file "matcher")
+	       (:file "package")
 	       (:file "storage-local")
 	       (:file "parser-oscap-oval")
 	       (:file "rlgl-server"))

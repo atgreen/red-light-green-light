@@ -5,6 +5,7 @@
 (defpackage rlgl-server-test
   (:use :cl
 	:rlgl-server
+	:matcher
 	:drakma
 	:prove))
 (in-package :rlgl-server-test)
@@ -14,6 +15,30 @@
 (plan 1)
 
 (start-rlgl-server nil)
+
+;; -----------------------------------------------------------------------------
+;; matcher tests
+;; -----------------------------------------------------------------------------
+
+(let ((a '((:a . "1") (:b . "2") (:c . "3")))
+      (b '(:c . "3"))
+      (c '(:c . "4"))
+      (d '(:d . "5")))
+  
+  (subtest "match-pair-in-alist"
+    (ok (not (match-pair-in-alist d a)))
+    (ok (not (match-pair-in-alist c a)))
+    (ok (match-pair-in-alist b a)))
+
+  (subtest "match-candidate-pattern"
+    (ok (match-candidate-pattern a a))
+    (ok (match-candidate-pattern a (list b)))
+    (ok (not (match-candidate-pattern a (list b c)))))
+  )
+
+;; -----------------------------------------------------------------------------
+;; API tests
+;; -----------------------------------------------------------------------------
 
 (subtest "start test"
   (loop for i from 5556 to 5566
