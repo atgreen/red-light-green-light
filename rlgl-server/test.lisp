@@ -6,6 +6,7 @@
   (:use :cl
 	:rlgl-server
 	:matcher
+	:policy
 	:drakma
 	:prove))
 (in-package :rlgl-server-test)
@@ -35,6 +36,13 @@
     (ok (match-candidate-pattern a (list b)))
     (ok (not (match-candidate-pattern a (list b c)))))
   )
+
+;; -----------------------------------------------------------------------------
+;; policy tests
+;; -----------------------------------------------------------------------------
+
+(subtest "policy"
+  (ok (make-policy "..")))
 
 ;; -----------------------------------------------------------------------------
 ;; API tests
