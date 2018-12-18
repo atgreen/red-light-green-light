@@ -21,19 +21,20 @@
 (defpackage #:matcher
   (:use #:cl)
   (:shadow #:package)
-  (:export #:make-policy-matcher #:githash #:log-entry
+  (:export #:make-policy-matcher #:matcher #:githash #:log-entry
 	   #:match-pair-in-alist #:match-candidate-pattern))
 
 (in-package #:matcher)
 
 (defclass policy-matcher ()
-  ((githash :initarg :githash :reader githash)
+  ((kind    :initarg :kind    :reader kind)
+   (githash :initarg :githash :reader githash)
    (lineno  :initarg :lineno  :reader lineno)
    (matcher :initarg :matcher :reader matcher)
    (log-entry :reader log-entry)))
 
-(defun make-policy-matcher (&key githash lineno matcher)
-  (make-instance 'policy-matcher :githash githash :lineno lineno :matcher matcher))
+(defun make-policy-matcher (&key kind githash lineno matcher)
+  (make-instance 'policy-matcher :kind kind :githash githash :lineno lineno :matcher matcher))
 
 (defun match-pair-in-alist (pair alist)
   "Given a cons PAIR, return non-NIL if that PAIR matches
