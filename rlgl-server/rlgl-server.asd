@@ -27,6 +27,6 @@
 	       (:file "storage-local")
 	       (:file "parser-oscap-oval")
 	       (:file "rlgl-server"))
-  :depends-on (:snooze :cl-json :plump :lquery :inferior-shell :cl-fad :hunchentoot))
+  :depends-on (:snooze :cl-json :plump :lquery :inferior-shell :cl-fad :hunchentoot :spinneret))
 
 
