@@ -58,18 +58,79 @@
 		  (map-apply #'(lambda (url text)
 				 (setf tests
 				       (cons
-					(list (cons "id" text)
-					      (cons "url" url))
+					(json:decode-json-from-string
+					 (format nil "{ \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+						 text url))
 					tests)))))
 	(if (null tests)
 	    "ERROR"
-	    (json:encode-json-to-string tests))))))
+	    (let ((processed-results (apply-policy *policy* tests)))
+	      (format t "*****[~A]~%" processed-results)
+	      (render processed-results)
+	      (json:encode-json-to-string tests)))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
 		 (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
+;;; Render processed results to HTML
+
+(defmacro with-page ((&key title) &body body)
+   `(with-html
+      (:doctype)
+      (:html
+        (:head
+         (:title ,title))
+        (:body ,@body))))
+
+(defun render (results)
+  (with-open-file (stream "/tmp/rp.html"
+			  :direction :output
+			  :if-exists :supersede
+			  :if-does-not-exist :create)
+    (let ((*html* stream))
+      (with-page (:title "Report")
+	(:header
+	 (:style
+"#results {
+  font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+#results td, #results th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#results tr:nth-child(even){background-color: #f2f2f2;}
+
+#results tr:hover {background-color: #ddd;}
+
+#results th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}")
+	 (:h1 "Report"))
+	(:section
+	 ("This is your report")
+	 (:table :id "results"
+		 (:body
+		  (:tr (:th "RESULT") (:th "ID")) 
+		  (dolist (item results)
+		    (let ((matcher (car item))
+			  (alist (cdr item)))
+		      (:tr
+		       (:td "FAIL")
+		       (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist))))))))))
+	(:footer ("All done"))))))
+	      
 ;;; Read JSON pattern ---------------------------------------------------------
 
 ;; Read policy files.  Ignore all blank lines and comments, which are
@@ -79,21 +140,6 @@
 
 (defvar *policy* (make-policy #p"."))
 
-;;; ---------------------------------------------------------------------------
-
-(defun apply-matchers (matchers result)
-  (mapcar (lambda (matcher)
-	    (if (match-candidate-pattern result matcher)
-		result
-		nil))
-	  matchers))
-
-(defun apply-policy (policy result-list)
-  (mapcar (lambda (result)
-	    ;;
-	    )
-	  result-list))
-	  
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
