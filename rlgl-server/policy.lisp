@@ -21,7 +21,7 @@
 (defpackage #:policy
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
-  (:export #:make-policy))
+  (:export #:make-policy #:apply-policy))
 
 (in-package #:policy)
 
@@ -44,12 +44,12 @@
 	  (list xfail-file pass-file fail-file))
     
     (let ((p (make-instance 'policy)))
-      (setf (slot-value p 'xfail-matchers) (read-json-patterns xfail-file))
-      (setf (slot-value p 'pass-matchers) (read-json-patterns pass-file))
-      (setf (slot-value p 'fail-matchers) (read-json-patterns fail-file))
+      (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
+      (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
+      (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
       p)))
 
-(defun read-json-patterns (filename)
+(defun read-json-patterns (kind filename)
   (let ((patterns (list)))
     (let ((matcher-lines (inferior-shell:run/lines
 			  (format nil "git blame -s -l ~A" filename))))
@@ -62,7 +62,8 @@
 		    (if (and (> (length line) 0)
 			     (null (find (char line 0) "#;-")))
 			(let ((json (json:decode-json-from-string line)))
-			  (setf patterns (cons (make-policy-matcher :githash githash
+			  (setf patterns (cons (make-policy-matcher :kind kind
+								    :githash githash
 								    :lineno lineno
 								    :matcher json)
 					       patterns))))))))
@@ -70,15 +71,33 @@
 
       ;; Now go through git logs
       (mapc (lambda (matcher)
-	      (let ((log-entry (gethash (githash matcher) *git-log-table*)))
-		(if (null log-entry)
+	      (let* ((githash (githash matcher))
+		     (log-entry (gethash githash *git-log-table*)))
+		(if (and (null log-entry)
+			 (not (string= githash ; check for local change
+				       "0000000000000000000000000000000000000000")))
 		    (progn
 		      (setf log-entry (inferior-shell:run/lines
 				       (format nil "git log -r ~A ~A"
-					       (githash matcher) filename)))
-		      (setf (gethash (githash matcher) *git-log-table*) log-entry)))
+					       githash filename)))
+		      (setf (gethash githash *git-log-table*) log-entry)))
 		(setf (slot-value matcher 'log-entry) log-entry)))
 	    patterns)
 
       patterns)))
 
+(defun apply-policy (policy candidate-result-list)
+  (mapcar (lambda (result)
+	    (cons
+	     (or
+	      (find-if (lambda (matcher)
+			 (match-candidate-pattern result (matcher matcher)))
+		       (xfail-matchers policy))
+	      (find-if (lambda (matcher)
+			 (match-candidate-pattern result (matcher matcher)))
+		       (fail-matchers policy))
+	      (find-if (lambda (matcher)
+			 (match-candidate-pattern result (matcher matcher)))
+		       (pass-matchers policy)))
+	     result))
+	  candidate-result-list))
