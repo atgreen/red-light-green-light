@@ -117,7 +117,7 @@ For example, to mark a CVE failure as an exception, we add the
 following to our `XFAIL` file:
 
     # Ignore this failure in our container images
-    { cve: "CVE-2014-4043" }
+    { id: "CVE-2014-4043" }
 
 To ignore all CVEs with a score of less than 7 we add the following to
 our `XFAIL` file:
