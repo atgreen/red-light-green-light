@@ -23,3 +23,6 @@ cover:
 	     --eval '(sb-cover:report "./coverage/")' \
 	     --eval '(sb-ext:quit)'
 
+clean:
+	@rm -f coverage/* rlgl-server *~
+
