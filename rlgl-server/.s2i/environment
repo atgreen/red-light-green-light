@@ -1,0 +1,2 @@
+APP_SYSTEM_NAME=rlgl-server
+APP_EVAL="(rlgl-server:start-rlgl-server)"
