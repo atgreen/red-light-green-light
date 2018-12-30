@@ -138,7 +138,9 @@
 ;; single line of text.  Record the line number of each matcher along
 ;; with the matcher.
 
-(defvar *policy* (make-policy #p"."))
+(defvar *policy* nil)
+
+; FIXME - above should be something like (make-policy #p".")
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
