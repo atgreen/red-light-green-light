@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+echo "---> Installing application source ..."
+whoami
+touch ./a-file
+mkdir -p ./quicklisp/local-projects/${APP_SYSTEM_NAME}
+cp -Rf /tmp/src/. ./quicklisp/local-projects/${APP_SYSTEM_NAME}
+
+echo "---> Building your AWESOME Common Lisp application from source ..."
+sbcl --eval "(sb-ext:restrict-compiler-policy 'debug 3)" --eval "(ql:quickload :`eval echo ${APP_SYSTEM_NAME}`)" --eval "(quit)"
+
+find ./quicklisp
+
+chown -R 1001 ./quicklisp
+
+echo "==============================================================="
+echo "==============================================================="
+echo "==============================================================="
+echo "==============================================================="
+echo "==============================================================="
+echo "==============================================================="
+
+find ./quicklisp
