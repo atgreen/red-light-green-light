@@ -161,7 +161,7 @@
 
 (defun start-rlgl-server (arg)
   "Start the web application and have the main thread sleep forever,
-  unless INTERACTIVE is non-nil."
+  unless INTERACTIVE is nil."
   (start-server)
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
