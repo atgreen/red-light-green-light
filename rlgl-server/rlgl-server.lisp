@@ -162,6 +162,7 @@
 (defun start-rlgl-server (arg)
   "Start the web application and have the main thread sleep forever,
   unless INTERACTIVE is nil."
+  (setf hunchentoot:*show-lisp-errors-p* t)
   (start-server)
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
