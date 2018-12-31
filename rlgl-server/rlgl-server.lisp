@@ -145,7 +145,7 @@
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
-(defmacro start-server (&key (handler '*handler*) (port 8081))
+(defmacro start-server (&key (handler '*handler*) (port 8080))
   "Initialize an HTTP handler"
 
   (setf snooze:*catch-errors* :verbose)
