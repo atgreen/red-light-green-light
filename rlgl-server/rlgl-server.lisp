@@ -151,7 +151,7 @@
   (setf snooze:*catch-errors* :verbose)
   (format t "PRE: ~A~%" hunchentoot:*dispatch-table*)
   (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
-  (format nil "POST: ~A~%" hunchentoot:*dispatch-table*)
+  (format t "POST: ~A~%" hunchentoot:*dispatch-table*)
   `(setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
 
 (defmacro stop-server (&key (handler '*handler*))
