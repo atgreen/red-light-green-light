@@ -55,7 +55,7 @@
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
     (let ((matcher-lines (inferior-shell:run/lines
-			  (format nil "bash -c \"(cd test-policy; git blame -s -l ~A)\"" filename))))
+			  (format nil "bash -c \"(cd test-policy; git blame -s -l ~A)\"" "XFAIL"))))
       (mapc (lambda (matcher-line)
 	      (let ((githash (subseq matcher-line 0 40)))
 		(multiple-value-bind (lineno location)
