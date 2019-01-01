@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; rlgl-server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@
 ;; ----------------------------------------------------------------------------
 
 (defun read-file-into-string (filename)
-  (with-open-file (stream filename)
+  (with-open-file (stream filename :external-format :UTF-8)
     (let ((contents (make-string (file-length stream))))
       (read-sequence contents stream)
       contents)))
