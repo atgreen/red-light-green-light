@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; rlgl-server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
@@ -33,10 +33,13 @@
    (fail-matchers  :reader fail-matchers))
   )
 
-(defun make-policy (directory)
-  (let ((xfail-file (merge-pathnames-as-file directory #p"XFAIL"))
-	(pass-file (merge-pathnames-as-file directory #p"PASS"))
-	(fail-file (merge-pathnames-as-file directory #p"FAIL")))
+(defun make-policy (url)
+
+  (inferior-shell:run (format nil "git clone ~A" url))
+  
+  (let ((xfail-file (merge-pathnames-as-file #p"test-policy/" #p"XFAIL"))
+	(pass-file (merge-pathnames-as-file #p"test-policy/" #p"PASS"))
+	(fail-file (merge-pathnames-as-file #p"test-policy/" #p"FAIL")))
 
     (mapc (lambda (file)
 	    (if (not (file-exists-p file))

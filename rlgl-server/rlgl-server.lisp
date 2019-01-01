@@ -163,7 +163,8 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
-  (setf *policy* (make-policy #p"/tmp/src/"))
+  (setf *policy* (make-policy
+		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
   (start-server)
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
