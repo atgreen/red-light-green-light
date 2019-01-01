@@ -163,7 +163,7 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
-  (setf *policy* (make-policy #p"."))
+  (setf *policy* (make-policy #p"/tmp/src"))
   (start-server)
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
