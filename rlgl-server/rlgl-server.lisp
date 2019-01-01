@@ -140,8 +140,6 @@
 
 (defvar *policy* nil)
 
-; FIXME - above should be something like (make-policy #p".")
-
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
@@ -165,9 +163,8 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
-  (format t "WHHHHHHHHHHHHHHHHAAAAAAAAAAAATTTTTTTTTTTTT?")
+  (setf *policy* (make-policy #p"."))
   (start-server)
-  (format t "OK?")
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
   (if arg
