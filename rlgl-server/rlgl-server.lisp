@@ -165,7 +165,9 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
+  (format t "WHHHHHHHHHHHHHHHHAAAAAAAAAAAATTTTTTTTTTTTT?")
   (start-server)
+  (format t "OK?")
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
   (if arg
