@@ -147,12 +147,12 @@
 
 (defmacro start-server (&key (handler '*handler*) (port 8080))
   "Initialize an HTTP handler"
-
-  (setf snooze:*catch-errors* :verbose)
-  (format t "PRE: ~A~%" hunchentoot:*dispatch-table*)
-  (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
-  (format t "POST: ~A~%" hunchentoot:*dispatch-table*)
-  `(setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port))))
+  `(progn
+     (setf snooze:*catch-errors* :verbose)
+     (format t "PRE: ~A~%" hunchentoot:*dispatch-table*)
+     (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
+     (format t "POST: ~A~%" hunchentoot:*dispatch-table*)
+     (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port)))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
