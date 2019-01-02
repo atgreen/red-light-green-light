@@ -1,4 +1,4 @@
-run:
+all:
 	buildapp --output rlgl-server \
 		--asdf-path `pwd`/.. \
 		--asdf-tree ~/quicklisp/dists/quicklisp/software \
