@@ -35,7 +35,10 @@
 
 (defun make-policy (url)
 
-  (inferior-shell:run (format nil "git clone ~A" url))
+  (let ((output (inferior-shell:run (format nil "/usr/bin/git clone ~A" url))))
+    (mapc (lambda (line)
+	    (format t line))
+	  output))
   
   (let ((xfail-file (merge-pathnames-as-file #p"test-policy/" #p"XFAIL"))
 	(pass-file (merge-pathnames-as-file #p"test-policy/" #p"PASS"))
