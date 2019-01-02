@@ -34,7 +34,7 @@ func main() {
       Usage:   "create a Player ID",
       Action:  func(c *cli.Context) error {
 
-  	response, err := http.Get("http://localhost:8080/start")
+  	response, err := http.Get("https://rlgl-server-rlgl.apps.home.labdroid.net/start")
 
 	if err != nil {
 		fmt.Print(err.Error())
@@ -73,7 +73,7 @@ func main() {
       file, err := os.Open(c.Args().Get(0));
       defer file.Close();
 
-      res, err := http.Post("http://localhost:8080/upload", "application/octet-stream", file);
+      res, err := http.Post("https://rlgl-server-rlgl.apps.home.labdroid.net/upload", "application/octet-stream", file);
       if err != nil {
       	 // panic(err)
 	 }
@@ -84,7 +84,7 @@ func main() {
           values := map[string]string{"name": file.Name(), "ref": string(message[:])}
 	  jsonValue, _ := json.Marshal(values)
 
-	 response, err := http.Post("http://localhost:8080/evaluate/", "application/json", bytes.NewBuffer(jsonValue))
+	 response, err := http.Post("https://rlgl-server-rlgl.apps.home.labdroid.net/evaluate/", "application/json", bytes.NewBuffer(jsonValue))
 
 	if err != nil {
 		fmt.Print(err.Error())
@@ -103,7 +103,7 @@ func main() {
   }
 
   app.Name = "rlgl"
-  app.Copyright = "(c) 2018 Anthony Green"
+  app.Copyright = "(c) 2018, 2019 Anthony Green"
   app.Compiled = time.Now()
   app.Authors = []cli.Author{
   	  cli.Author{
