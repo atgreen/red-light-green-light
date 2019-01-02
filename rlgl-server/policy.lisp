@@ -84,8 +84,8 @@
 				       "0000000000000000000000000000000000000000")))
 		    (progn
 		      (setf log-entry (inferior-shell:run/lines
-				       (format nil "git log -r ~A ~A"
-					       githash filename)))
+				       (format nil "bash -c \"(cd test-policy; git log -r ~A ~A)\""
+					       githash "XFAIL")))
 		      (setf (gethash githash *git-log-table*) log-entry)))
 		(setf (slot-value matcher 'log-entry) log-entry)))
 	    patterns)
