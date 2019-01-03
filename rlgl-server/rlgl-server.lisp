@@ -61,9 +61,7 @@
   margin-left: 20%;
   margin-right: 20%;
 }")
-     (:h1 "Red Light Green Light"))
-    (:section
-     ("Server is running."))))
+     (:h1 "Red Light Green Light"))))
 
 (snooze:defroute start (:get :text/plain)
   (setf *player-count* (+ 1 *player-count*))
