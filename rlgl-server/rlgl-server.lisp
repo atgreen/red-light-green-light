@@ -22,8 +22,10 @@
 
 (defvar *player-count* 5555)
 
-(defparameter *default-config* "[rlgl]
-player-id-start = 5555
+(defvar *config* nil)
+
+(defparameter *default-config-text*
+"player-id-start = 7777
 ")
 
 ;; ----------------------------------------------------------------------------
@@ -151,9 +153,7 @@ player-id-start = 5555
   "Initialize an HTTP handler"
   `(progn
      (setf snooze:*catch-errors* :verbose)
-     (format t "PRE: ~A~%" hunchentoot:*dispatch-table*)
      (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
-     (format t "POST: ~A~%" hunchentoot:*dispatch-table*)
      (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port)))))
 
 (defmacro stop-server (&key (handler '*handler*))
@@ -167,7 +167,10 @@ player-id-start = 5555
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
-  (format t "~A~%" (cl-toml:parse *default-config*))
+  (setf *config* (cl-toml:parse *default-config-text*))
+  
+  (setf *player-count* (gethash "player-id-start" *config*))
+  
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
   (start-server)
