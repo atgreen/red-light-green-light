@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; Rlgl-Server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
@@ -27,6 +27,6 @@
 	       (:file "storage-local")
 	       (:file "parser-oscap-oval")
 	       (:file "rlgl-server"))
-  :depends-on (:snooze :cl-json :plump :lquery :inferior-shell :cl-fad :hunchentoot :spinneret))
+  :depends-on (:cl-toml :snooze :cl-json :plump :lquery :inferior-shell :cl-fad :hunchentoot :spinneret))
 
 

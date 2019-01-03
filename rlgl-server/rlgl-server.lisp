@@ -22,6 +22,10 @@
 
 (defvar *player-count* 5555)
 
+(defparameter *default-config* "[rlgl]
+player-id-start = 5555
+")
+
 ;; ----------------------------------------------------------------------------
 ;; Storage backends
 
@@ -40,28 +44,6 @@
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
-
-(defmacro with-page-string ((&key title) &body body)
-   `(with-html-string
-      (:doctype)
-      (:html
-        (:head
-         (:title ,title))
-        (:body ,@body))))
-
-(hunchentoot:define-easy-handler (top-level :uri "/") ()
-  (setf (hunchentoot:content-type*) "text/plain")
-  (with-page (:title "Red Light Green Light")
-    (:header
-     (:style
-      "{
-  font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 60%;
-  margin-left: 20%;
-  margin-right: 20%;
-}")
-     (:h1 "Red Light Green Light"))))
 
 (snooze:defroute start (:get :text/plain)
   (setf *player-count* (+ 1 *player-count*))
@@ -185,6 +167,7 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
+  (format t "~A~%" (cl-toml:parse *default-config*))
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
   (start-server)
