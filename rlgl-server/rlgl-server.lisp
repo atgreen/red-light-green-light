@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; rlgl-server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
@@ -40,6 +40,30 @@
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
+
+(defmacro with-page-string ((&key title) &body body)
+   `(with-html-string
+      (:doctype)
+      (:html
+        (:head
+         (:title ,title))
+        (:body ,@body))))
+
+(hunchentoot:define-easy-handler (top-level :uri "/") ()
+  (setf (hunchentoot:content-type*) "text/plain")
+  (with-page (:title "Red Light Green Light")
+    (:header
+     (:style
+      "{
+  font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 60%;
+  margin-left: 20%;
+  margin-right: 20%;
+}")
+     (:h1 "Red Light Green Light"))
+    (:section
+     ("Server is running."))))
 
 (snooze:defroute start (:get :text/plain)
   (setf *player-count* (+ 1 *player-count*))
