@@ -28,7 +28,7 @@ tools introduces problems:
 Policy Driven Quality Gates
 ------------------------------
 
-The idea behind Red Light Green Light is that to decouple the test
+The main idea behind Red Light Green Light is to decouple the test
 evaluation mechanisms and policies from the underlying testing tools,
 in a way that they are:
 
