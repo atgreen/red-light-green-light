@@ -39,7 +39,7 @@ they are:
  - protected with authentication/authorization mechanisms
 
 The goal of all of this is to enable auditors to easily answer the
-following questions as they related to any artifact promoted through a
+following questions as they relate to any artifact promoted through a
 CI/CD pipeline:
 
  - who presented test results for evaluation?
