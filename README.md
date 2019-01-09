@@ -28,9 +28,9 @@ tools introduces problems:
 Policy Driven Quality Gates
 ------------------------------
 
-The idea behind Red Light Green Light is that we decouple the test
-evaluation policies from the underlying testing tools, in a way that
-they are:
+The idea behind Red Light Green Light is that to decouple the test
+evaluation mechanisms and policies from the underlying testing tools,
+in a way that they are:
 
  - centrally managed
  - version controlled
@@ -42,7 +42,7 @@ Here are the basic concepts:
 
 - Each deployable artifact is given a Player ID.  The Player ID is
   what flows down the pipeline along with the various build/deploy
-  artifacts.  They would be attached as artifact metadata.
+  artifacts.  They would be attached as artefact metadata.
 
 ```
 $ ID=$(rlgl start)
@@ -50,29 +50,31 @@ $ ID=$(rlgl start)
 
 - As the pipeline proceeds, test results are generated (scans, unit
   tests, etc).  For each test report generated, `rlgl` evaluates the
-  report against the stated policy, resulting in a **Red Light**, meaning
-  stop the pipeline, or **Green Light**, meaning proceed with the
-  pipeline.
+  report against the stated policy, resulting in a **Red Light**,
+  meaning stop the pipeline, or **Green Light**, meaning proceed with
+  the pipeline.  It also produces a URL, which links to a report
+  showing annotated evaluation results.  Annotations, include, for
+  example, the git logs for policies defining exceptions resulting in
+  green lights.
 
 ```shell
-$ rlgl test --policy=dev $ID my-test-report.html
-green
+$ rlgl evaluate --policy=dev $ID my-test-report.html
+green: http://rlgl-server.example.com/bc7db3f.html
 ```
 
 ```shell
-$ rlgl test --policy=global-prod $ID oval-scan.xml
-red
+$ rlgl evaluate --policy=global-prod $ID oval-scan.xml
+red: http://rlgl-server.example.com/1cf5b3a.html
 ```
    
 ```shell
-$ rlgl test --policy=my-proj $ID gcc.log
-green
+$ rlgl evaluate --policy=my-proj $ID gcc.log
+green: http://rlgl-server.example.com/afc7db2.html
 ```
 
 That's it!   The client side is very easy.   
 
 The server side, where policy is evaluated, is where the magic is.
-
 
 The first step is to identify the type of report we're evaluating and
 convert it into a canonical form.  The canonical form is defined
@@ -103,6 +105,9 @@ The `XFAIL`, `FAIL`, `PASS` files are maintained in a git repo.  The git
 repo (and credentials) are identified by the policy ID.  Changing
 policy requires modifying the policy in git, which is logged and
 auditable.
+
+The server side also records which policies have received green
+lights, and can report on those facts.
 
 
 Policy in Detail
