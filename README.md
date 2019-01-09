@@ -29,8 +29,8 @@ Policy Driven Quality Gates
 ------------------------------
 
 The main idea behind Red Light Green Light is to decouple the test
-evaluation mechanisms and policies from the underlying testing tools,
-in a way that they are:
+evaluation policies from the underlying testing tools, in a way that
+they are:
 
  - centrally managed
  - version controlled
@@ -38,14 +38,23 @@ in a way that they are:
  - customizeable
  - protected with authentication/authorization mechanisms
 
+The goal of all of this is to enable auditors to easily answer the
+following questions as they related to any artifact promoted through a
+CI/CD pipeline:
+
+ - who presented test results for evaluation?
+ - what were those test results?
+ - what policies were they evaluated against?
+ - who defined the policies and when?
+
 Here are the basic concepts:
 
 - Each deployable artifact is given a Player ID.  The Player ID is
   what flows down the pipeline along with the various build/deploy
-  artifacts.  They would be attached as artefact metadata.
+  artifacts.  They would be attached as artifact metadata.
 
 ```
-$ ID=$(rlgl start)
+$ ID=$(rlgl start -u USERNAME -p PASSWORD)
 ```
 
 - As the pipeline proceeds, test results are generated (scans, unit
@@ -78,8 +87,7 @@ The server side, where policy is evaluated, is where the magic is.
 
 The first step is to identify the type of report we're evaluating and
 convert it into a canonical form.  The canonical form is defined
-simply as this: a json object.  That's it.  No special schema is
-defined.
+simply as this: a json object.  No special schema is defined.
 
 Policy is also defined in plain text divided into three files: `XFAIL`,
 `FAIL`, and `PASS`.  Each of these files contains a list of json matching
@@ -99,16 +107,16 @@ the test results.
 
 Any remaining entries in the test results are recorded as UNKNOWN.
 `rlgl` interprets these as failures, but they are reported as UNKNOWN in
-order aim for 100% coverage of the `PASS`/FAIL scans.
+order aim for 100% coverage of the `PASS`/`FAIL` scans.
 
 The `XFAIL`, `FAIL`, `PASS` files are maintained in a git repo.  The git
 repo (and credentials) are identified by the policy ID.  Changing
 policy requires modifying the policy in git, which is logged and
 auditable.
 
-The server side also records which policies have received green
-lights, and can report on those facts.
-
+In addition to this simple test evaluation service, the server can
+report on which policies have received green lights for each Player
+ID, and records all test documents for archive and audit purposes.
 
 Policy in Detail
 ---------------
