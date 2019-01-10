@@ -24,8 +24,11 @@
 ;; Default configuration.  Overridden by external config file.
 (defvar *config* nil)
 (defparameter *default-config-text*
-"storage-driver = local
+"storage-driver = \"local\"
+server-uri = \"http://localhost:8080\"
 ")
+
+(defvar *server-uri* nil)
 
 ;; ----------------------------------------------------------------------------
 ;; Storage backends
@@ -49,7 +52,7 @@
 (snooze:defroute start (:get :text/plain)
   ; Return a random 7 character hash
   (let ((chars "abcdef0123456789"))
-    (coerce (loop repeat length collect (aref chars (random (length chars))))
+    (coerce (loop repeat 7 collect (aref chars (random (length chars))))
             'string)))
 
 (snooze:defroute evaluate (:post :application/json)
@@ -72,12 +75,19 @@
 	(if (null tests)
 	    "ERROR"
 	    (let ((processed-results (apply-policy *policy* tests)))
-	      (format t "*****[~A]~%" processed-results)
-	      (render processed-results)
-	      (json:encode-json-to-string tests)))))))
+	      (let ((stream (make-string-output-stream)))
+		(render stream processed-results)
+		(format nil "green: ~A/doc?id=~A~%~%"
+			*server-uri*
+			(store-document *storage-driver*
+					(flexi-streams:string-to-octets
+					 (get-output-stream-string stream)))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
-		 (store-document *storage-driver* (hunchentoot:raw-post-data)))
+  (store-document *storage-driver* (hunchentoot:raw-post-data)))
+
+(snooze:defroute doc (:get :text/html &key id)
+  (read-document *storage-driver* id))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
@@ -91,16 +101,12 @@
          (:title ,title))
         (:body ,@body))))
 
-(defun render (results)
-  (with-open-file (stream "/tmp/rp.html"
-			  :direction :output
-			  :if-exists :supersede
-			  :if-does-not-exist :create)
-    (let ((*html* stream))
-      (with-page (:title "Report")
-	(:header
-	 (:style
-"#results {
+(defun render (stream results)
+  (let ((*html* stream))
+    (with-page (:title "Report")
+      (:header
+       (:style
+	"#results {
   font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 60%;
@@ -124,19 +130,19 @@
   background-color: #4CAF50;
   color: white;
 }")
-	 (:h1 "Report"))
-	(:section
-	 ("This is your report")
-	 (:table :id "results"
-		 (:body
-		  (:tr (:th "RESULT") (:th "ID")) 
-		  (dolist (item results)
-		    (let ((matcher (car item))
-			  (alist (cdr item)))
-		      (:tr
-		       (:td "FAIL")
+       (:h1 "Report"))
+      (:section
+       ("This is your report")
+       (:table :id "results"
+	       (:body
+		(:tr (:th "RESULT") (:th "ID")) 
+		(dolist (item results)
+		  (let ((matcher (car item))
+			(alist (cdr item)))
+		    (:tr
+		     (:td "FAIL")
 		       (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist))))))))))
-	(:footer ("All done"))))))
+      (:footer ("All done")))))
 	      
 ;;; Read JSON pattern ---------------------------------------------------------
 
@@ -174,15 +180,17 @@
 
   ;; FIXME: lookup storage driver
   ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *config*)))
+  (setf *server-uri* (gethash "server-uri" *config*))
   
-;  (setf *policy* (make-policy
-;		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
-  (start-server)
-  ;; If ARG is NIL, then exit right away.  This is used by the
-  ;; testsuite.
-  (if arg
-      (loop
-	 (sleep 3000))))
+  (setf *policy* (make-policy
+		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
+  (let ((srvr (start-server)))
+    ;; If ARG is NIL, then exit right away.  This is used by the
+    ;; testsuite.
+    (if arg
+	(loop
+	   (sleep 3000)))
+    srvr))
 
 (defun stop-rlgl-server ()
   "Stop the web application."

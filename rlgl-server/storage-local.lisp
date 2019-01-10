@@ -68,12 +68,12 @@
 
 (defmethod store-document ((backend local-storage-backend) document)
   "Store a document into local storage."
-  (let* ((filename (format nil "rlgl-~A"
+  (let* ((filename (format nil "RLGL-~A"
 			   (generate-random-string))))
     (with-open-file (stream (format nil "~A/~A" (local-dir backend) filename)
-			  :direction :output
-			  :if-exists :supersede
-			  :if-does-not-exist :create
-			  :element-type '(unsigned-byte 8))
+			    :direction :output
+			    :if-exists :supersede
+			    :if-does-not-exist :create
+			    :element-type '(unsigned-byte 8))
       (write-sequence document stream)
       filename)))

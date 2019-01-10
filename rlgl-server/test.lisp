@@ -15,7 +15,7 @@
 
 (plan 1)
 
-(start-rlgl-server nil)
+(format t ">>>> ~A~%" (start-rlgl-server nil))
 
 ;; -----------------------------------------------------------------------------
 ;; matcher tests
@@ -41,23 +41,24 @@
 ;; policy tests
 ;; -----------------------------------------------------------------------------
 
-(subtest "policy"
-  (ok (make-policy "..")))
+;(subtest "policy"
+;  (ok (make-policy "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git")))
 
 ;; -----------------------------------------------------------------------------
 ;; API tests
 ;; -----------------------------------------------------------------------------
 
 (subtest "start test"
-  (loop for i from 5556 to 5566
+  (loop for i from 0 to 10
      do
-       (is (drakma:http-request "http://localhost:8081/start") (format nil "~A" i))))
+       (let ((id (drakma:http-request "http://localhost:8080/start")))
+	 (is (length id) 7))))
 
 (defvar *upload-ref* nil)
 
 (subtest "upload test"
   (let ((upload-ref
-	 (drakma:http-request "http://localhost:8081/upload"
+	 (drakma:http-request "http://localhost:8080/upload"
 			      :method :post
 			      :content-type "application/octet-stream"
 			      :content #p"../test/report.html")))
@@ -66,11 +67,13 @@
     
 (subtest "evaluate test"
   (print
-   (drakma:http-request "http://localhost:8081/evaluate"
+   (drakma:http-request "http://localhost:8080/evaluate"
 			:method :post
 			:content-type "application/json"
 			:content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
 
 (finalize)
+
+(sleep 3000)
 
 
