@@ -2,3 +2,4 @@ rlgl/rlgl
 rlgl-server/rlgl-server
 *~
 rlgl-server/coverage/*
+/rlgl-server/test-policy/
