@@ -7,6 +7,7 @@ all:
 		--entry "rlgl-server:start-rlgl-server"
 
 check:
+	rm -rf test-policy
 	sbcl --eval '(ql:quickload :prove)' \
 	     --eval '(ql:quickload :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
