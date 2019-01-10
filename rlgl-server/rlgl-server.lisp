@@ -20,12 +20,11 @@
 
 (in-package :rlgl-server)
 
-(defvar *player-count* 5555)
-
+;; ----------------------------------------------------------------------------
+;; Default configuration.  Overridden by external config file.
 (defvar *config* nil)
-
 (defparameter *default-config-text*
-"player-id-start = 7777
+"storage-driver = local
 ")
 
 ;; ----------------------------------------------------------------------------
@@ -48,8 +47,10 @@
 ;; API routes
 
 (snooze:defroute start (:get :text/plain)
-  (setf *player-count* (+ 1 *player-count*))
-  (format nil "~A" *player-count*))
+  ; Return a random 7 character hash
+  (let ((chars "abcdef0123456789"))
+    (coerce (loop repeat length collect (aref chars (random (length chars))))
+            'string)))
 
 (snooze:defroute evaluate (:post :application/json)
   (let ((json
@@ -167,12 +168,15 @@
   unless INTERACTIVE is nil."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
+
+  ;; Read the built-in configuration settings.
   (setf *config* (cl-toml:parse *default-config-text*))
+
+  ;; FIXME: lookup storage driver
+  ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *config*)))
   
-  (setf *player-count* (gethash "player-id-start" *config*))
-  
-  (setf *policy* (make-policy
-		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
+;  (setf *policy* (make-policy
+;		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
   (start-server)
   ;; If ARG is NIL, then exit right away.  This is used by the
   ;; testsuite.
