@@ -46,6 +46,26 @@ server-uri = \"http://localhost:8080\"
 (defclass report-parser ()
   ((name :initarg :name :reader name)))
 
+;; Run all of the scripts in recog.d until we find
+;; a match.
+(defun recognize-report (doc)
+  (let ((fname
+	 (cl-fad:with-output-to-temporary-file (stream)
+	   (print doc stream))))
+    (let ((scripts (cl-fad:list-directory "recog.d"))
+	  (result nil))
+      (find-if (lambda (script)
+		 (let ((output (inferior-shell:run/ss
+				(str:concat
+				 (namestring script) " "
+				 (namestring fname)))))
+		   (setf result output)
+		   (equal (length output) 0)))
+	       scripts)
+      (delete-file fname)
+      (make-instance (read-from-string
+		      (str:concat "parser/" result))))))
+
 ;; ----------------------------------------------------------------------------
 ;; API routes
 
