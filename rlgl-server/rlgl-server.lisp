@@ -109,7 +109,16 @@ server-uri = \"http://localhost:8080\"
       (:doctype)
       (:html
         (:head
-         (:title ,title))
+         (:title ,title)
+	 (:script :type "text/javascript"
+		  (:!--
+"
+$(function(){
+  $(\".fold-table tr.view\").on(\"click\", function(){
+    $(this).toggleClass(\"open\").next(\".fold\").toggleClass(\"open\");
+  });
+});
+")))
         (:body ,@body))))
 
 (defun render (stream results)
@@ -140,19 +149,68 @@ server-uri = \"http://localhost:8080\"
   text-align: left;
   background-color: #4CAF50;
   color: white;
-}")
+}
+
+// fold table 
+table.fold-table {
+  > tbody {
+    // view segment
+    > tr.view {
+      td, th {cursor: pointer;}
+      td:first-child, 
+      th:first-child { 
+        position: relative;
+        padding-left:20px;
+        &:before {
+          position: absolute;
+          top:50%; left:5px;
+          width: 9px; height: 16px;
+          margin-top: -8px;
+          font: 16px fontawesome;
+          color: #999;
+          content: \"\f0d7\";
+          transition: all .3s ease;
+        }
+      }
+      &:nth-child(4n-1) { background: #eee; }
+      &:hover { background: #000; }
+      &.open {
+        background: tomato;
+        color: white;
+        td:first-child, th:first-child {
+          &:before {
+            transform: rotate(-180deg);
+            color: #333;
+          }
+        }
+      }
+    }
+  
+    // fold segment
+    > tr.fold {
+      display: none;
+      &.open { display:table-row; }
+    }
+  }
+}
+")
        (:h1 "Report"))
       (:section
        ("This is your report")
-       (:table :id "results"
+       (:table :class "\"fold-table\"" :id "\"results\""
 	       (:body
-		(:tr (:th "RESULT") (:th "ID")) 
+		(:tr (:th "RESULT") (:th "ID"))
 		(dolist (item results)
 		  (let ((matcher (car item))
 			(alist (cdr item)))
-		    (:tr
-		     (:td "FAIL")
-		       (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist))))))))))
+		    (:tr :class "\"view\""
+		     (:td (cdr (assoc :RESULT alist)))
+		     (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist)))))
+		    (:tr :class "\"fold\""
+			 (:td :colspan "2")
+			 (:div :class "\"fold-content\""
+			       (:h3 "more info")))
+			 )))))
       (:footer ("All done")))))
 	      
 ;;; Read JSON pattern ---------------------------------------------------------
@@ -167,12 +225,36 @@ server-uri = \"http://localhost:8080\"
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
+(defun rlgl-root ()
+  (fad:pathname-as-directory
+   (make-pathname :name nil
+                  :type nil
+                  :defaults #.(or *compile-file-truename* *load-truename*))))
+
+(defparameter *rlgl-dispatch-table*
+  (list
+   (hunchentoot:create-folder-dispatcher-and-handler
+    "/images/" (fad:pathname-as-directory
+                (make-pathname :name "images"
+                               :defaults (rlgl-root))))
+   (hunchentoot:create-folder-dispatcher-and-handler
+    "/js/" (fad:pathname-as-directory
+            (make-pathname :name "js"
+                           :defaults (rlgl-root))))
+   (hunchentoot:create-folder-dispatcher-and-handler
+    "/css/" (fad:pathname-as-directory
+            (make-pathname :name "css"
+                           :defaults (rlgl-root))))
+   (snooze:make-hunchentoot-app)))
+
 (defmacro start-server (&key (handler '*handler*) (port 8080))
   "Initialize an HTTP handler"
   `(progn
      (setf snooze:*catch-errors* :verbose)
-     (push (snooze:make-hunchentoot-app) hunchentoot:*dispatch-table*)
-     (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor :port ,port)))))
+     (setf hunchentoot:*dispatch-table* *rlgl-dispatch-table*)
+     (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
+						      :document-root #p"./"
+						      :port ,port)))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -188,10 +270,12 @@ server-uri = \"http://localhost:8080\"
 
   ;; Read the built-in configuration settings.
   (setf *config* (cl-toml:parse *default-config-text*))
+  (log:info *default-config-text*)
 
   ;; FIXME: lookup storage driver
   ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *config*)))
   (setf *server-uri* (gethash "server-uri" *config*))
+  (log:info *server-uri*)
   
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))

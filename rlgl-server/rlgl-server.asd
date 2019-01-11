@@ -29,6 +29,6 @@
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery
 			:inferior-shell :cl-fad :hunchentoot :spinneret
-			:cl-json-util :cl-fad :str))
+			:cl-json-util :cl-fad :str :log4cl))
 
 

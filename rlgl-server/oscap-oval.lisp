@@ -28,16 +28,24 @@
 
 (defmethod parse-report ((parser parser/oscap-oval) doc)
   (let ((pdoc (plump:parse doc))
-	(tests (list)))
+	(tests-fail (list))
+	(tests-pass (list)))
     (lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a" 
 	      (combine (attr :href) (text))
 	      (map-apply #'(lambda (url text)
-			     (setf tests
+			     (setf tests-fail
 				   (cons
 				    (json:decode-json-from-string
 				     (format nil "{ \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
 					     text url))
-				    tests)))))
-    tests))
-
-
+				    tests-fail)))))
+    (lquery:$ pdoc "tr.resultgoodA > td:nth-child(4) > a" 
+	      (combine (attr :href) (text))
+	      (map-apply #'(lambda (url text)
+			     (setf tests-pass
+				   (cons
+				    (json:decode-json-from-string
+				     (format nil "{ \"result\": \"PASS\", \"id\": \"~A\", \"url\": \"~A\" }"
+					     text url))
+				    tests-pass)))))
+    (append tests-fail tests-pass)))

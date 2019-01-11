@@ -15,7 +15,7 @@
 
 (plan 1)
 
-(format t ">>>> ~A~%" (start-rlgl-server nil))
+(start-rlgl-server nil)
 
 ;; -----------------------------------------------------------------------------
 ;; matcher tests
