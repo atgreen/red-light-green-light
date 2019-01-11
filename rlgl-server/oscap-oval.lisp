@@ -16,6 +16,8 @@
 ;;; along with rlgl-server; see the file COPYING3.  If not see
 ;;; <http://www.gnu.org/licenses/>.
 
+(in-package :rlgl-server)
+
 ;;; MVP OpenScap OVAL Results report parser
 
 ;; ----------------------------------------------------------------------------
@@ -24,6 +26,18 @@
   ()
   )
 
-
+(defmethod parse-report ((parser parser/oscap-oval) doc)
+  (let ((pdoc (plump:parse doc))
+	(tests (list)))
+    (lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a" 
+	      (combine (attr :href) (text))
+	      (map-apply #'(lambda (url text)
+			     (setf tests
+				   (cons
+				    (json:decode-json-from-string
+				     (format nil "{ \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+					     text url))
+				    tests)))))
+    tests))
 
 

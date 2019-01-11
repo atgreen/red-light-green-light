@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 
-;;; Copyright (C) 2018  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 
 ;;; Rlgl-Server is free software; you can redistribute it and/or modify it
 ;;; under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
   (:shadow #:package)
-  (:export #:start-rlgl-server #:stop-rlgl-server))
+  (:export #:start-rlgl-server #:stop-rlgl-server
+	   #:parser/oscap-oval))
 
 (in-package #:rlgl-server)

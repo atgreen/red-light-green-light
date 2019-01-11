@@ -64,7 +64,7 @@ server-uri = \"http://localhost:8080\"
 	       scripts)
       (delete-file fname)
       (make-instance (read-from-string
-		      (str:concat "parser/" result))))))
+		      (str:concat "rlgl-server:parser/" result))))))
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
@@ -80,28 +80,19 @@ server-uri = \"http://localhost:8080\"
 	 (json:decode-json-from-string
 	  (funcall
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
-    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json)))))
-      (let ((pdoc (plump:parse doc))
-	    (tests (list)))
-	(lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a" 
-		  (combine (attr :href) (text))
-		  (map-apply #'(lambda (url text)
-				 (setf tests
-				       (cons
-					(json:decode-json-from-string
-					 (format nil "{ \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
-						 text url))
-					tests)))))
-	(if (null tests)
-	    "ERROR"
-	    (let ((processed-results (apply-policy *policy* tests)))
-	      (let ((stream (make-string-output-stream)))
-		(render stream processed-results)
-		(format nil "green: ~A/doc?id=~A~%~%"
-			*server-uri*
-			(store-document *storage-driver*
-					(flexi-streams:string-to-octets
-					 (get-output-stream-string stream)))))))))))
+    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
+	   (parser (recognize-report doc))
+	   (tests (parse-report parser doc)))
+      (if (null tests)
+	  "ERROR"
+	  (let ((processed-results (apply-policy *policy* tests)))
+	    (let ((stream (make-string-output-stream)))
+	      (render stream processed-results)
+	      (format nil "green: ~A/doc?id=~A~%~%"
+		      *server-uri*
+		      (store-document *storage-driver*
+				      (flexi-streams:string-to-octets
+				       (get-output-stream-string stream))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
