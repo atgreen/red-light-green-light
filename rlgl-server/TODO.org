@@ -9,7 +9,4 @@
 
 * Add link to original document in report
 
-* Links should open in separate window
-
-
 

@@ -206,7 +206,7 @@ table.fold-table > tbody > tr.fold.open {
 			(alist (cdr item)))
 		    (:tr :class "view"
 		     (:td (cdr (assoc :RESULT alist)))
-		     (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist)))))
+		     (:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
 		    (:tr :class "fold"
 			 (:td :colspan "2")
 			 (:div :class "fold-content"
@@ -214,6 +214,7 @@ table.fold-table > tbody > tr.fold.open {
 				   (let ((log-lines (log-entry matcher)))
 				     (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
 						       (githash matcher))
+					 :target "_blank" 
 					 (:pre (str:trim (car log-lines))))
 				     (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines))))))
 			       (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))
