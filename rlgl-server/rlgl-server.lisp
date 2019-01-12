@@ -109,16 +109,7 @@ server-uri = \"http://localhost:8080\"
       (:doctype)
       (:html
         (:head
-         (:title ,title)
-	 (:script :type "text/javascript"
-		  (:!--
-"
-$(function(){
-  $(\".fold-table tr.view\").on(\"click\", function(){
-    $(this).toggleClass(\"open\").next(\".fold\").toggleClass(\"open\");
-  });
-});
-")))
+         (:title ,title))
         (:body ,@body))))
 
 (defun render (stream results)
@@ -126,92 +117,104 @@ $(function(){
     (with-page (:title "Report")
       (:header
        (:style
-	"#results {
-  font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 60%;
-  margin-left: 20%;
-  margin-right: 20%;
+	("@import url(\"https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css\");
+
+* {
+  box-sizing: border-box;
 }
 
-#results td, #results th {
-  border: 1px solid #ddd;
-  padding: 8px;
+body {
+  padding: .2em 2em;
 }
 
-#results tr:nth-child(even){background-color: #f2f2f2;}
-
-#results tr:hover {background-color: #ddd;}
-
-#results th {
-  padding-top: 12px;
-  padding-bottom: 12px;
+table {
+  width: 100%;
+}
+table th {
   text-align: left;
-  background-color: #4CAF50;
+  border-bottom: 1px solid #ccc;
+}
+table th, table td {
+  padding: .4em;
+}
+
+table.fold-table > tbody > tr.view td, table.fold-table > tbody > tr.view th {
+  cursor: pointer;
+}
+table.fold-table > tbody > tr.view td:first-child,
+table.fold-table > tbody > tr.view th:first-child {
+  position: relative;
+  padding-left: 20px;
+}
+table.fold-table > tbody > tr.view td:first-child:before,
+table.fold-table > tbody > tr.view th:first-child:before {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  width: 9px;
+  height: 16px;
+  margin-top: -8px;
+  font: 16px fontawesome;
+  color: #999;
+  content: \"\\f0d7\";
+  transition: all .3s ease;
+}
+table.fold-table > tbody > tr.view:nth-child(4n-1) {
+  background: #eee;
+}
+table.fold-table > tbody > tr.view:hover {
+  background: #000;
+}
+table.fold-table > tbody > tr.view.open {
+  background: tomato;
   color: white;
 }
-
-// fold table 
-table.fold-table {
-  > tbody {
-    // view segment
-    > tr.view {
-      td, th {cursor: pointer;}
-      td:first-child, 
-      th:first-child { 
-        position: relative;
-        padding-left:20px;
-        &:before {
-          position: absolute;
-          top:50%; left:5px;
-          width: 9px; height: 16px;
-          margin-top: -8px;
-          font: 16px fontawesome;
-          color: #999;
-          content: \"\f0d7\";
-          transition: all .3s ease;
-        }
-      }
-      &:nth-child(4n-1) { background: #eee; }
-      &:hover { background: #000; }
-      &.open {
-        background: tomato;
-        color: white;
-        td:first-child, th:first-child {
-          &:before {
-            transform: rotate(-180deg);
-            color: #333;
-          }
-        }
-      }
-    }
-  
-    // fold segment
-    > tr.fold {
-      display: none;
-      &.open { display:table-row; }
-    }
-  }
+table.fold-table > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
+  transform: rotate(-180deg);
+  color: #333;
 }
-")
+table.fold-table > tbody > tr.fold {
+  display: none;
+}
+table.fold-table > tbody > tr.fold.open {
+  display: table-row;
+}
+
+.fold-content {
+  padding: .5em;
+}
+.fold-content h3 {
+  margin-top: 0;
+}
+.fold-content > table {
+  border: 2px solid #ccc;
+}
+.fold-content > table > tbody tr:nth-child(even) {
+  background: #eee;
+}")
+(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+
+
        (:h1 "Report"))
       (:section
        ("This is your report")
-       (:table :class "\"fold-table\"" :id "\"results\""
+       (:table :class "fold-table" :id "results"
 	       (:body
 		(:tr (:th "RESULT") (:th "ID"))
 		(dolist (item results)
 		  (let ((matcher (car item))
 			(alist (cdr item)))
-		    (:tr :class "\"view\""
+		    (:tr :class "view"
 		     (:td (cdr (assoc :RESULT alist)))
 		     (:td (:a :href (cdr (assoc :URL alist)) (cdr (assoc :ID alist)))))
-		    (:tr :class "\"fold\""
+		    (:tr :class "fold"
 			 (:td :colspan "2")
-			 (:div :class "\"fold-content\""
+			 (:div :class "fold-content"
 			       (:h3 "more info")))
-			 )))))
-      (:footer ("All done")))))
+		    ))))
+       (:script :attrs (list :src "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"))
+       (:script :attrs (list :src "js/index.js"))
+      (:footer ("All done"))))))
 	      
 ;;; Read JSON pattern ---------------------------------------------------------
 
