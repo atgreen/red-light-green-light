@@ -60,7 +60,7 @@
     (let ((matcher-lines (inferior-shell:run/lines
 			  (format nil "bash -c \"(cd test-policy; git blame -s -l ~A)\"" "XFAIL"))))
       (mapc (lambda (matcher-line)
-	      (let ((githash (subseq matcher-line 0 40)))
+	      (let ((githash (subseq matcher-line 1 41)))
 		(multiple-value-bind (lineno location)
 		    (read-from-string (subseq matcher-line 40))
 		  (let ((line (string-trim '(#\Space #\Tab)
