@@ -210,8 +210,13 @@ table.fold-table > tbody > tr.fold.open {
 		    (:tr :class "fold"
 			 (:td :colspan "2")
 			 (:div :class "fold-content"
-			       (:h3 "more info")))
-		    ))))
+			       (if matcher
+				   (let ((log-lines (log-entry matcher)))
+				     (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
+						       (githash matcher))
+					 (:pre (str:trim (car log-lines))))
+				     (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines))))))
+			       (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))
        (:script :attrs (list :src "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"))
        (:script :attrs (list :src "js/index.js"))
       (:footer ("All done"))))))
