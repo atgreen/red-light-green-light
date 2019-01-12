@@ -259,6 +259,7 @@ table.fold-table > tbody > tr.fold.open {
   "Initialize an HTTP handler"
   `(progn
      (setf snooze:*catch-errors* :verbose)
+     (setf *print-pretty* nil)
      (setf hunchentoot:*dispatch-table* *rlgl-dispatch-table*)
      (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
 						      :document-root #p"./"
