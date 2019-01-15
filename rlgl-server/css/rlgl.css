@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+#border {
+    border: 1px dashed #1C6EA4;
+    border-radius: 8px;
+}
+
 body {
     padding: .2em 2em;
 }

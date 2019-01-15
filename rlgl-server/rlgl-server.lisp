@@ -133,16 +133,19 @@ server-uri = \"http://localhost:8080\"
 		    (:tr :class "fold"
 			 (:td :colspan "2")
 			 (:div :class "fold-content"
-			       (if matcher
-				   (let ((log-lines (log-entry matcher)))
-				     (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
-						       (githash matcher))
-					 :target "_blank" 
-					 (:pre (str:trim (car log-lines))))
-				     (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines))))))
-			       (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))
+				     (if matcher
+					 (let ((log-lines (log-entry matcher)))
+					   (:div :id "border"
+						 (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
+								   (githash matcher))
+						     :target "_blank"
+						     (:pre (str:trim (car log-lines))))
+						 (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
+					   (:br)))
+				     (:div :id "border"
+					   (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))
        (:script :attrs (list :src "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"))
-       (:script :attrs (list :src "js/index.js"))))))
+       (:script :attrs (list :src "js/index.js")))))
 	      
 ;;; Read JSON pattern ---------------------------------------------------------
 
