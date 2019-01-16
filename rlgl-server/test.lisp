@@ -74,6 +74,7 @@
 
 (finalize)
 
-(sleep 3000)
-
-
+(if (uiop:getenv "RLGL_WAIT4EVER")
+    (progn
+      (format t "Waiting forever.  Hit CTRL-C to exit.")
+      (loop (sleep 3000))))
