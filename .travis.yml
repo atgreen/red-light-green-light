@@ -3,6 +3,7 @@ language: common-lisp
 sudo: required
 
 env:
+  LISP=sbcl
 
 install:
   # Install lisp support...
