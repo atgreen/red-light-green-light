@@ -87,7 +87,8 @@ server-uri = \"http://localhost:8080\"
 	  "ERROR"
 	  (let ((processed-results (apply-policy *policy* tests)))
 	    (let ((stream (make-string-output-stream)))
-	      (render stream (cdr (assoc :REF json)) processed-results)
+	      (render stream (cdr (assoc :REF json)) processed-results
+		      (commit-url-format *policy*))
 	      (format nil "green: ~A/doc?id=~A~%~%"
 		      *server-uri*
 		      (store-document *storage-driver*
@@ -104,7 +105,7 @@ server-uri = \"http://localhost:8080\"
 
 ;;; Render processed results to HTML
 
-(defun render (stream report-ref results)
+(defun render (stream report-ref results commit-url-format)
   (let ((*html* stream))
     (with-html
 	(:doctype)
@@ -132,8 +133,7 @@ server-uri = \"http://localhost:8080\"
 				(if matcher
 				    (let ((log-lines (log-entry matcher)))
 				      (:div :id "border"
-					    (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
-							      (githash matcher))
+					    (:a :href (format nil commit-url-format (githash matcher))
 						:target "_blank"
 						(:pre (str:trim (car log-lines))))
 					    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))

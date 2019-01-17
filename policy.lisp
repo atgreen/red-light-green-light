@@ -21,7 +21,7 @@
 (defpackage #:policy
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
-  (:export #:make-policy #:apply-policy))
+  (:export #:make-policy #:apply-policy #:commit-url-format))
 
 (in-package #:policy)
 
@@ -30,16 +30,30 @@
 (defclass policy ()
   ((xfail-matchers :reader xfail-matchers)
    (pass-matchers  :reader pass-matchers)
-   (fail-matchers  :reader fail-matchers))
+   (fail-matchers  :reader fail-matchers)
+   (commit-url-format :reader commit-url-format))
   )
 
-(defun make-policy (url)
+(defun guess-commit-url-format (url)
+  "Guess the commit URL format string based on URL."
+  ;; We should be able to guess github, gitlab and gogs commit URLs.
+  ;; This is only ever called when we aren't handed a commit URL
+  ;; in MAKE-POLICY.
+  ;; FIXME: this is a hardcoded for now.  Write this function.
+  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A")
+  
+(defun make-policy (url &key (commit-url-format (guess-commit-url-format url)))
+  "Create an intance of a POLICY object based on the contents of the
+git repo at URL.  If :COMMIT-URL-FORMAT is provided, use that as the
+format string for generating a git commit url given a commit hash
+argument.  If not provided, we will try to guess this format string
+based on URL."
 
   (let ((output (inferior-shell:run (format nil "/usr/bin/git clone ~A" url))))
     (mapc (lambda (line)
 	    (format t line))
 	  output))
-  
+
   (let ((xfail-file (merge-pathnames-as-file #p"test-policy/" #p"XFAIL"))
 	(pass-file (merge-pathnames-as-file #p"test-policy/" #p"PASS"))
 	(fail-file (merge-pathnames-as-file #p"test-policy/" #p"FAIL")))
@@ -50,6 +64,7 @@
 	  (list xfail-file pass-file fail-file))
     
     (let ((p (make-instance 'policy)))
+      (setf (slot-value p 'commit-url-format) commit-url-format)
       (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
       (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
       (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
