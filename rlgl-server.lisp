@@ -213,8 +213,7 @@ server-uri = \"http://localhost:8080\"
   (log:info *server-uri*)
   
   (setf *policy* (make-policy
-		  "/home/green/git/test-policy"))
-;		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
+		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
   (let ((srvr (start-server)))
     ;; If ARG is NIL, then exit right away.  This is used by the
     ;; testsuite.
