@@ -1,5 +1,6 @@
-rlgl/rlgl
-rlgl-server/rlgl-server
+cli/rlgl
+rlgl-server
 *~
-rlgl-server/coverage/*
-/rlgl-server/test-policy/
+rlgl-server/coverage
+test-policy/
+system-index.txt

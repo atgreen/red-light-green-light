@@ -1,3 +1,0 @@
-rlgl-server.asd
-test-rlgl-server.asd
-3rd-party/cl-json-util/cl-json-util.asd
