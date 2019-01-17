@@ -40,6 +40,4 @@ coveralls: clean
 		--eval '(sb-ext:quit)'
 
 clean:
-	@rm -rf coverage/* test-policy rlgl-server *~ */*~
-
-
+	@rm -rf system-index.txt test/system-index.txt coverage/* test-policy rlgl-server *~ */*~
