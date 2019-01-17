@@ -4,9 +4,7 @@
   the stored content up directly.
 
 * S3 Storage Driver
-
-* Serve CSS up statically, outside of documents
-
-* Add link to original document in report
-
+* Write 'guess-commit-url-format'
+This function should guess a git commit format string that takes a
+commit hash from a repo URL.
 
