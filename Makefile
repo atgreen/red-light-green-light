@@ -35,7 +35,8 @@ coveralls: clean
 		--eval '(pushnew (truename ".") ql:*local-project-directories* )' \
 		--eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
 		--eval '(ql:register-local-projects)' \
-		--eval '(coveralls:with-coveralls (:project-dir	"$(shell pwd)/test") (ql:quickload :test-rlgl-server) (test-rlgl-server:run))' \
+		--eval '(ql:quickload :test-rlgl-server)' \
+		--eval '(coveralls:with-coveralls (:project-dir	"$(shell pwd)") (test-rlgl-server:run))' \
 		--eval '(sb-ext:quit)'
 
 clean:
