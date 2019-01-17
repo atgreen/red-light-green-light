@@ -8,15 +8,21 @@ all:
 
 check: clean
 	sbcl --eval '(ql:quickload :prove)' \
+	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
+	     --eval '(ql:register-local-projects)' \
 	     --eval '(ql:quickload :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
-	     --eval '(prove:run #P"test.lisp")' \
+	     --eval '(ql:quickload :test-rlgl-server)' \
+	     --eval '(test-rlgl-server:run)' \
 	     --eval '(sb-ext:quit)'
 
 cover: clean
 	sbcl --eval '(require :sb-cover)' \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(declaim (optimize sb-cover:store-coverage-data))' \
+	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
+	     --eval '(ql:register-local-projects)' \
 	     --eval '(ql:quickload :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
 	     --eval '(prove:run #P"test.lisp")' \
@@ -34,5 +40,6 @@ coveralls: clean
 		--eval '(sb-ext:quit)'
 
 clean:
-	@rm -rf coverage/* test-policy rlgl-server *~
+	@rm -rf coverage/* test-policy rlgl-server *~ */*~
+
 
