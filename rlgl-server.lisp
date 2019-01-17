@@ -104,48 +104,44 @@ server-uri = \"http://localhost:8080\"
 
 ;;; Render processed results to HTML
 
-(defmacro with-page ((&key title) &body body)
-   `(with-html
-      (:doctype)
-      (:html
-        (:head
-         (:title ,title)
-	 (:link :rel "stylesheet" :href "css/rlgl.css")
-	 (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
-        (:body ,@body))))
-
 (defun render (stream report-ref results)
   (let ((*html* stream))
-    (with-page (:title "Report")
-      (:h1 "Report")
-      (:section
-       (:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
-	   :target "_blank" "Original Report")
-       (:table :class "fold-table" :id "results"
-	       (:body
-		(:tr (:th "RESULT") (:th "ID"))
-		(dolist (item results)
-		  (let ((matcher (car item))
-			(alist (cdr item)))
-		    (:tr :class "view"
-			 (:td (cdr (assoc :RESULT alist)))
-			 (:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
-		    (:tr :class "fold"
-			 (:td :colspan "2")
-			 (:div :class "fold-content"
-				     (if matcher
-					 (let ((log-lines (log-entry matcher)))
-					   (:div :id "border"
-						 (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
-								   (githash matcher))
-						     :target "_blank"
-						     (:pre (str:trim (car log-lines))))
-						 (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
-					   (:br)))
-				     (:div :id "border"
-					   (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))
+    (with-html
+	(:doctype)
+      (:html
+       (:head
+	(:title "Report")
+	(:link :rel "stylesheet" :href "css/rlgl.css")
+	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+       (:h1 "Report")
+       (:section
+	(:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
+	    :target "_blank" "Original Report")
+	(:table :class "fold-table" :id "results"
+		(:body
+		 (:tr (:th "RESULT") (:th "ID"))
+		 (dolist (item results)
+		   (let ((matcher (car item))
+			 (alist (cdr item)))
+		     (:tr :class "view"
+			  (:td (cdr (assoc :RESULT alist)))
+			  (:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
+		     (:tr :class "fold"
+			  (:td :colspan "2")
+			  (:div :class "fold-content"
+				(if matcher
+				    (let ((log-lines (log-entry matcher)))
+				      (:div :id "border"
+					    (:a :href (format nil "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A"
+							      (githash matcher))
+						:target "_blank"
+						(:pre (str:trim (car log-lines))))
+					    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
+				      (:br)))
+				(:div :id "border"
+				      (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))
        (:script :attrs (list :src "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"))
-       (:script :attrs (list :src "js/index.js")))))
+       (:script :attrs (list :src "js/index.js"))))))
 	      
 ;;; Read JSON pattern ---------------------------------------------------------
 
