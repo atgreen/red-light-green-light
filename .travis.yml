@@ -10,4 +10,4 @@ install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
 
 script:
-  - (cd rlgl-server; make coveralls)
+  - make coveralls
