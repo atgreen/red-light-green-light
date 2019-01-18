@@ -5,6 +5,6 @@
 
 * S3 Storage Driver
 * Write 'guess-commit-url-format'
-This function should guess a git commit format string that takes a
+  This function should guess a git commit format string that takes a
 commit hash from a repo URL.
 

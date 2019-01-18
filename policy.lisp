@@ -21,9 +21,13 @@
 (defpackage #:policy
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
-  (:export #:make-policy #:apply-policy #:commit-url-format))
+  (:export #:*policy-dir* #:make-policy #:apply-policy #:commit-url-format))
 
 (in-package #:policy)
+
+(defvar *policy-lock* (bt:make-lock))
+
+(defvar *policy-dir* nil)
 
 (defvar *git-log-table* (make-hash-table :test 'equal))
 
@@ -49,31 +53,49 @@ format string for generating a git commit url given a commit hash
 argument.  If not provided, we will try to guess this format string
 based on URL."
 
-  (let ((output (inferior-shell:run (format nil "/usr/bin/git clone ~A" url))))
-    (mapc (lambda (line)
-	    (format t line))
-	  output))
+  ;; Hold one big lock, just in case...
+  (bt:with-lock-held (*policy-lock*)
 
-  (let ((xfail-file (merge-pathnames-as-file #p"test-policy/" #p"XFAIL"))
-	(pass-file (merge-pathnames-as-file #p"test-policy/" #p"PASS"))
-	(fail-file (merge-pathnames-as-file #p"test-policy/" #p"FAIL")))
+    (let* ((policy-dirname (str:concat (namestring *policy-dir*)
+				       (subseq (ironclad:byte-array-to-hex-string
+						(ironclad:digest-sequence
+						 :sha1 (flexi-streams:string-to-octets url)))
+					       0 8))))
 
-    (mapc (lambda (file)
-	    (if (not (file-exists-p file))
-		(error (format nil "Policy file \"~A\" missing." file))))
-	  (list xfail-file pass-file fail-file))
-    
-    (let ((p (make-instance 'policy)))
-      (setf (slot-value p 'commit-url-format) commit-url-format)
-      (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
-      (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
-      (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
-      p)))
+      (if (fad:directory-exists-p policy-dirname)
+	  (sb-ext:delete-directory policy-dirname :recursive t))
+      
+      (let ((output (inferior-shell:run
+		     (format nil "/usr/bin/git clone ~A ~A"
+			     url policy-dirname))))
+	(mapc (lambda (line)
+		(format t line))
+	      output))
+
+      (let ((policy-pathname
+	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
+	
+	(let ((xfail-file (merge-pathnames-as-file policy-pathname #p"XFAIL"))
+	      (pass-file (merge-pathnames-as-file policy-pathname #p"PASS"))
+	      (fail-file (merge-pathnames-as-file policy-pathname #p"FAIL")))
+
+	  (mapc (lambda (file)
+		  (if (not (file-exists-p (namestring file)))
+		      (error (format nil "Policy file \"~A\" missing." file))))
+		(list xfail-file pass-file fail-file))
+	  
+	  (let ((p (make-instance 'policy)))
+	    (setf (slot-value p 'commit-url-format) commit-url-format)
+	    (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
+	    (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
+	    (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
+	    p))))))
 
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
     (let ((matcher-lines (inferior-shell:run/lines
-			  (format nil "bash -c \"(cd test-policy; git blame -s -l ~A)\"" "XFAIL"))))
+			  (format nil "bash -c \"(cd $(dirname ~A); git blame -s -l $(basename ~A))\""
+				  filename filename))))
       (mapc (lambda (matcher-line)
 	      (let ((githash (subseq matcher-line 1 41)))
 		(multiple-value-bind (lineno location)
@@ -99,8 +121,8 @@ based on URL."
 				       "0000000000000000000000000000000000000000")))
 		    (progn
 		      (setf log-entry (inferior-shell:run/lines
-				       (format nil "bash -c \"(cd test-policy; git log -r ~A ~A)\""
-					       githash "XFAIL")))
+				       (format nil "bash -c \"(cd $(dirname ~A); git log -r ~A $(basename ~A))\""
+					       filename githash filename)))
 		      (setf (gethash githash *git-log-table*) log-entry)))
 		(setf (slot-value matcher 'log-entry) log-entry)))
 	    patterns)

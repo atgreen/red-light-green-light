@@ -21,14 +21,13 @@
   :author "Anthony Green <green@moxielogic.com>"
            :version "0"
   :serial t
-  :components ((:file "matcher")
+  :components ((:file "util")
+	       (:file "matcher")
 	       (:file "policy")
 	       (:file "package")
 	       (:file "storage-local")
 	       (:file "oscap-oval")
 	       (:file "rlgl-server"))
-  :depends-on (:cl-toml :snooze :cl-json :plump :lquery
+  :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 			:inferior-shell :cl-fad :hunchentoot :spinneret
 			:cl-json-util :cl-fad :str :log4cl))
-
-
