@@ -27,7 +27,9 @@
 	       (:file "package")
 	       (:file "storage-local")
 	       (:file "oscap-oval")
+	       (:file "junit")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 			:inferior-shell :cl-fad :hunchentoot :spinneret
-			:cl-json-util :cl-fad :str :log4cl :cl-ppcre))
+			:cl-json-util :cl-fad :str :log4cl :cl-ppcre
+			:cxml))

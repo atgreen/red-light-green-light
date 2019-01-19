@@ -40,7 +40,7 @@
 			     (setf tests-fail
 				   (cons
 				    (json:decode-json-from-string
-				     (format nil "{ \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
 					     text url))
 				    tests-fail)))))
     (lquery:$ pdoc "tr.resultgoodA > td:nth-child(4) > a" 
@@ -49,7 +49,7 @@
 			     (setf tests-pass
 				   (cons
 				    (json:decode-json-from-string
-				     (format nil "{ \"result\": \"PASS\", \"id\": \"~A\", \"url\": \"~A\" }"
+				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"PASS\", \"id\": \"~A\", \"url\": \"~A\" }"
 					     text url))
 				    tests-pass)))))
     (append tests-fail tests-pass)))

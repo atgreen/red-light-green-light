@@ -34,7 +34,9 @@
    (matcher :initarg :matcher :reader matcher)
    (log-entry :reader log-entry)))
 
-(defun make-policy-matcher (&key kind githash lineno matcher)
+(defun make-policy-matcher (&key kind (githash nil)
+			      (lineno 0)
+			      (matcher nil))
   (make-instance 'policy-matcher :kind kind :githash githash :lineno lineno :matcher matcher))
 
 (defun match-pair-in-alist (pair alist)

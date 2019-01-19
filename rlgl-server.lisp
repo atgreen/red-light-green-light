@@ -62,7 +62,7 @@ policy-dir = \"/tmp/policy5/\"
 				 (namestring script) " "
 				 (namestring fname)))))
 		   (setf result output)
-		   (equal (length output) 0)))
+		   (> (length output) 0)))
 	       scripts)
       (delete-file fname)
       (make-instance (read-from-string
@@ -115,27 +115,36 @@ policy-dir = \"/tmp/policy5/\"
 
 ;;; Render processed results to HTML
 
+(defparameter *unknown-matcher*
+  (make-policy-matcher :kind :unknown))
+
 (defun render (stream report-ref results title commit-url-format)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
 	(xfail nil)
-	(pass nil))
+	(pass nil)
+	(unknown nil))
     (dolist (item results)
-      (let ((kind (kind (car item))))
-	(cond
-	  ((eq kind :FAIL)
-	   (setf fail (cons item fail)))
-	  ((eq kind :XFAIL)
-	   (setf xfail (cons item xfail)))
-	  ((eq kind :PASS)
-	   (setf pass (cons item pass)))
-	  ((t t))))) ; FIXME: abort
+      (if (car item)
+	  (let ((kind (kind (car item))))
+	    (cond
+	      ((eq kind :FAIL)
+	       (setf fail (cons item fail)))
+	      ((eq kind :XFAIL)
+	       (setf xfail (cons item xfail)))
+	      ((eq kind :PASS)
+	       (setf pass (cons item pass)))
+	      ((t t)))) ; FIXME: abort
+	  (setf unknown (cons (cons *unknown-matcher*
+				    (cdr item))
+			      unknown))))
     (setf results
 	  (concatenate 'list
 		       (reverse fail)
 		       (reverse xfail)
-		       (reverse pass))))
+		       (reverse pass)
+		       (reverse unknown))))
   (let ((*html* stream))
     (with-html
 	(:doctype)
@@ -174,7 +183,8 @@ policy-dir = \"/tmp/policy5/\"
 			   (:tr :class "fold"
 				(:td :colspan "2")
 				(:div :class "fold-content"
-				      (if matcher
+				      (if (and matcher
+					       (not (eq (kind matcher) :unknown)))
 					  (let ((log-lines (log-entry matcher)))
 					    (:div :id "border"
 						  (:a :href (format nil commit-url-format (githash matcher))

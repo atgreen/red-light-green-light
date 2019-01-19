@@ -67,6 +67,22 @@
 				 :content-type "application/json"
 				 :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
   
+  (subtest "upload test"
+	   (let ((upload-ref
+		  (drakma:http-request "http://localhost:8080/upload"
+				       :method :post
+				       :content-type "application/octet-stream"
+				       :content #p"test/sample-junit.xml")))
+	     (like upload-ref "RLGL-[A-Z0-9]+")
+	     (setf *upload-ref* upload-ref)))
+  
+  (subtest "evaluate test"
+	   (print
+	    (drakma:http-request "http://localhost:8080/evaluate"
+				 :method :post
+				 :content-type "application/json"
+				 :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
+
   (finalize)
 
   (if (uiop:getenv "RLGL_WAIT4EVER")
