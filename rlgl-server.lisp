@@ -152,7 +152,7 @@ policy-dir = \"/tmp/policy5/\"
 		 (dolist (item results)
 		   (let ((matcher (car item))
 			 (alist (cdr item)))
-		     (:tr :class "view"
+		     (:tr :class "view" :class (kind matcher)
 			  (:td (kind matcher))
 			  (:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
 		     (:tr :class "fold"

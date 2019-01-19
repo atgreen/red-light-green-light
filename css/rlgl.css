@@ -58,6 +58,18 @@ table.fold-table > tbody > tr.view:hover {
     background: #000;
 }
 
+table.fold-table > tbody > tr.fail {
+    background: #ffb3b3
+}
+
+table.fold-table > tbody > tr.xfail {
+    background: #e6f6e6
+}
+
+table.fold-table > tbody > tr.pass {
+    background: #80ff80
+}
+
 table.fold-table > tbody > tr.view.open {
     background: tomato;
     color: white;
