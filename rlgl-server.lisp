@@ -120,13 +120,13 @@ policy-dir = \"/tmp/policy5/\"
 	(xfail nil)
 	(pass nil))
     (dolist (item results)
-      (let ((matcher (car item)))
+      (let ((kind (kind (car item))))
 	(cond
-	  ((eq (kind matcher) :FAIL)
+	  ((eq kind :FAIL)
 	   (setf fail (cons item fail)))
-	  ((eq (kind matcher) :XFAIL)
+	  ((eq kind :XFAIL)
 	   (setf xfail (cons item xfail)))
-	  ((eq (kind matcher) :PASS)
+	  ((eq kind :PASS)
 	   (setf pass (cons item pass)))
 	  ((t t))))) ; FIXME: abort
     (setf results
