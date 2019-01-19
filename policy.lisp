@@ -97,7 +97,7 @@ based on URL."
 			  (format nil "bash -c \"(cd $(dirname ~A); git blame -s -l $(basename ~A))\""
 				  filename filename))))
       (mapc (lambda (matcher-line)
-	      (let ((githash (subseq matcher-line 1 41)))
+	      (let ((githash (subseq (remove #\^ matcher-line) 0 40)))
 		(multiple-value-bind (lineno location)
 		    (read-from-string (subseq matcher-line 40))
 		  (let ((line (string-trim '(#\Space #\Tab)
@@ -121,7 +121,7 @@ based on URL."
 				       "0000000000000000000000000000000000000000")))
 		    (progn
 		      (setf log-entry (inferior-shell:run/lines
-				       (format nil "bash -c \"(cd $(dirname ~A); git log -r ~A $(basename ~A))\""
+				       (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
 					       filename githash filename)))
 		      (setf (gethash githash *git-log-table*) log-entry)))
 		(setf (slot-value matcher 'log-entry) log-entry)))
