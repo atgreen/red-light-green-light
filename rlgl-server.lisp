@@ -114,6 +114,26 @@ policy-dir = \"/tmp/policy5/\"
 ;;; Render processed results to HTML
 
 (defun render (stream report-ref results commit-url-format)
+  ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
+  ;; preserve order otherwise.
+  (let ((fail nil)
+	(xfail nil)
+	(pass nil))
+    (dolist (item results)
+      (let ((matcher (car item)))
+	(cond
+	  ((eq (kind matcher) :FAIL)
+	   (setf fail (cons item fail)))
+	  ((eq (kind matcher) :XFAIL)
+	   (setf xfail (cons item xfail)))
+	  ((eq (kind matcher) :PASS)
+	   (setf pass (cons item pass)))
+	  ((t t))))) ; FIXME: abort
+    (setf results
+	  (concatenate 'list
+		       (reverse fail)
+		       (reverse xfail)
+		       (reverse pass))))
   (let ((*html* stream))
     (with-html
 	(:doctype)
@@ -133,7 +153,7 @@ policy-dir = \"/tmp/policy5/\"
 		   (let ((matcher (car item))
 			 (alist (cdr item)))
 		     (:tr :class "view"
-			  (:td (cdr (assoc :RESULT alist)))
+			  (:td (kind matcher))
 			  (:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
 		     (:tr :class "fold"
 			  (:td :colspan "2")
