@@ -5,6 +5,16 @@
     box-sizing: border-box;
 }
 
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    padding-top: 65px;
+    margin-bottom: 60px;
+}
+
 .rlgl-svg {
     float: left;
     width: 100%;
@@ -13,22 +23,17 @@
     height: 0;
     padding: 0; /* reset */
     padding-bottom: 92%;
-    border: thin dotted darkgrey;
 }
 
 h1 {
   position: relative;
-  top: 18px;
+  bottom: 18px;
   left: 10px;
 }
 
 #border {
     border: 1px dashed #1C6EA4;
     border-radius: 8px;
-}
-
-body {
-    padding: .2em 2em;
 }
 
 table {
@@ -74,7 +79,7 @@ table.fold-table > tbody > tr.view:nth-child(4n-1) {
 }
 
 table.fold-table > tbody > tr.view:hover {
-    background: #000;
+    background: #aaa;
 }
 
 table.fold-table > tbody > tr.fail {
@@ -123,3 +128,21 @@ tr:nth-child(4n-2) {
     background: #eee;
 }
 
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 120px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+
+.footer > .container {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+code {
+  font-size: 80%;
+}
