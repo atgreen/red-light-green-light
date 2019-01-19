@@ -130,17 +130,33 @@ based on URL."
       patterns)))
 
 (defun apply-policy (policy candidate-result-list)
-  (mapcar (lambda (result)
-	    (cons
-	     (or
-	      (find-if (lambda (matcher)
-			 (match-candidate-pattern result (matcher matcher)))
-		       (xfail-matchers policy))
-	      (find-if (lambda (matcher)
-			 (match-candidate-pattern result (matcher matcher)))
-		       (fail-matchers policy))
-	      (find-if (lambda (matcher)
-			 (match-candidate-pattern result (matcher matcher)))
-		       (pass-matchers policy)))
-	     result))
-	  candidate-result-list))
+  (let ((red-or-green :GREEN))
+    (let ((result (mapcar (lambda (result)
+			   (cons
+			    (or
+			     ;; Check for exceptions
+			     (find-if (lambda (matcher)
+					(match-candidate-pattern
+					 result (matcher matcher)))
+				      (xfail-matchers policy))
+			     ;; Now check for failures
+			     (let ((red-match
+				    (find-if (lambda (matcher)
+					       (match-candidate-pattern
+						result (matcher matcher)))
+					     (fail-matchers policy))))
+			       (if red-match
+				   (setf red-or-green :RED))
+			       red-match)
+			     ;; No check for passes
+			     (find-if (lambda (matcher)
+					(match-candidate-pattern
+					 result (matcher matcher)))
+				      (pass-matchers policy))
+			     ;; We don't have a match. Let's fail.
+			     (progn
+			       (setf red-or-green :RED)
+			       nil))
+			    result))
+			  candidate-result-list)))
+      (values red-or-green result))))

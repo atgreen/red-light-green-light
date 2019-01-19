@@ -87,11 +87,13 @@ policy-dir = \"/tmp/policy5/\"
 	   (tests (parse-report parser doc)))
       (if (null tests)
 	  "ERROR"
-	  (let ((processed-results (apply-policy *policy* tests)))
+	  (multiple-value-bind (red-or-green processed-results)
+	      (apply-policy *policy* tests)
 	    (let ((stream (make-string-output-stream)))
 	      (render stream (cdr (assoc :REF json)) processed-results
 		      (commit-url-format *policy*))
-	      (format nil "green: ~A/doc?id=~A~%~%"
+	      (format nil "~A: ~A/doc?id=~A~%~%"
+		      red-or-green
 		      *server-uri*
 		      (store-document *storage-driver*
 				      (flexi-streams:string-to-octets
