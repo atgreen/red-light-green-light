@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/atgreen/red-light-green-light.svg?branch=master)](https://travis-ci.org/atgreen/red-light-green-light)
 [![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
-**This is experimental Work In Progress**
+**This is an experimental Work In Progress**
 ---
 
 `rlgl` - Red Light Green Light
@@ -55,12 +55,17 @@ CI/CD pipeline:
 
 Here are the basic concepts:
 
+- First we must log into the rlgl server like so:
+```
+$ rlgl login -u USERNAME -p PASSWORD http://rlgl-server.example.com
+```
+
 - Each deployable artifact is given a Player ID.  The Player ID is
   what flows down the pipeline along with the various build/deploy
   artifacts.  They would be attached as artifact metadata.
 
 ```
-$ ID=$(rlgl start -u USERNAME -p PASSWORD)
+$ ID=$(rlgl start)
 ```
 
 - As the pipeline proceeds, test results are generated (scans, unit
@@ -73,18 +78,18 @@ $ ID=$(rlgl start -u USERNAME -p PASSWORD)
   green lights.
 
 ```shell
-$ rlgl evaluate --policy=dev $ID my-test-report.html
-green: http://rlgl-server.example.com/bc7db3f.html
+$ rlgl evaluate --policy dev --id $ID my-test-report.html
+green: http://rlgl-server.example.com/RLGL-BC7DB3F
 ```
 
 ```shell
-$ rlgl evaluate --policy=global-prod $ID oval-scan.xml
-red: http://rlgl-server.example.com/1cf5b3a.html
+$ rlgl evaluate --policy global-prod --id $ID oval-scan.xml
+red: http://rlgl-server.example.com/RLGL-1CF5B3A
 ```
    
 ```shell
-$ rlgl evaluate --policy=my-proj $ID gcc.log
-green: http://rlgl-server.example.com/afc7db2.html
+$ rlgl evaluate --policy my-proj --id $ID gcc.log
+green: http://rlgl-server.example.com/RLGL-AFC7DB2
 ```
 
 That's it!   The client side is very easy.   
