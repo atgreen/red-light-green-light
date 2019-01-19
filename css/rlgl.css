@@ -1,7 +1,25 @@
 @import url("https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css");
 
 * {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     box-sizing: border-box;
+}
+
+.rlgl-svg {
+    float: left;
+    width: 100%;
+    background-image: url(../images/rlgl.svg);
+    background-size: cover;
+    height: 0;
+    padding: 0; /* reset */
+    padding-bottom: 92%;
+    border: thin dotted darkgrey;
+}
+
+h1 {
+  position: relative;
+  top: 18px;
+  left: 10px;
 }
 
 #border {
@@ -14,7 +32,8 @@ body {
 }
 
 table {
-    width: 100%;
+    border-collapse: collapse;
+    width: 75%;
 }
 
 table th {
