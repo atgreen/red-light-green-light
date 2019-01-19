@@ -45,7 +45,8 @@ policy-dir = \"/tmp/policy5/\"
 ;; Parsing backends
 
 (defclass report-parser ()
-  ((name :initarg :name :reader name)))
+  ((name :initarg :name :reader name)
+   (title :initarg :title :reader title)))
 
 ;; Run all of the scripts in recog.d until we find
 ;; a match.
@@ -95,6 +96,7 @@ policy-dir = \"/tmp/policy5/\"
 	      (apply-policy *policy* tests)
 	    (let ((stream (make-string-output-stream)))
 	      (render stream (cdr (assoc :REF json)) processed-results
+		      (title parser)
 		      (commit-url-format *policy*))
 	      (format nil "~A: ~A/doc?id=~A~%"
 		      red-or-green
@@ -113,7 +115,7 @@ policy-dir = \"/tmp/policy5/\"
 
 ;;; Render processed results to HTML
 
-(defun render (stream report-ref results commit-url-format)
+(defun render (stream report-ref results title commit-url-format)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
@@ -155,10 +157,10 @@ policy-dir = \"/tmp/policy5/\"
 	 ))
 	(:main :role "main" :class "container"
 	       (:div :class "row"
-		     (:div :class "col text-center"
+		     (:div :class "col"
 	       (:div :style "width:100px"
 		     (:div :class "rlgl-svg"))
-	       (:h1 :class "mt-5" "OVAL Scan Results")
+	       (:h1 :class "mt-5" title)
 	       (:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
 		   :target "_blank" "Original Report")
 	       (:table :class "fold-table" :id "results"

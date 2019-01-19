@@ -24,7 +24,8 @@
 
 (defclass parser/oscap-oval (report-parser)
   ()
-  )
+  (:default-initargs
+   :title  "OpenScap OVAL Scan Report"))
 
 (defmethod parse-report ((parser parser/oscap-oval) doc)
   (let ((pdoc (plump:parse doc))
