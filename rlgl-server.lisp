@@ -74,6 +74,9 @@ policy-dir = \"/tmp/policy5/\"
   ;; Return a random 7 character hash
   (rlgl.util:random-hex-string 7))
 
+(snooze:defroute login (:get :text/plain)
+  "rlgl-server v0.1 connected")
+
 (snooze:defroute evaluate (:post :application/json)
   (let ((json
 	 (json:decode-json-from-string
