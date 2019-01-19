@@ -82,6 +82,10 @@ policy-dir = \"/tmp/policy5/\"
 	 (json:decode-json-from-string
 	  (funcall
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
+    (let ((policy-name (cdr (assoc :POLICY json))))
+      (if (rlgl.util:valid-url? policy-name)
+	  (setf *policy* (make-policy policy-name))
+	  (print "NO POLICY")))
     (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
 	   (parser (recognize-report doc))
 	   (tests (parse-report parser doc)))

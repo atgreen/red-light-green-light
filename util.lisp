@@ -19,8 +19,7 @@
 (defpackage #:rlgl.util
   (:use #:cl)
   (:shadow #:package)
-  (:export #:random-hex-string #:make-rwlock #:with-read-lock #:with-write-lock
-	   #:write-lock-begin #:write-lock-end #:rwlock%))
+  (:export #:random-hex-string #:valid-url?))
 
 (in-package #:rlgl.util)
 
@@ -31,3 +30,6 @@
     (coerce (loop repeat length collect (aref chars (random (length chars))))
             'string)))
 
+(defun valid-url? (string)
+  "Returns T if STRING is a valid url."
+  (not (null (ppcre:scan "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9\\.\\-]+|(?:www\\.|[\\-;:&=\\+\\$,\\w]+@)[A-Za-z0-9\\.\\-]+)((?:\\/[\\+~%\\/\\.\\w\\-_]*)?\\??(?:[\\-\\+=&;%@\\.\\w_]*)#?(?:[\\.\\!\\/\\\\\\w]*))?)" string))))
