@@ -79,18 +79,22 @@ $ ID=$(rlgl start)
 
 ```shell
 $ rlgl evaluate --policy dev --id $ID my-test-report.html
-green: http://rlgl-server.example.com/RLGL-BC7DB3F
+GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F
 ```
 
 ```shell
 $ rlgl evaluate --policy global-prod --id $ID oval-scan.xml
-red: http://rlgl-server.example.com/RLGL-1CF5B3A
+RED: http://rlgl-server.example.com/RLGL-1CF5B3A
 ```
    
 ```shell
 $ rlgl evaluate --policy my-proj --id $ID gcc.log
-green: http://rlgl-server.example.com/RLGL-AFC7DB2
+GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2
 ```
+
+GREEN lights have an exit code of 0.
+RED lights have an exit code of 1.
+Any other exit code is an error.
 
 That's it!   The client side is very easy.   
 

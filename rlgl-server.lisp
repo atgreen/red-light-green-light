@@ -92,7 +92,7 @@ policy-dir = \"/tmp/policy5/\"
 	    (let ((stream (make-string-output-stream)))
 	      (render stream (cdr (assoc :REF json)) processed-results
 		      (commit-url-format *policy*))
-	      (format nil "~A: ~A/doc?id=~A~%~%"
+	      (format nil "~A: ~A/doc?id=~A~%"
 		      red-or-green
 		      *server-uri*
 		      (store-document *storage-driver*

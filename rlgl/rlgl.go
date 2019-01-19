@@ -37,7 +37,7 @@ func output(s string) {
 
 func exitErr(err error) {
 	output(red(err.Error()))
-	os.Exit(1)
+	os.Exit(2)
 }
 
 func (c *Config) Write(path string) {
@@ -222,16 +222,24 @@ func main() {
 				response, err := http.Post(fmt.Sprintf("%s/evaluate", config.Host), "application/json", bytes.NewBuffer(jsonValue))
 
 				if err != nil {
-					fmt.Print(err.Error())
-					os.Exit(1)
+					exitErr(err);
 				}
 
 				responseData, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
-				fmt.Println(string(responseData))
+				fmt.Print(string(responseData))
 
+				if (strings.HasPrefix(string(responseData), "GREEN:")) {
+					os.Exit(0)
+				} else {
+					if (strings.HasPrefix(string(responseData), "RED:")) {
+						os.Exit(1)
+					} else {
+						os.Exit(2)
+					}
+				}
 				return nil
 			},
 		},
