@@ -23,6 +23,7 @@
   (:shadow #:package)
   (:export #:start-rlgl-server #:stop-rlgl-server
 	   #:parser/oscap-oval
+	   #:parser/aqua
 	   #:parser/junit))
 
 (in-package #:rlgl-server)

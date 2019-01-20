@@ -27,6 +27,7 @@
 	       (:file "package")
 	       (:file "storage-local")
 	       (:file "oscap-oval")
+	       (:file "aqua")
 	       (:file "junit")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad

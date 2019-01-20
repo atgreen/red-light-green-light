@@ -1,0 +1,2825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title> | Scan Results</title>
+
+    <style>
+        .hidden{display:none}.pl30{padding-left:30px !important}.pl10{padding-left:10px !important}.severity{color:#fff;border-radius:3px;padding:3px 6px}.severity.negligible{background:#5cef97}.severity.high{background:#e0443d}.severity.medium{background:#f79421}.severity.low{background:#e1c930}progress,sub,sup{vertical-align:baseline}button,hr,input{overflow:visible}[type=checkbox],[type=radio],legend{box-sizing:border-box;padding:0}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}article,aside,details,figcaption,figure,footer,header,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent;-webkit-text-decoration-skip:objects}a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}svg:not(:root){overflow:hidden}code,kbd,pre,samp{font-family:monospace, monospace;font-size:1em}figure{margin:1em 40px}hr{box-sizing:content-box;height:0}button,input,select,textarea{font:inherit;margin:0}optgroup{font-weight:700}button,select{text-transform:none}[type=reset],[type=submit],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:ButtonText dotted 1px}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{color:inherit;display:table;max-width:100%;white-space:normal}textarea{overflow:auto}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-input-placeholder{color:inherit;opacity:.54}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}h1{font-weight:700}h2{font-size:1.2em}.success{margin:2em auto;max-width:400px;padding:1em;font-size:1.6em;background-color:#91b94f;color:#fff}table{width:auto;margin:1em auto;border-collapse:collapse}#summary tr:first-child td{padding:.75em;font-size:1.5em;border:1px solid #000;color:#fff;text-shadow:1px 1px 1px #000}#summary tr:first-child td:nth-child(1){background-color:#e0443d}#summary tr:first-child td:nth-child(2){background-color:#f79421}#summary tr:first-child td:nth-child(3){background-color:#e1c930}#summary tr:first-child td:nth-child(4){background-color:#5cef97}#summary tr:first-child td:nth-child(5){background-color:#1280c4}#summary tr:last-child td{padding-top:4px;font-size:.9em;text-transform:uppercase}#disallow{text-align:left;max-width:500px;margin:2em auto 0;background-color:#e0adad;padding:10px;border:1px solid #e0443d}#disallow li{line-height:24px}#disallow p{margin-bottom:10px}.wrapper{height:calc(100% - 190px);overflow:auto}.table-data{margin-top:0;width:calc(100% - 5px);text-align:left;background:#f9f9f9}.table-data caption{margin-bottom:.6em}.table-data td,.table-data th{padding:7px 10px;border:1px solid #1f9fba;position:relative}.table-data th{border:none;background:#fff}.table-data th:first-child{padding-left:32px}.table-data a{text-decoration:none;color:#08b1d5}.table-data a:hover{text-decoration:underline}.table-data tr:hover{background:#d5d2d0}.table-data tbody tr:nth-child(even) td{background-color:#daf1f6}.more-info th{border:1px solid #ccc !important}.more-info td{background:#fff !important;border:1px solid #ccc !important;font-size:14px}.more-info > td{background:#ececec !important}.more-info tr:hover td{background:#f9f9f9 !important}.more-info ul{list-style:none;text-align:left}.more-info{display:none;background:transparent !important;border:1px solid #1f9fba}body > p{margin-top:2em}.bold{font-weight:700}.chevron{color:#08b1d5;font-size:20px;padding:10px;cursor:pointer;position:absolute;left:-5px;top:40%;z-index:10;transform:translateY(-50%)}#logo{display:block;margin:0 auto;width:144px;height:52px;background-repeat:no-repeat;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAAA0CAYAAABly7FAAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AcMDhEFC0soHwAACLJJREFUeNrtm3uMVFcdxz8zu9MlW9juYIXahWJBZXgIxXQRTMFaenJLS4lLDGqqVavNqiWQaBr6iI9GjCaSSBWN2KTEEmPaEGuHWD386NqkVGhXuqIwXdFFERAqhW23LCywu+Mfc8ZcLnfu3NmZyczsnm9ys7l3z+t3zvf8XucMWFhYWFhYWFhYWFiMDZzbPN1OQhUgUu4Oeo+0rgV+mLevKMT29UeiRwfSeUpGgIONaw7PtctXeUTLRJrs33XA46afSIiHAspYjEYC9R5pJT6tk94jrQ8Bm+wUj27Ul4k83wMestNrNdBIyPMtSx6rgUZKno3A1+20Wg00EvJsHevkUcoJfLdhfG7ybALWFUvl2L5+okcHwowq1bjm8JwwCyqi3e+TgQTwXuA9rqKDwAngkIju9Kubr32lnMVAKzDV/Pss0A3sFNG9SjkRz3ynRXTa1VbEZz2Gg8bgV0dEDwfIP83IfwNwLZDt/zzwH+CAiH49rPxFmzBDnp8B7dW4O0Q0Sjn1wBbgHqAhpBb5KvCEIVYgeZRy5gM7XMTxK7sNWO3p/4vAk673DcAjrvchYFzQGIDPAVtzKQUzvmnAj4CVIbXo28AqEd0RhkQjMmFNyVRWA+nSkicN6VBPIZrzauC+MORx4afAG0o59X5myEWeJ4A/B5HH4LM+/V/yvF/wvJ8NMc5LIcosDkseg2uAF5Ry9hgZS6uBmpIp+lbOJp48uGX3Oxs/f8uEA+dLQZ2L1128dHV68s8jLaw2uy/I7F6Cf5ZbgU0EOkX0Au9ONBP7feBLo9i9WaSUs1lErwnSRAUTqG/lbJqSqV8MwSfuOfzg2r6Vsy+UasSXnr1tmCj1IcZVjOm9CBwHThvbD9BofKLrPWVvUsq5U0Q/79FAy4H1Pm2fAXqAd4AYEAemm/arBWeNv3fGzEUEGA9MM+N14wGlnAdF9PmiTVhTMkVTMhVpSqZ2Avfm0RLViH8BK4wpmQG0iuilInopcLOIbgG+4VNvs09Utdmn3PPAJGChiF5m2v2gMaFfcTmslcJu4CZgAjATWGTGuARYALwL+L1PvQ1F+0BZswV0AKrGiNMHTBLRN4ro3xoTlPYxSYjoDcBeT/1JSjnjXOWWG63ixg4RfZeIHvK2a7DV7PZK4FkgLqKXiOj9XvlFdHacaRG93GecTlEEypKnKZnaDtxaa4bcTNYpn0W9zEF0fd/uM0dXud5/7NPN/bmcTdNuXQXlvyCi3ypA/pc8TTQq5USL8SXqmpKpXbVInoCcTZ0xZVGlnJnAPJMfmQLc4uO015l6zaaMGx0i+o0akz9mNkVUKWeBMbU3mvzQQu/6B+UL6/OE6hHgL8Ds0UAepZxrjQZZCjSPwLm9xjjHbvyqhuS/GfgBMMvIMq7YtqN5fJ5dtUwepZysmp6olPM0cAr4lIm2Ggtty9TxzllXtR5ZuMY1Xynnj0CnsSSTS0GeIB8o1pRMvQTcVsuax6js8SYCWx2yWjqgrWaffw2GSflXSn6lnHlkkp2Ly9FHvY/2aQD+Tv7saiVRH3IH1gMpE7r64SSZY4i9xlR3A2uB7+Yo31xL2pfMederAcVeN+mHPwEHgEPmfVkxCzGpismTNmFmW8jyC3LI8iiwVUSf8Jn4gYD2jvkFGWEPHiugfb7MlUcoaTJHK78R0f0+8g8Wu5PT5qnGe8f9wEeMVgmDR3y+rRTRO0bY/wWfuZkmol+r0g33qM/aXi+iT5aqgyi1hVnAX2NtHWHL3+mzM3cUSeBhz7cVZZK1oZhNrJTT6OMod5aSPLVCoDQwAEyJtXUcK4A8cHkCEDLnPyNyog3e4srrFfeF8EWGQ/R72vM+DhjOFeGZ70HHSeN9vu0vUv6aJNApYG6sreN4CdqaqJQTzXVzUCmngYDUvfEZ/uGzmOs8YbM3envAh8x+cnpxt9e3cvXRBNwf0J6fL3drULivlNMCzBlNBBokk4fqGWF9P8/20z4Ob0QpZ4ZZxHxJHb9F26SU0+r2KZVyGpRyZinlHAU2hjBHf/P59nT2HM6dYlHKuQN4OyjNIqL7fDTfDKWcOTkCAccECQUFUPVVTJ6LQEusreN0EW2s9yHENqWch4FnyFzrWAjcBbSECY1F9B6lnG4yRx9uvAqcVMrpNxtzggmjw0ZN+5Vyhrj83Owq4IRSzj4z1hnGD5wYstkNwDc9CuM1pZxXgCSZ6ywfNZrp3WXLp1QAR4EPxdo63iwyD3IQ+K9JTfxf2xg1/dgIQ2OALwB7fIpcV6TcK4Df+eSelo1Q/sc9BMqScol5RqUT3Qt8AHizmEbMNYVBE/aHdQyHyXPV0bS7F/hMgRtiKMSC7yQ48RfG7LnHeYbM3euwOJvDFyuAQJFIqCcdiVDK24gZ1ZA+B0yPtXUMFBhtBZmcHuD9BF9Oz+Z4ZgE/yTdHpt1fGjOW757P14wfNxiCmMMi+sPAc3naHDJadEMI+Z8E7g4xXd1GU3ddsSyBa+bB5G/vbgF6InkqNtRHWb8qEauLRkrDHTh8bELzvO+0RPrLodbMFY424JPAfDIHoyfJHDA+I6L/YMpNBd7n0UovG23mXZzsccnHyFwDmWryN8eAl4EXRXSfycmc4fKs8L0ieluORc/+TGiVMTU3mPpdwK+B50T0sPmZ0hyXhq0T0btyyB8ncx64ymj4OqMZXwS2i+guU26+x8caAPa6f4IUSKBJj+2eAvybEAR6+OMJ6upKQqBD7Yn4zC3dvbQn4pSJQDmPG4o9ishXvxAClQvlkr8aCHSGzPWCwXKRp9KoBgKVC5WOwo4AifZEfBALS6AC8Up7Ir7ILkFto1Jh/KH2RHzRlu5euwKWQAWjB5gLMFp9HmvCyocX2hPx28fgPEe48mJXzGqgwrC7PRG/fYyarX4yv1Ad73qeGs0aqNS3EbvaE/ElY9VsmRzLubFiwo6TuWsSiAIy0JH2RLzPegsWFhYWFhYWFhYWFhbA/wBfcjd15gj72AAAAABJRU5ErkJggg==)}#logo span{display:none}*{margin:0;padding:0}html,body{max-height:100%;overflow:hidden;background:#ccc;font-family:'Lucida Grande', 'Lucida Sans', Arial, sans-serif;color:#464547}.mt20{margin-top:20px}.clearfix::after{display:block;content:"";clear:both}.header{height:50px;line-height:50px;background:#000}.header .logo{width:100px;margin-top:7px;margin-left:10px}.content{margin:30px;background:#fff;height:calc(100vh - 110px)}.tabset{float:left;list-style:none;padding-left:20px}.tabset li{float:left;position:relative}.tab input[type=radio]{display:none}.tab input[type=radio] + label{display:inline-block;padding:10px;color:#999;cursor:pointer}.tab input[type=radio]:checked + label{color:#2b2b2b;border:1px solid #ddd;border-bottom:0;border-radius:3px 3px 0 0}.tab input[type=radio]:checked + label:after{content:"";position:absolute;height:1px;width:calc(100% - 2px);background:#fff;left:1px;bottom:-1px;z-index:1000}.tabs-content{clear:both;height:calc(100% - 20px);overflow:auto;border-top:1px solid #ddd;padding:20px}.tabs-content .tab-content{display:none;height:100%}.tabs-content .tab1{display:block;height:calc(100% - 165px);overflow:auto}.content > .title{padding:15px 20px;margin-bottom:10px;border-bottom:0}.content > .title h1{margin-bottom:5px;font-size:24px}.content > .title span{font-size:16px}.box{padding:25px 20px;border:1px solid #ddd}.image-status{background:#f7f7f7}.image-status .icon-warning-triangle,.image-status .icon-check{width:60px;height:60px;float:left}.image-status h2,.image-status h5{padding-left:70px;margin-top:5px}.image-status h5{font-size:14px;font-weight:normal}.title{padding:0;margin:0;border-bottom:1px solid #ddd;padding-bottom:10px;font-weight:normal;font-size:16px}.vuln-nums{padding:10px}.vuln-nums li{list-style:none;float:left;padding:5px 10px;border-right:1px solid #ddd;font-size:12px}.vuln-nums li:last-child{border-right:none}.square{border-radius:3px;width:15px;height:15px;display:inline-block;position:relative;top:3px}.red{background:#e0443d}.orange{background:#f79421}.yellow{background:#e1c930}.green{background:#a5cf4f}.text-alert{color:#e0443d;fill:#e0443d}.text-success{color:#a5cf4f;fill:#a5cf4f}.assurance-checks li{list-style:none;padding:10px 5px;border-bottom:1px solid #ddd;font-size:14px}.assurance-checks .icon-warning-triangle{width:20px;position:relative;top:3px;margin-right:5px}
+    </style>
+    <script>
+        function changeTab(e){for(var t=document.getElementsByClassName("tab-content"),n=document.getElementsByClassName(e)[0],s=0;s<t.length;s++)t[s].style.display="none";n.style.display="block"}function getDisplay(e){return e.currentStyle?e.currentStyle.display:getComputedStyle(e,null).display}function toggleOpen(e){var t=document.getElementById("show"+e.id);"none"===getDisplay(t)?(e.getElementsByClassName('chevron')[0].innerHTML="&#9662;",t.style.display="table-row"):(e.getElementsByClassName('chevron')[0].innerHTML="&#9656;",t.style.display="none");return false;}function toggleGroupBy(e){var t=document.getElementById("resources"),n=document.getElementById("cves");e.checked?(t.classList.remove("hidden"),n.classList.add("hidden")):(n.classList.remove("hidden"),t.classList.add("hidden"))}
+    </script>
+</head>
+
+<body>
+<header class="header">
+    <svg class="logo" viewBox="0 0 490.42 176" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <style>.cls-1 {
+                fill: #f1df36;
+            }
+            .cls-2 {
+                fill: #faaf42;
+            }
+            .cls-3 {
+                fill: #9ad7ec;
+            }
+            .cls-4 {
+                fill: #08b1d5;
+            }
+            .cls-5 {
+                fill: #f69421;
+            }
+            .cls-6 {
+                fill: #1180c4;
+            }
+            .cls-7 {
+                fill: #fff;
+            }
+            .cls-8 {
+                fill: none;
+                stroke: #f69421;
+                stroke-miterlimit: 10;
+                stroke-width: 22px;
+            }</style>
+        </defs>
+        <title>aqua_logo_</title>
+        <polygon class="cls-1" points="85.58 20 50.78 54 120.38 54 120.38 20"/>
+        <polygon class="cls-2" points="120.38 122 155.18 88 155.18 54 120.38 54"/>
+        <polygon class="cls-3" points="50.78 122 50.78 156 85.58 156 120.38 122"/>
+        <polygon class="cls-4" points="15.98 88 15.98 122 50.78 122 50.78 54"/>
+        <rect class="cls-5" x="120.38" y="20" width="34.8" height="34"/>
+        <rect class="cls-6" x="15.98" y="122" width="34.8" height="34"/>
+        <path class="cls-7" d="M239.94,51.45A25.86,25.86,0,0,0,230.15,47a59.53,59.53,0,0,0-12.93-1.21A70,70,0,0,0,204.48,47c-4.24.79-7.54,1.52-9.82,2.18l-1.08.31v15h2.52l0.28-.12a65.57,65.57,0,0,1,11.17-3.59,45.5,45.5,0,0,1,9.61-1.23,47.4,47.4,0,0,1,6.74.47A12.9,12.9,0,0,1,229,61.79a8.09,8.09,0,0,1,3.07,3.44,14.35,14.35,0,0,1,1.14,6.25v0.92c-5.91.35-11.49,0.86-16.62,1.52a51.69,51.69,0,0,0-14.84,4,23.27,23.27,0,0,0-10.73,9,26,26,0,0,0-3.4,13.6,26.31,26.31,0,0,0,1.86,9.81,23.78,23.78,0,0,0,5,7.87,23.46,23.46,0,0,0,16.65,6.87,31.87,31.87,0,0,0,8.91-1,38,38,0,0,0,6.5-2.69,29.78,29.78,0,0,0,5.1-3.32l1.56-1.23v6.2H248.4V71.94a32.05,32.05,0,0,0-2.06-12.13A19.67,19.67,0,0,0,239.94,51.45Zm-6.68,33.76V103a44,44,0,0,1-8,5.5,20.44,20.44,0,0,1-9.75,2.32c-4.1,0-7.21-.94-9.25-2.79s-3-4.56-3-8.3c0-3.29.89-5.75,2.73-7.53A18.22,18.22,0,0,1,213.43,88a58.31,58.31,0,0,1,10.47-1.86C227.49,85.76,230.62,85.46,233.25,85.21Z"/>
+        <path class="cls-7" d="M306.7,49.86a40.8,40.8,0,0,0-6.95-3,33.78,33.78,0,0,0-10.13-1.37,28.89,28.89,0,0,0-12.26,2.74A29.53,29.53,0,0,0,267.26,56a39,39,0,0,0-7.07,12.52,50.69,50.69,0,0,0-2.65,17c0,12.05,2.57,21.63,7.63,28.46a24.78,24.78,0,0,0,20.88,10.51,29.1,29.1,0,0,0,11.84-2.37,37.47,37.47,0,0,0,8.28-5.21v32.91h15.21V47.52h-14.1Zm-7.63,10.48A39.15,39.15,0,0,1,306.18,63v39.67a35,35,0,0,1-8.08,5.1,22.6,22.6,0,0,1-9.38,2.08c-5.33,0-9.14-2-11.64-6.13-2.61-4.31-3.94-10.63-3.94-18.8,0-8.33,1.65-14.76,4.9-19.1s7.64-6.35,13.61-6.35A30.68,30.68,0,0,1,299.07,60.35Z"/>
+        <path class="cls-7" d="M380.35,102.49a42.28,42.28,0,0,1-8.46,5.58,20,20,0,0,1-8.88,2.38,15.39,15.39,0,0,1-6.69-1.14,7.82,7.82,0,0,1-3.41-3.45,17.3,17.3,0,0,1-1.75-6.13,88,88,0,0,1-.41-9.41V47.52H335.54V96.1a41.14,41.14,0,0,0,1.8,12.95,24.82,24.82,0,0,0,5.16,9,20.29,20.29,0,0,0,7.89,5.32,27,27,0,0,0,9.45,1.65,26.25,26.25,0,0,0,12-2.73,50.21,50.21,0,0,0,8.54-5.63v6.34h15.21V47.52H380.35v55Z"/>
+        <path class="cls-7" d="M463.82,59.81a19.67,19.67,0,0,0-6.4-8.36A25.86,25.86,0,0,0,447.64,47a59.53,59.53,0,0,0-12.93-1.21A70,70,0,0,0,422,47c-4.24.79-7.54,1.52-9.82,2.18l-1.08.31v15h2.52l0.28-.12A65.57,65.57,0,0,1,425,60.78a45.5,45.5,0,0,1,9.61-1.23,47.4,47.4,0,0,1,6.74.47,12.9,12.9,0,0,1,5.15,1.78,8.09,8.09,0,0,1,3.07,3.44,14.35,14.35,0,0,1,1.14,6.25v0.92c-5.91.35-11.49,0.86-16.62,1.52a51.69,51.69,0,0,0-14.84,4,23.27,23.27,0,0,0-10.73,9,26,26,0,0,0-3.4,13.6,26.31,26.31,0,0,0,1.86,9.81,23.78,23.78,0,0,0,5,7.87,23.46,23.46,0,0,0,16.65,6.87,31.87,31.87,0,0,0,8.91-1,38,38,0,0,0,6.5-2.69,29.78,29.78,0,0,0,5.1-3.32l1.56-1.23v6.2h15.14V71.94A32.05,32.05,0,0,0,463.82,59.81Zm-13.08,25.4V103a44,44,0,0,1-8,5.5,20.44,20.44,0,0,1-9.75,2.32c-4.1,0-7.21-.94-9.25-2.79s-3-4.56-3-8.3c0-3.29.89-5.75,2.73-7.53A18.22,18.22,0,0,1,430.92,88a58.31,58.31,0,0,1,10.47-1.86C445,85.76,448.11,85.46,450.74,85.21Z"/>
+        <rect class="cls-8" x="-604.42" y="-703.27" width="1676" height="1646"/>
+    </svg>
+
+
+</header>
+<main class="content">
+    <div class="title">
+        <h1>Scan Report: </h1>
+        <span>From Local Docker Engine</span>
+
+    </div>
+    <ul class="tabset">
+        <li class="tab">
+            <input type="radio" name="tab" id="tab1" checked>
+            <label for="tab1" onclick="changeTab('tab1')">Risk</label>
+        </li>
+        <li class="tab">
+            <input type="radio" name="tab" id="tab2">
+            <label for="tab2" onclick="changeTab('tab2')">Vulnerabilities</label>
+        </li>
+		
+		
+    </ul>
+    <div class="tabs-content">
+        <div class="tab-content tab1">
+            <div class="image-status box">
+            	
+					<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"
+						 class="icon-warning-triangle text-alert">
+						<path d="M30.587 30.447c-0.009 0-0.017 0-0.027 0h-29.259c-0.469 0-0.905-0.248-1.144-0.652-0.24-0.403-0.248-0.904-0.021-1.315l14.629-26.533c0.467-0.847 1.864-0.847 2.331 0l14.516 26.328c0.191 0.229 0.305 0.524 0.305 0.845 0 0.732-0.596 1.327-1.331 1.327zM15.931 5.34l-12.38 22.453h24.76l-12.38-22.453zM15.931 11.873c0.735 0 1.331 0.593 1.331 1.327v6.633c0 0.732-0.596 1.327-1.331 1.327s-1.329-0.595-1.329-1.327v-6.633c0-0.733 0.595-1.327 1.329-1.327zM16.879 22.871c0.239 0.252 0.385 0.597 0.385 0.943s-0.147 0.689-0.399 0.941c-0.24 0.239-0.585 0.385-0.931 0.385-0.36 0-0.692-0.147-0.944-0.385-0.253-0.252-0.387-0.596-0.387-0.941s0.133-0.691 0.387-0.943c0.491-0.491 1.396-0.491 1.888 0z"></path>
+					</svg>
+
+					<h2 class="text-alert">Image is disallowed</h2>
+                
+                <h5>Image scanned on August 3, 2018 14:59</h5>
+            </div>
+            <div class="image-overview box mt20">
+                <h4 class="title">Image Overview</h4>
+                <ul class="vuln-nums clearfix">
+                    <li class="vuln">
+                        <span class="square red"></span>
+                        <span>6 High</span>
+                    </li>
+                    <li class="vuln">
+                        <span class="square orange"></span>
+                        <span>20 Medium</span>
+                    </li>
+                    <li class="vuln">
+                        <span class="square yellow"></span>
+                        <span>35 Low</span>
+                    </li>
+                    <li class="vuln">
+                        <span class="square green"></span>
+                        <span>2 Negligible</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="assurance-checks box mt20">
+                <h4 class="title">Image Assurance</h4>
+                <ul>
+                	
+						<li>
+							<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"
+								 class="icon-warning-triangle text-alert">
+								<path d="M30.587 30.447c-0.009 0-0.017 0-0.027 0h-29.259c-0.469 0-0.905-0.248-1.144-0.652-0.24-0.403-0.248-0.904-0.021-1.315l14.629-26.533c0.467-0.847 1.864-0.847 2.331 0l14.516 26.328c0.191 0.229 0.305 0.524 0.305 0.845 0 0.732-0.596 1.327-1.331 1.327zM15.931 5.34l-12.38 22.453h24.76l-12.38-22.453zM15.931 11.873c0.735 0 1.331 0.593 1.331 1.327v6.633c0 0.732-0.596 1.327-1.331 1.327s-1.329-0.595-1.329-1.327v-6.633c0-0.733 0.595-1.327 1.329-1.327zM16.879 22.871c0.239 0.252 0.385 0.597 0.385 0.943s-0.147 0.689-0.399 0.941c-0.24 0.239-0.585 0.385-0.931 0.385-0.36 0-0.692-0.147-0.944-0.385-0.253-0.252-0.387-0.596-0.387-0.941s0.133-0.691 0.387-0.943c0.491-0.491 1.396-0.491 1.888 0z"></path>
+							</svg>
+							Image severity <strong>high</strong> exeeds the allowed max severity <strong>high</strong>
+						</li>
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="tab-content tab2">
+			<div class="group-by" style="margin-left: 5px;margin-bottom: 20px;">
+                <input type="checkbox" id="group" onchange="toggleGroupBy(this)">
+                <label for="group">Group by resource</label>
+            </div>
+            <div class="wrapper">
+                <table id="resources" class="hidden table-data resources">
+                    <thead>
+                    <tr>
+                        <th scope="col">Resource</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Version</th>
+                        <th scope="col">Format</th>
+                        <th scope="col">Arch</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="1">
+									<span class="chevron">&#9656;</span>
+									
+										setup
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.8.71-7.el7</td>
+						<td>rpm</td>
+						<td>noarch</td>
+                    </tr>
+
+                    <tr id="show1" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1113" target="_blank">CVE-2018-1113</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="4">
+									<span class="chevron">&#9656;</span>
+									
+										glibc
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.17-196.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show4" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-11237" target="_blank">CVE-2018-11237</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2017-16997" target="_blank">CVE-2017-16997</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-11236" target="_blank">CVE-2018-11236</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-4043" target="_blank">CVE-2014-4043</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>1</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-0805.html" target="_blank">RHSA-2018:0805</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>7</span></td>
+										<td>2.17-222.el7</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="6">
+									<span class="chevron">&#9656;</span>
+									
+										bash
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>4.2.46-29.el7_4</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show6" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-6278" target="_blank">CVE-2014-6278</a></td>
+										<td><span class="severity negligible">negligible</span></td>
+										<td><span>10</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-6277" target="_blank">CVE-2014-6277</a></td>
+										<td><span class="severity negligible">negligible</span></td>
+										<td><span>10</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="15">
+									<span class="chevron">&#9656;</span>
+									
+										libgcrypt
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>1.5.3-14.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show15" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-0495" target="_blank">CVE-2018-0495</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-3591" target="_blank">CVE-2014-3591</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>1.2</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2015-0837" target="_blank">CVE-2015-0837</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>1.2</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-5270" target="_blank">CVE-2014-5270</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>1.9</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="18">
+									<span class="chevron">&#9656;</span>
+									
+										sqlite
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>3.7.17-8.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show18" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-8740" target="_blank">CVE-2018-8740</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="30">
+									<span class="chevron">&#9656;</span>
+									
+										libidn
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>1.28-4.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show30" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2015-2059" target="_blank">CVE-2015-2059</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>2.6</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="44">
+									<span class="chevron">&#9656;</span>
+									
+										procps-ng
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>3.3.10-16.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show44" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1122" target="_blank">CVE-2018-1122</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1123" target="_blank">CVE-2018-1123</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1125" target="_blank">CVE-2018-1125</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-1700.html" target="_blank">RHSA-2018:1700</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>7</span></td>
+										<td>3.3.10-17.el7_5.2</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="46">
+									<span class="chevron">&#9656;</span>
+									
+										binutils
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.25.1-32.base.el7_4.1</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show46" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-9996" target="_blank">CVE-2018-9996</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-9138" target="_blank">CVE-2018-9138</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-10534" target="_blank">CVE-2018-10534</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-10535" target="_blank">CVE-2018-10535</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-10372" target="_blank">CVE-2018-10372</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-10373" target="_blank">CVE-2018-10373</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12641" target="_blank">CVE-2018-12641</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-13033" target="_blank">CVE-2018-13033</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12697" target="_blank">CVE-2018-12697</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12698" target="_blank">CVE-2018-12698</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12699" target="_blank">CVE-2018-12699</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12700" target="_blank">CVE-2018-12700</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-12934" target="_blank">CVE-2018-12934</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-7643" target="_blank">CVE-2018-7643</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-7208" target="_blank">CVE-2018-7208</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-8945" target="_blank">CVE-2018-8945</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-7568" target="_blank">CVE-2018-7568</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-7569" target="_blank">CVE-2018-7569</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-7642" target="_blank">CVE-2018-7642</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="47">
+									<span class="chevron">&#9656;</span>
+									
+										nss
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>3.28.4-15.el7_4</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show47" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-0495" target="_blank">CVE-2018-0495</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-3566" target="_blank">CVE-2014-3566</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="49">
+									<span class="chevron">&#9656;</span>
+									
+										curl
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>7.29.0-42.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show49" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1000301" target="_blank">CVE-2018-1000301</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1000007" target="_blank">CVE-2018-1000007</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1000120" target="_blank">CVE-2018-1000120</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1000121" target="_blank">CVE-2018-1000121</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1000122" target="_blank">CVE-2018-1000122</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2017-3263.html" target="_blank">RHSA-2017:3263</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>7.29.0-42.el7_4.1</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="56">
+									<span class="chevron">&#9656;</span>
+									
+										dracut
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>033-502.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show56" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2017-5715" target="_blank">CVE-2017-5715</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>7</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="57">
+									<span class="chevron">&#9656;</span>
+									
+										systemd
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>219-42.el7_4.4</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show57" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-6954" target="_blank">CVE-2018-6954</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-0260.html" target="_blank">RHSA-2018:0260</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>219-42.el7_4.7</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="59">
+									<span class="chevron">&#9656;</span>
+									
+										python
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.7.5-58.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show59" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1060" target="_blank">CVE-2018-1060</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-1061" target="_blank">CVE-2018-1061</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-2123.html" target="_blank">RHSA-2018:2123</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>4.3</span></td>
+										<td>2.7.5-69.el7_5</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="73">
+									<span class="chevron">&#9656;</span>
+									
+										yum-utils
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>1.1.31-42.el7</td>
+						<td>rpm</td>
+						<td>noarch</td>
+                    </tr>
+
+                    <tr id="show73" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-2285.html" target="_blank">RHSA-2018:2285</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>7</span></td>
+										<td>1.1.31-46.el7_5</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="81">
+									<span class="chevron">&#9656;</span>
+									
+										policycoreutils
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.5-17.1.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show81" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-0913.html" target="_blank">RHSA-2018:0913</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>2.5-22.el7</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="84">
+									<span class="chevron">&#9656;</span>
+									
+										libevent
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.0.21-4.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show84" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2015-6525" target="_blank">CVE-2015-6525</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5.1</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-6272" target="_blank">CVE-2014-6272</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5.1</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="124">
+									<span class="chevron">&#9656;</span>
+									
+										libxml2
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.9.1-6.el7_2.3</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show124" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-14404" target="_blank">CVE-2018-14404</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2017-18258" target="_blank">CVE-2017-18258</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="140">
+									<span class="chevron">&#9656;</span>
+									
+										ncurses
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>5.9-14.20130511.el7_4</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show140" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-10754" target="_blank">CVE-2018-10754</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+                    <tr>
+                        <td class="pl30">
+                            
+								<a href="#" onclick="toggleOpen(this)" id="176">
+									<span class="chevron">&#9656;</span>
+									
+										gnupg2
+									
+								</a>
+							
+                        </td>
+                        <td>PACKAGE</td>
+                        <td>2.0.22-4.el7</td>
+						<td>rpm</td>
+						<td>x86_64</td>
+                    </tr>
+
+                    <tr id="show176" class="more-info">
+                        <td colspan="6">
+                            <table style="width:100%">
+								<thead>
+									<tr>
+										<th scope="col">Name</th>
+										<th scope="col">Severity</th>
+										<th scope="col">Score</th>
+										<th scope="col">Fix Version</th>
+									</tr>
+								 </thead>
+								<tbody>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2018-9234" target="_blank">CVE-2018-9234</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>3</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-3591" target="_blank">CVE-2014-3591</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>1.2</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2015-0837" target="_blank">CVE-2015-0837</a></td>
+										<td><span class="severity low">low</span></td>
+										<td><span>1.2</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://access.redhat.com/security/cve/CVE-2014-4617" target="_blank">CVE-2014-4617</a></td>
+										<td><span class="severity medium">medium</span></td>
+										<td><span>5</span></td>
+										<td>None</td>
+									</tr>
+								
+									<tr>
+										<td><a href="https://rhn.redhat.com/errata/RHSA-2018-2181.html" target="_blank">RHSA-2018:2181</a></td>
+										<td><span class="severity high">high</span></td>
+										<td><span>7</span></td>
+										<td>2.0.22-5.el7_5</td>
+									</tr>
+								
+								</tbody>
+                            </table>
+                        </td>
+                    </tr>
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+						
+
+					
+                    </tbody>
+                </table>
+
+				<table id="cves" class="table-data">
+                    <thead>
+						<tr>
+							<th scope="col">Name</th>
+							<th scope="col">Resource</th>
+							<th scope="col">Severity</th>
+							<th scope="col">Score</th>
+							<th scope="col">Fix Version</th>
+						</tr>
+                    </thead>
+                    <tbody>
+
+						<tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-2181.html" target="_blank">RHSA-2018:2181</a>
+										
+									</td>
+									
+										<td>gnupg2</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>7</span></td>
+									<td>2.0.22-5.el7_5</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-1700.html" target="_blank">RHSA-2018:1700</a>
+										
+									</td>
+									
+										<td>procps-ng</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>7</span></td>
+									<td>3.3.10-17.el7_5.2</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2017-5715" target="_blank">CVE-2017-5715</a>
+										
+									</td>
+									
+										<td>dracut</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>7</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-0805.html" target="_blank">RHSA-2018:0805</a>
+										
+									</td>
+									
+										<td>glibc</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>7</span></td>
+									<td>2.17-222.el7</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-2285.html" target="_blank">RHSA-2018:2285</a>
+										
+									</td>
+									
+										<td>yum-utils</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>7</span></td>
+									<td>1.1.31-46.el7_5</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2015-6525" target="_blank">CVE-2015-6525</a>
+										
+									</td>
+									
+										<td>libevent</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5.1</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-6272" target="_blank">CVE-2014-6272</a>
+										
+									</td>
+									
+										<td>libevent</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5.1</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-14404" target="_blank">CVE-2018-14404</a>
+										
+									</td>
+									
+										<td>libxml2</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-0495" target="_blank">CVE-2018-0495</a>
+										
+									</td>
+									
+										<td>libgcrypt</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-0495" target="_blank">CVE-2018-0495</a>
+										
+									</td>
+									
+										<td>nss</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1061" target="_blank">CVE-2018-1061</a>
+										
+									</td>
+									
+										<td>python</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1122" target="_blank">CVE-2018-1122</a>
+										
+									</td>
+									
+										<td>procps-ng</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-0260.html" target="_blank">RHSA-2018:0260</a>
+										
+									</td>
+									
+										<td>systemd</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>219-42.el7_4.7</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-4617" target="_blank">CVE-2014-4617</a>
+										
+									</td>
+									
+										<td>gnupg2</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-11236" target="_blank">CVE-2018-11236</a>
+										
+									</td>
+									
+										<td>glibc</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-6954" target="_blank">CVE-2018-6954</a>
+										
+									</td>
+									
+										<td>systemd</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2017-16997" target="_blank">CVE-2017-16997</a>
+										
+									</td>
+									
+										<td>glibc</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-11237" target="_blank">CVE-2018-11237</a>
+										
+									</td>
+									
+										<td>glibc</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2017-3263.html" target="_blank">RHSA-2017:3263</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>7.29.0-42.el7_4.1</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1000122" target="_blank">CVE-2018-1000122</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1000120" target="_blank">CVE-2018-1000120</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1000007" target="_blank">CVE-2018-1000007</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1000301" target="_blank">CVE-2018-1000301</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-3566" target="_blank">CVE-2014-3566</a>
+										
+									</td>
+									
+										<td>nss</td>
+									
+									<td><span class="severity high">high</span></td>
+									<td><span>5</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-2123.html" target="_blank">RHSA-2018:2123</a>
+										
+									</td>
+									
+										<td>python</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>4.3</span></td>
+									<td>2.7.5-69.el7_5</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12641" target="_blank">CVE-2018-12641</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12697" target="_blank">CVE-2018-12697</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12698" target="_blank">CVE-2018-12698</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12699" target="_blank">CVE-2018-12699</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12700" target="_blank">CVE-2018-12700</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-12934" target="_blank">CVE-2018-12934</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-13033" target="_blank">CVE-2018-13033</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-7208" target="_blank">CVE-2018-7208</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-8945" target="_blank">CVE-2018-8945</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-7568" target="_blank">CVE-2018-7568</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-7569" target="_blank">CVE-2018-7569</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-7642" target="_blank">CVE-2018-7642</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-10373" target="_blank">CVE-2018-10373</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-7643" target="_blank">CVE-2018-7643</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-10372" target="_blank">CVE-2018-10372</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-10535" target="_blank">CVE-2018-10535</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-10534" target="_blank">CVE-2018-10534</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1000121" target="_blank">CVE-2018-1000121</a>
+										
+									</td>
+									
+										<td>curl</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-9138" target="_blank">CVE-2018-9138</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-9996" target="_blank">CVE-2018-9996</a>
+										
+									</td>
+									
+										<td>binutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1125" target="_blank">CVE-2018-1125</a>
+										
+									</td>
+									
+										<td>procps-ng</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1123" target="_blank">CVE-2018-1123</a>
+										
+									</td>
+									
+										<td>procps-ng</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-8740" target="_blank">CVE-2018-8740</a>
+										
+									</td>
+									
+										<td>sqlite</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1060" target="_blank">CVE-2018-1060</a>
+										
+									</td>
+									
+										<td>python</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2017-18258" target="_blank">CVE-2017-18258</a>
+										
+									</td>
+									
+										<td>libxml2</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-10754" target="_blank">CVE-2018-10754</a>
+										
+									</td>
+									
+										<td>ncurses</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-9234" target="_blank">CVE-2018-9234</a>
+										
+									</td>
+									
+										<td>gnupg2</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://rhn.redhat.com/errata/RHSA-2018-0913.html" target="_blank">RHSA-2018:0913</a>
+										
+									</td>
+									
+										<td>policycoreutils</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>2.5-22.el7</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2018-1113" target="_blank">CVE-2018-1113</a>
+										
+									</td>
+									
+										<td>setup</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>3</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2015-2059" target="_blank">CVE-2015-2059</a>
+										
+									</td>
+									
+										<td>libidn</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>2.6</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-5270" target="_blank">CVE-2014-5270</a>
+										
+									</td>
+									
+										<td>libgcrypt</td>
+									
+									<td><span class="severity medium">medium</span></td>
+									<td><span>1.9</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2015-0837" target="_blank">CVE-2015-0837</a>
+										
+									</td>
+									
+										<td>libgcrypt</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>1.2</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-3591" target="_blank">CVE-2014-3591</a>
+										
+									</td>
+									
+										<td>libgcrypt</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>1.2</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-3591" target="_blank">CVE-2014-3591</a>
+										
+									</td>
+									
+										<td>gnupg2</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>1.2</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2015-0837" target="_blank">CVE-2015-0837</a>
+										
+									</td>
+									
+										<td>gnupg2</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>1.2</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-4043" target="_blank">CVE-2014-4043</a>
+										
+									</td>
+									
+										<td>glibc</td>
+									
+									<td><span class="severity low">low</span></td>
+									<td><span>1</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-6278" target="_blank">CVE-2014-6278</a>
+										
+									</td>
+									
+										<td>bash</td>
+									
+									<td><span class="severity negligible">negligible</span></td>
+									<td><span>0</span></td>
+									<td>None</td>
+								</tr>
+							
+								<tr>
+									<td>
+										
+										<a href="https://access.redhat.com/security/cve/CVE-2014-6277" target="_blank">CVE-2014-6277</a>
+										
+									</td>
+									
+										<td>bash</td>
+									
+									<td><span class="severity negligible">negligible</span></td>
+									<td><span>0</span></td>
+									<td>None</td>
+								</tr>
+							
+						</tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+		
+		
+    </div>
+</main>
+
+</body>
+
+</html>
