@@ -138,21 +138,28 @@ Policy in Detail
 
 As mentioned above, a `rlgl` policy consists of three separate files:
 `XFAIL`, `FAIL` and `PASS`. Each file contains JSON matchmaking
-expressions as defined here:
-https://github.com/chancancode/json_expressions.
+expressions.  These expressions are also JSON objects.
 
 For example, to mark a CVE failure as an exception, we add the
 following to our `XFAIL` file:
 
     # Ignore this failure in our container images
-    { id: "CVE-2014-4043" }
+    { "result": "FAIL", "id": "CVE-2014-4043" }
 
-To ignore all CVEs with a score of less than 7 we add the following to
-our `XFAIL` file:
+The value here, "CVE-2014-4043", is a string, and must match "id" from
+the test result exactly.  There are two other special forms of values.
+String starting with "^" are interpreted as regular expressions, and
+strings of the form "NUMBER..NUMBER" are interpreted as a numeric
+range.
 
-    # Ignore everything but the most critical CVEs.
-    { score: "0..6" }
+So, for example, to ignore all CVE vulnerabilities from 2013 with a
+score of less than 7 we add the following to our `XFAIL` file:
 
+    # Ignore everything but the most critical CVEs from 2013.
+    { "result": "FAIL", "id": "^CVE-2013.*", "score": "0..6" }
+
+Every element of the matchmaking expression must match the test result
+in order to qualify as a match.
 
 Managing Policy
 ------------
