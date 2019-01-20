@@ -37,17 +37,17 @@
 (defun make-policy-matcher (&key kind (githash nil)
 			      (lineno 0)
 			      (matcher nil))
-  (make-instance 'policy-matcher :kind kind :githash githash :lineno lineno :matcher matcher))
+  (make-instance 'policy-matcher
+		 :kind kind :githash githash :lineno lineno :matcher matcher))
 
 (defun match-pair-in-alist (pair alist)
-  "Given a cons PAIR, return non-NIL if that PAIR matches
-in ALIST, where a match means the CDRs are EQUALP."
+  "Given a cons PAIR, return non-NIL if PAIR matches in ALIST using
+the function stored in the CDR of PAIR."
   (let ((c (assoc (car pair) alist)))
-    (and c (equalp (cdr pair) (cdr c)))))
+    (and c (apply (cdr pair) (list (cdr c))))))
 
 (defun match-candidate-pattern (candidate pattern)
   "Given a CANDIDATE alist, return T if PATTERN matches CANDIDATE."
   (not (find-if-not (lambda (v)
 		      (match-pair-in-alist v candidate))
 		    pattern)))
-

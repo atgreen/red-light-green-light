@@ -21,7 +21,8 @@
 (defpackage #:policy
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
-  (:export #:*policy-dir* #:make-policy #:apply-policy #:commit-url-format))
+  (:export #:*policy-dir* #:make-policy #:apply-policy #:commit-url-format
+	   #:compile-scanners))
 
 (in-package #:policy)
 
@@ -91,6 +92,38 @@ based on URL."
 	    (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
 	    p))))))
 
+;; regex matcher for the special case of numeric ranges: two floating
+;; point numbers separated by "..".
+(defparameter *range-matcher*
+  (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)\.\.[0-9]+(|\.[0-9]*)$"))
+
+(defparameter *number-matcher*
+  (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)"))
+
+(defun compile-scanners (matcher)
+  "Given an alist, MATCHER, replace that CDR of each pair with the
+pre-compiled scanner of that regexp string.  The regexp string is
+wrapped with ^ and $ to ensure an exact match.  As a special
+exception, strings that match RANGE-MATCHER will be replaced by
+RANGE-MATCHER."
+  (mapcar (lambda (pair)
+	    (cons (car pair)
+		  (if (cl-ppcre:scan *range-matcher* (cdr pair))
+		      ;; TODO Extract the min and max number from the range.
+		      (eval `(lambda (s)
+			       (if (cl-ppcre:scan *number-matcher* s)
+				   (let ((num (read-from-string s)))
+				     ;; TODO verify num is within the range.
+			       ))))
+		      (eval `(lambda (s)
+			       (cl-ppcre:scan
+				,(cl-ppcre:create-scanner
+				  (str:concat "^" (cdr pair) "$"))
+				s))))))
+	  matcher))
+
+; (apply (cdr (car (cdr (compile-scanners '(( 1 . "a" ) (2 . "c")))))) '("c"))
+
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
     (let ((matcher-lines (inferior-shell:run/lines
@@ -104,7 +137,9 @@ based on URL."
 					   (subseq matcher-line (+ 41 location)))))
 		    (if (and (> (length line) 0)
 			     (null (find (char line 0) "#;-")))
-			(let ((json (json:decode-json-from-string line)))
+			(let ((json
+			       (compile-scanners
+				(json:decode-json-from-string line))))
 			  (setf patterns (cons (make-policy-matcher :kind kind
 								    :githash githash
 								    :lineno lineno
@@ -130,6 +165,12 @@ based on URL."
       patterns)))
 
 (defun apply-policy (policy candidate-result-list)
+  "Apply a POLICY to CANDIDATE-RESULT-LIST, a list of test results,
+  where these results are represented as alists derived from json
+  encoded values produced by the report parsers.  This function
+  returns two values: :GREEN or :RED, as well as a list of pairs made
+  by consing the matcher object with the test result alist."
+  
   (let ((red-or-green :GREEN))
     (let ((result (mapcar (lambda (result)
 			   (cons

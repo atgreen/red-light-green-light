@@ -1,6 +1,6 @@
 (in-package #:cl-user)
 (defpackage #:test-rlgl-server
-  (:use #:common-lisp #:rlgl-server #:prove #:matcher)
+  (:use #:common-lisp #:rlgl-server #:prove #:matcher #:policy)
   (:export #:run))
 (in-package #:test-rlgl-server)
 
@@ -13,35 +13,8 @@
   (start-rlgl-server nil)
 
   ;; ---------------------------------------------------------------------------
-  ;; matcher tests
+  ;; API tests
   ;; ---------------------------------------------------------------------------
-
-  (let ((a '((:a . "1") (:b . "2") (:c . "3")))
-	(b '(:c . "3"))
-	(c '(:c . "4"))
-	(d '(:d . "5")))
-    
-    (subtest "match-pair-in-alist"
-	     (ok (not (match-pair-in-alist d a)))
-	     (ok (not (match-pair-in-alist c a)))
-	     (ok (match-pair-in-alist b a)))
-    
-    (subtest "match-candidate-pattern"
-	     (ok (match-candidate-pattern a a))
-	     (ok (match-candidate-pattern a (list b)))
-	     (ok (not (match-candidate-pattern a (list b c)))))
-    )
-  
-  ;; ---------------------------------------------------------------------------
-  ;; policy tests
-  ;; ---------------------------------------------------------------------------
-  
-;(subtest "policy"
-;  (ok (make-policy "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git")))
-
-;; -----------------------------------------------------------------------------
-;; API tests
-;; -----------------------------------------------------------------------------
 
   (subtest "start test"
 	   (loop for i from 0 to 10
