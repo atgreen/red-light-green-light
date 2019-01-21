@@ -170,9 +170,9 @@ Report Parsers
 
 Currently supported report parsers include:
 
-* OpenSCAP OVAL scan reports
-* JUnit XML results report
-* AquaSec container microscanner reports
+* [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
+* [JUnit](https://junit.org/junit5/) XML results report
+* [AquaSec](https://github.com/aquasecurity/microscanner) container microscanner reports
 
 A generic CSV parser is in the works, allowing you to implement policy
 on any arbitrary metric (file size, performance results, etc).
