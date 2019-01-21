@@ -1,15 +1,12 @@
+<img src="images/rlgl.svg" align="right" />
+
+# Red Light Green Light
+> A git-centric policy management and enforcement tool designed to accelerate your CI/CD pipelines
+
 [![Build Status](https://travis-ci.org/atgreen/red-light-green-light.svg?branch=master)](https://travis-ci.org/atgreen/red-light-green-light)
 [![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
-**This is an experimental Work In Progress**
----
-
-Red Light Green Light
-===============================
-
-**Red Light Green Light** is a git-centric policy management and
-  enforcement tool designed to accelerate your CI/CD pipelines.
-
+**This is an experimental work in progress**
 
 Problem Statement
 ----------------
