@@ -29,7 +29,7 @@ tools introduces problems:
  - bespoke gating mechanisms must be created to evaluate test results
  - different tools require different exception processes and policy management
  - no centralized, auditable policy management
- - policies are locked within proprietery tools
+ - policies are locked within proprietary tools
 
 Policy Driven Quality Gates
 ------------------------------
@@ -54,11 +54,11 @@ CI/CD pipeline:
  - who defined the policies and when?
 
 The Red Light Green Light service is invoked via the `rlgl`
-command-line tool, typically within within some other pipeline
+command-line tool, typically within some other pipeline
 automation framework, such as a [jenkins](https://jenkins.io)
 pipeline.  Here's an example workflow:
 
-- First we must log into our Red Light Green Light server with `rlgl`
+- First, we must log into our Red Light Green Light server with `rlgl`
 cli tool the like so:
 ```
 $ rlgl login -u USERNAME -p PASSWORD http://rlgl-server.example.com
@@ -106,20 +106,20 @@ The server side, where policy is evaluated, is where the magic is.
 
 The first step is to identify the type of report we're evaluating and
 convert it into a canonical form.  The canonical form is defined
-simply as this: a json object.  No special schema is defined.
+simply as this: a JSON object.  No special schema is defined.
 
 Policies are maintained in git repos, and consist of three plain text
 files: `XFAIL`, `FAIL`, and `PASS`.  Each of these files contains a
-list of json matching expressions to match again the canonical test
+list of JSON matching expressions to match again the canonical test
 results.  They are evaluated this order: `XFAIL`, `FAIL`, `PASS`.
 
 `XFAIL` contains matchers for test results we are expecting to fail and
 allowing to pass anyway.  These are your exceptions.  Any matching
-json objects are removed from the test results before processing with
+JSON objects are removed from the test results before processing with
 FAIL.
 
 `FAIL` contains matchers for tests results that are definitely failures.
-The are removed from the test results before processing with `PASS`.
+They are removed from the test results before processing with `PASS`.
 
 `PASS` contains matchers for known test passes.  These are removed from
 the test results.
@@ -172,7 +172,7 @@ in order to qualify as a match.
 
 JSON matchmaking expressions cannot span more than one line of text.
 This is required in order to attribute policy changes to individuals
-via `git blame`.  These change logs are available through the `rlgl`
+via `git blame`.  These changelogs are available through the `rlgl`
 reports generated at evaluation time.
 
 Report Parsers
