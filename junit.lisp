@@ -36,22 +36,18 @@
       (remove nil
 	      (mapcar
 	       (lambda (child)
-		 (if (listp child)
-		     (if (string= (car child) "testcase")
-			 (progn
-			   (let ((classname nil)
-				 (result nil))
-			     (dolist (a (car (cdr child)))
-			       (cond
-				 ((string= (car a) "classname")
-				  (setf classname (car (cdr a))))
-				 ((string= (car a) "name")
-				  (setf result (car (cdr a))))))
-			     (json:decode-json-from-string
-			      (format nil "{ \"report\": \"junit\", \"result\": \"~A\", \"id\": \"~A\" }"
-				      result classname))))
-			 nil)
+		 (if (and (listp child)
+			  (string= (car child) "testcase"))
+		     (let ((classname nil)
+			   (result nil))
+		       (dolist (a (car (cdr child)))
+			 (cond
+			   ((string= (car a) "classname")
+			    (setf classname (car (cdr a))))
+			   ((string= (car a) "name")
+			    (setf result (car (cdr a))))))
+		       (json:decode-json-from-string
+			(format nil "{ \"report\": \"junit\", \"result\": \"~A\", \"id\": \"~A\" }"
+				result classname)))
 		     nil))
 	       children)))))
-
-

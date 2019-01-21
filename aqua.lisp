@@ -31,7 +31,6 @@
   (let ((pdoc (plump:parse doc))
 	(tests-fail (list))
 	(tests-pass (list)))
-    (format t "AQUA PARSER!~%")
     (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(1) > a"
      	      (combine (attr :href) (text))
      	      (map-apply #'(lambda (url text)

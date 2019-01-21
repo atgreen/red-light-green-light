@@ -158,7 +158,8 @@ policy-dir = \"/tmp/policy5/\"
 	(:link :attrs (list :rel "stylesheet"
 			    :href "https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
 			    :integrity "sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-			    :crossorigin "anonymous")))
+			    :crossorigin "anonymous"))
+	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
        (:body
 	(:header
 	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
@@ -183,15 +184,15 @@ policy-dir = \"/tmp/policy5/\"
 			   (:tr :class "fold"
 				(:td :colspan "2")
 				(:div :class "fold-content"
-				      (if (and matcher
-					       (not (eq (kind matcher) :unknown)))
-					  (let ((log-lines (log-entry matcher)))
-					    (:div :id "border"
-						  (:a :href (format nil commit-url-format (githash matcher))
-						      :target "_blank"
-						      (:pre (str:trim (car log-lines))))
-						  (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
-					    (:br)))
+				      (when (and matcher
+						 (not (eq (kind matcher) :unknown)))
+					(let ((log-lines (log-entry matcher)))
+					  (:div :id "border"
+						(:a :href (format nil commit-url-format (githash matcher))
+						    :target "_blank"
+						    (:pre (str:trim (car log-lines))))
+						(:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
+					  (:br)))
 				      (:div :id "border"
 					    (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
 	(:footer :class "fixed-bottom bg-light"
@@ -287,8 +288,8 @@ policy-dir = \"/tmp/policy5/\"
   ;;
   (setf policy:*policy-dir* (pathname
 			     (str:concat (gethash "policy-dir" *config*) "/")))
-  (if (not (initialize-policy-dir *policy-dir*))
-      (sb-ext:quit))
+  (unless (initialize-policy-dir *policy-dir*)
+    (sb-ext:quit))
   
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
@@ -296,9 +297,9 @@ policy-dir = \"/tmp/policy5/\"
   (let ((srvr (start-server)))
     ;; If ARG is NIL, then exit right away.  This is used by the
     ;; testsuite.
-    (if arg
-	(loop
-	   (sleep 3000)))
+    (when arg
+      (loop
+	 (sleep 3000)))
     srvr))
 
 (defun stop-rlgl-server ()

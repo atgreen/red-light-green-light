@@ -63,7 +63,7 @@ based on URL."
 						 :sha1 (flexi-streams:string-to-octets url)))
 					       0 8))))
 
-      (if (fad:directory-exists-p policy-dirname)
+      (when (fad:directory-exists-p policy-dirname)
 	  (sb-ext:delete-directory policy-dirname :recursive t))
       
       (let ((output (inferior-shell:run
@@ -81,8 +81,8 @@ based on URL."
 	      (fail-file (merge-pathnames-as-file policy-pathname #p"FAIL")))
 
 	  (mapc (lambda (file)
-		  (if (not (file-exists-p (namestring file)))
-		      (error (format nil "Policy file \"~A\" missing." file))))
+		  (unless (file-exists-p (namestring file))
+		    (error (format nil "Policy file \"~A\" missing." file))))
 		(list xfail-file pass-file fail-file))
 	  
 	  (let ((p (make-instance 'policy)))
@@ -100,6 +100,19 @@ based on URL."
 (defparameter *number-matcher*
   (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)"))
 
+(defparameter *numeric-range*
+  (cl-ppcre:create-scanner "^(.+)\.\.(.+)$"))
+
+(defun parse-numeric-range (value)
+  "Extract the numeric values for a double-dotted range."
+  (multiple-value-bind (x y start-array end-array) 
+      (cl-ppcre:scan *numeric-range* value)
+    (values
+     (read-from-string
+      (subseq value (aref start-array 0) (aref end-array 0)))
+     (read-from-string
+      (subseq value (aref start-array 1) (aref end-array 1))))))
+
 (defun compile-scanners (matcher)
   "Given an alist, MATCHER, replace that CDR of each pair with the
 pre-compiled scanner of that regexp string.  The regexp string is
@@ -109,7 +122,9 @@ RANGE-MATCHER."
   (mapcar (lambda (pair)
 	    (cons (car pair)
 		  (if (cl-ppcre:scan *range-matcher* (cdr pair))
-		      ;; TODO Extract the min and max number from the range.
+		      ;; (multiple-value-bind (start end)
+		      ;; 	  (parse-numeric-range (cdr pair))
+		      ;; 	(XXXXXXXXX
 		      (eval `(lambda (s)
 			       (if (cl-ppcre:scan *number-matcher* s)
 				   (let ((num (read-from-string s)))
@@ -135,8 +150,8 @@ RANGE-MATCHER."
 		    (read-from-string (subseq matcher-line 40))
 		  (let ((line (string-trim '(#\Space #\Tab)
 					   (subseq matcher-line (+ 41 location)))))
-		    (if (and (> (length line) 0)
-			     (null (find (char line 0) "#;-")))
+		    (when (and (> (length line) 0)
+			       (null (find (char line 0) "#;-")))
 			(let ((json
 			       (compile-scanners
 				(json:decode-json-from-string line))))
@@ -151,14 +166,14 @@ RANGE-MATCHER."
       (mapc (lambda (matcher)
 	      (let* ((githash (githash matcher))
 		     (log-entry (gethash githash *git-log-table*)))
-		(if (and (null log-entry)
-			 (not (string= githash ; check for local change
-				       "0000000000000000000000000000000000000000")))
-		    (progn
-		      (setf log-entry (inferior-shell:run/lines
-				       (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
-					       filename githash filename)))
-		      (setf (gethash githash *git-log-table*) log-entry)))
+		(when (and (null log-entry)
+			   (not (string= githash ; check for local change
+					 "0000000000000000000000000000000000000000")))
+		  (progn
+		    (setf log-entry (inferior-shell:run/lines
+				     (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
+					     filename githash filename)))
+		    (setf (gethash githash *git-log-table*) log-entry)))
 		(setf (slot-value matcher 'log-entry) log-entry)))
 	    patterns)
 
@@ -173,31 +188,32 @@ RANGE-MATCHER."
   
   (let ((red-or-green :GREEN))
     (let ((result (mapcar (lambda (result)
-			   (cons
-			    (or
-			     ;; Check for exceptions
-			     (find-if (lambda (matcher)
-					(match-candidate-pattern
-					 result (matcher matcher)))
-				      (xfail-matchers policy))
-			     ;; Now check for failures
-			     (let ((red-match
-				    (find-if (lambda (matcher)
-					       (match-candidate-pattern
-						result (matcher matcher)))
-					     (fail-matchers policy))))
-			       (if red-match
-				   (setf red-or-green :RED))
-			       red-match)
-			     ;; No check for passes
-			     (find-if (lambda (matcher)
-					(match-candidate-pattern
-					 result (matcher matcher)))
-				      (pass-matchers policy))
-			     ;; We don't have a match. Let's fail.
-			     (progn
-			       (setf red-or-green :RED)
-			       nil))
-			    result))
+			    (cons
+			     (or
+			      ;; Check for exceptions
+			      (find-if (lambda (matcher)
+					 (match-candidate-pattern
+					  result (matcher matcher)))
+				       (xfail-matchers policy))
+			      ;; Now check for failures
+			      (let ((red-match
+				     (find-if (lambda (matcher)
+						(match-candidate-pattern
+						 result (matcher matcher)))
+					      (fail-matchers policy))))
+				(when red-match
+				  (setf red-or-green :RED))
+				red-match)
+			      ;; No check for passes
+			      (find-if (lambda (matcher)
+					 (match-candidate-pattern
+					  result (matcher matcher)))
+				       (pass-matchers policy))
+			      ;; We don't have a match. Let's fail.
+			      (progn
+				(setf red-or-green :RED)
+				nil))
+			     result))
 			  candidate-result-list)))
       (values red-or-green result))))
+
