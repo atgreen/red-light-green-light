@@ -145,11 +145,11 @@ following to our `XFAIL` file:
     # Ignore this failure in our container images
     { "result": "FAIL", "id": "CVE-2014-4043" }
 
-Each JSON field strings must match the corresponding string in the
-test result object exactly.  There are two special forms of strings
-values.  Strings starting with "^" are interpreted as regular
-expressions, and strings of the form "NUMBER..NUMBER" are interpreted
-as a numeric range.
+Each JSON field string must match the corresponding string in the test
+result object exactly.  There are two special forms of strings values.
+Strings starting with "^" are interpreted as regular expressions, and
+strings of the form "NUMBER..NUMBER" are interpreted as a numeric
+range.
 
 So, for example, to ignore all CVE vulnerabilities from 2013 with a
 score of less than 7 we add the following to our `XFAIL` file:
