@@ -1,4 +1,4 @@
-<img src="images/rlgl.svg" align="right" />
+<img src="images/rlgl.svg.png" align="right" />
 
 # Red Light Green Light
 > A git-centric policy management and enforcement tool designed to accelerate your CI/CD pipelines
