@@ -156,7 +156,7 @@ following to our `XFAIL` file:
     { "result": "FAIL", "id": "CVE-2014-4043" }
 
 Each JSON field string must match the corresponding string in the test
-result object exactly.  There are two special forms of strings values.
+result object exactly.  There are two special forms of string values.
 Strings starting with "^" are interpreted as regular expressions, and
 strings of the form "NUMBER..NUMBER" are interpreted as a numeric
 range.
