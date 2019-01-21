@@ -165,3 +165,30 @@ This is required in order to attribute policy changes to individuals
 via `git blame`.  These change logs are available through the `rlgl`
 reports generated at evaluation time.
 
+Report Parsers
+---------------
+
+Currently supported report parsers include:
+
+* OpenSCAP OVAL scan reports
+* JUnit XML results report
+* AquaSec container microscanner reports
+
+A generic CSV parser is in the works, allowing you to implement policy
+on any arbitrary metric (file size, performance results, etc).
+
+While the `rlgl` command-line tool is written in
+[Go](https://golang.org/), the server side is written in [Common
+Lisp](https://github.com/container-lisp), and adding additional report
+types requires modifying the `rlgl-server` lisp code.  External parser
+support is planned, allowing you to invoke report parsers through a
+simple API.
+
+Author and License
+-------------------
+
+Red Light Green Light was written by [Anthony
+Green](https://github.com/atgreen), and is distributed under the terms
+of the GNU GPLv3.  See
+[COPYING3](https://raw.githubusercontent.com/atgreen/red-light-green-light/master/COPYING3)
+for details.
