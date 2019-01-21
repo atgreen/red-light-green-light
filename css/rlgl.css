@@ -50,7 +50,8 @@ table th, table td {
     padding: .4em;
 }
 
-table.fold-table > tbody > tr.view td, table.fold-table > tbody > tr.view th {
+table.fold-table > tbody > tr.view td,
+table.fold-table > tbody > tr.view th {
     cursor: pointer;
 }
 
@@ -69,7 +70,7 @@ table.fold-table > tbody > tr.view th:first-child:before {
     height: 16px;
     margin-top: -8px;
     font: 16px fontawesome;
-    color: #999;.view
+    color: #999;
     content: "\f0d7";
     transition: all .3s ease;
 }
@@ -94,10 +95,12 @@ table.fold-table > tbody > tr.pass {
     background: #80ff80
 }
 
+/*
 table.fold-table > tbody > tr.view.open {
     background: tomato;
     color: white;
 }
+*/
 
 table.fold-table > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
     transform: rotate(-180deg);
