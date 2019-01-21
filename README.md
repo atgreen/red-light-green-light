@@ -7,8 +7,8 @@
 `rlgl` - Red Light Green Light
 ===============================
 
-**Red Light Green Light** is a policy management and enforcement tool
-  designed to accelerate your CI/CD pipelines.
+**Red Light Green Light** is a git-centric policy management and
+  enforcement tool designed to accelerate your CI/CD pipelines.
 
 
 Problem Statement
@@ -70,31 +70,31 @@ $ ID=$(rlgl start)
 
 - As the pipeline proceeds, test results are generated (scans, unit
   tests, etc).  For each test report generated, `rlgl` evaluates the
-  report against the stated policy, resulting in a **Red Light**,
-  meaning stop the pipeline, or **Green Light**, meaning proceed with
-  the pipeline.  It also produces a URL, which links to a report
-  showing annotated evaluation results.  Annotations, include, for
-  example, the git logs for policies defining exceptions resulting in
-  green lights.
+  report against the stated git-hosted policy, resulting in a **Red
+  Light**, meaning stop the pipeline, or **Green Light**, meaning
+  proceed with the pipeline.  It also produces a URL, which links to a
+  report showing annotated evaluation results.  Annotations, include,
+  for example, the git logs for policies defining exceptions resulting
+  in green lights.
 
 ```shell
-$ rlgl evaluate --policy dev --id $ID my-test-report.html
+$ rlgl evaluate --policy https://git.example.com/policy/dev.git --id $ID my-test-report.html
 GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F
 ```
 
 ```shell
-$ rlgl evaluate --policy global-prod --id $ID oval-scan.xml
+$ rlgl evaluate --policy https://git.example.com/policy/prod.git --id $ID oval-scan.xml
 RED: http://rlgl-server.example.com/RLGL-1CF5B3A
 ```
    
 ```shell
-$ rlgl evaluate --policy my-proj --id $ID gcc.log
+$ rlgl evaluate --policy https://git.example.com/policy/rel.git --id $ID gcc.log
 GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2
 ```
 
-GREEN lights have an exit code of 0.
-RED lights have an exit code of 1.
-Any other exit code is an error.
+Standard exit codes make it easy to integrate `rlgl` into your CI/CD
+pipeline scripts.  `GREEN` lights have an exit code of 0.  `RED`
+lights have an exit code of 1.  Any other exit code is an error.
 
 That's it!   The client side is very easy.   
 
@@ -104,10 +104,10 @@ The first step is to identify the type of report we're evaluating and
 convert it into a canonical form.  The canonical form is defined
 simply as this: a json object.  No special schema is defined.
 
-Policy is also defined in plain text divided into three files: `XFAIL`,
-`FAIL`, and `PASS`.  Each of these files contains a list of json matching
-expressions to match again the canonical test results.  They are
-evaluated this order: `XFAIL`, `FAIL`, `PASS`.
+Policies are maintained in git repos, and consist of three plain text
+files: `XFAIL`, `FAIL`, and `PASS`.  Each of these files contains a
+list of json matching expressions to match again the canonical test
+results.  They are evaluated this order: `XFAIL`, `FAIL`, `PASS`.
 
 `XFAIL` contains matchers for test results we are expecting to fail and
 allowing to pass anyway.  These are your exceptions.  Any matching
@@ -120,14 +120,13 @@ The are removed from the test results before processing with `PASS`.
 `PASS` contains matchers for known test passes.  These are removed from
 the test results.
 
-Any remaining entries in the test results are recorded as UNKNOWN.
-`rlgl` interprets these as failures, but they are reported as UNKNOWN in
+Any remaining entries in the test results are recorded as `UNKNOWN`.
+`rlgl` interprets these as failures, but they are reported as `UNKNOWN` in
 order aim for 100% coverage of the `PASS`/`FAIL` scans.
 
-The `XFAIL`, `FAIL`, `PASS` files are maintained in a git repo.  The git
-repo (and credentials) are identified by the policy ID.  Changing
-policy requires modifying the policy in git, which is logged and
-auditable.
+The `XFAIL`, `FAIL`, `PASS` files are maintained in a git
+repo. Changing policy requires modifying the policy in git, which is
+logged and auditable.
 
 In addition to this simple test evaluation service, the server can
 report on which policies have received green lights for each Player
@@ -136,9 +135,9 @@ ID, and records all test documents for archive and audit purposes.
 Policy in Detail
 ---------------
 
-As mentioned above, a `rlgl` policy consists of three separate files:
-`XFAIL`, `FAIL` and `PASS`. Each file contains JSON matchmaking
-expressions.  These expressions are also JSON objects.
+A `rlgl` policy consists of three separate files: `XFAIL`, `FAIL` and
+`PASS`. Each file contains JSON matchmaking expressions.  These
+expressions are also JSON objects.
 
 For example, to mark a CVE failure as an exception, we add the
 following to our `XFAIL` file:
@@ -146,11 +145,11 @@ following to our `XFAIL` file:
     # Ignore this failure in our container images
     { "result": "FAIL", "id": "CVE-2014-4043" }
 
-The value here, "CVE-2014-4043", is a string, and must match "id" from
-the test result exactly.  There are two other special forms of values.
-String starting with "^" are interpreted as regular expressions, and
-strings of the form "NUMBER..NUMBER" are interpreted as a numeric
-range.
+Each JSON field strings must match the corresponding string in the
+test result object exactly.  There are two special forms of strings
+values.  Strings starting with "^" are interpreted as regular
+expressions, and strings of the form "NUMBER..NUMBER" are interpreted
+as a numeric range.
 
 So, for example, to ignore all CVE vulnerabilities from 2013 with a
 score of less than 7 we add the following to our `XFAIL` file:
@@ -161,31 +160,8 @@ score of less than 7 we add the following to our `XFAIL` file:
 Every element of the matchmaking expression must match the test result
 in order to qualify as a match.
 
-Managing Policy
-------------
-
-This is a 'dev' policy:
-
-    policy dev {
-      url: https://github.com/atgreen/my-dev-rlgl-policy.git
-      credentials: admin-creds
-    }
-
-The repo identied above contain `XFAIL`, `FAIL` and `PASS` files.
-
-Policies can be composed of multiple policies by merging the contents
-of `XFAIL`, `FAIL` and `PASS`.
-
-    policy dev {
-      policy: dev
-      policy: special-dev
-    }
-
-Policies can have expiration dates:
-
-    policy dev {
-      url: https://github.com/atgreen/my-dev-rlgl-policy.git
-      credentials: admin-creds
-      expires: 2019-02-01
-    }
+JSON matchmaking expressions cannot span more than one line of text.
+This is required in order to attribute policy changes to individuals
+via `git blame`.  These change logs are available through the `rlgl`
+reports generated at evaluation time.
 
