@@ -76,7 +76,7 @@ $ ID=$(rlgl start)
   tests, etc).  For each test report generated, `rlgl` evaluates the
   report against the stated git-hosted policy, resulting in a **Red
   Light**, meaning stop the pipeline, or **Green Light**, meaning
-  proceed with the pipeline.  It also produces a URL, which links to a
+  proceed with the pipeline.  It also produces a URL that links to a
   report showing annotated evaluation results.  Annotations, include,
   for example, the git logs for policies defining exceptions resulting
   in green lights.
