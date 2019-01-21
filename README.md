@@ -4,7 +4,7 @@
 **This is an experimental Work In Progress**
 ---
 
-`rlgl` - Red Light Green Light
+Red Light Green Light
 ===============================
 
 **Red Light Green Light** is a git-centric policy management and
@@ -53,9 +53,13 @@ CI/CD pipeline:
  - what policies were they evaluated against?
  - who defined the policies and when?
 
-Here are the basic concepts:
+The Red Light Green Light service is invoked via the `rlgl`
+command-line tool, typically within within some other pipeline
+automation framework, such as a [jenkins](https://jenkins.io)
+pipeline.  Here's an example workflow:
 
-- First we must log into the rlgl server like so:
+- First we must log into our Red Light Green Light server with `rlgl`
+cli tool the like so:
 ```
 $ rlgl login -u USERNAME -p PASSWORD http://rlgl-server.example.com
 ```
@@ -189,6 +193,7 @@ Lisp](https://github.com/container-lisp), and adding additional report
 types requires modifying the `rlgl-server` lisp code.  External parser
 support is planned, allowing you to invoke report parsers through a
 simple API.
+
 
 Author and License
 -------------------
