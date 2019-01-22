@@ -6,6 +6,26 @@
 
 (setf prove:*default-reporter* :fiveam)
 
+(defun test-eval (report)
+  
+    (subtest (format nil "upload ~A" report)
+	     (let ((upload-ref
+		    (drakma:http-request "http://localhost:8080/upload"
+					 :method :post
+					 :content-type "application/octet-stream"
+					 :content (pathname report))))
+	       (like upload-ref "RLGL-[A-Z0-9]+")
+	       (setf *upload-ref* upload-ref)))
+  
+    (subtest (format nil "evaluate ~A" report)
+	     (print
+	      (drakma:http-request "http://localhost:8080/evaluate"
+				   :method :post
+				   :content-type "application/json"
+				   :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
+    )
+
+
 (defun run ()
 
   (plan 1)
@@ -23,38 +43,10 @@
 		  (is (length id) 7))))
   
   (defvar *upload-ref* nil)
-  
-  (subtest "upload test"
-	   (let ((upload-ref
-		  (drakma:http-request "http://localhost:8080/upload"
-				       :method :post
-				       :content-type "application/octet-stream"
-				       :content #p"test/report.html")))
-	     (like upload-ref "RLGL-[A-Z0-9]+")
-	     (setf *upload-ref* upload-ref)))
-  
-  (subtest "evaluate test"
-	   (print
-	    (drakma:http-request "http://localhost:8080/evaluate"
-				 :method :post
-				 :content-type "application/json"
-				 :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
-  
-  (subtest "upload test"
-	   (let ((upload-ref
-		  (drakma:http-request "http://localhost:8080/upload"
-				       :method :post
-				       :content-type "application/octet-stream"
-				       :content #p"test/sample-junit.xml")))
-	     (like upload-ref "RLGL-[A-Z0-9]+")
-	     (setf *upload-ref* upload-ref)))
-  
-  (subtest "evaluate test"
-	   (print
-	    (drakma:http-request "http://localhost:8080/evaluate"
-				 :method :post
-				 :content-type "application/json"
-				 :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
+
+  (test-eval "test/report.html") 
+  (test-eval "test/sample-junit.xml")
+  (test-eval "test/mysql-aqua.html")
 
   (finalize)
 
