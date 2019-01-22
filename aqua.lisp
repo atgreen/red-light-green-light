@@ -29,15 +29,29 @@
 
 (defmethod parse-report ((parser parser/aqua) doc)
   (let ((pdoc (plump:parse doc))
-	(tests-fail (list))
-	(tests-pass (list)))
-    (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(1) > a"
-     	      (combine (attr :href) (text))
-     	      (map-apply #'(lambda (url text)
-     			     (setf tests-fail
-     				   (cons
-     				    (json:decode-json-from-string
-     				     (format nil "{ \"report\": \"aqua\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
-     					     text url))
-     				    tests-fail)))))
-    (append tests-fail tests-pass)))
+	(tests-fail (list)))
+
+    (let* ((vulns (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(1) > a"
+     			    (combine (attr :href) (text))))
+	   (severity (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(3) > span"
+			       (text)))
+	   (score (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(4) > span"
+			    (text))))
+      
+      (loop for i from 0 to (- (length vulns) 1)
+	 do
+	   (progn
+	     (setf tests-fail
+		   (cons
+		    (json:decode-json-from-string
+		     (format nil
+			     "{ \"report\": \"aqua\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\", \"severity\": \"~A\", \"score\": \"~A\" }"
+			     (car (cdr (aref vulns i)))
+			     (car (aref vulns i))
+			     (aref severity i)
+			     (aref score i)))
+		    tests-fail)))))
+
+    tests-fail))
+
+  

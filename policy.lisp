@@ -114,30 +114,34 @@ based on URL."
       (subseq value (aref start-array 1) (aref end-array 1))))))
 
 (defun compile-scanners (matcher)
-  "Given an alist, MATCHER, replace that CDR of each pair with the
-pre-compiled scanner of that regexp string.  The regexp string is
-wrapped with ^ and $ to ensure an exact match.  As a special
-exception, strings that match RANGE-MATCHER will be replaced by
-RANGE-MATCHER."
+  "Given an alist, MATCHER, replace the CDR of each pair with a
+function that runs one of three matching algorithms against a single
+string argument: numeric range checks, regexp matching, and string
+comparison.  The algorithm choice depends on the CDR of the pair,
+which is either a numeric range string ('..' notation), a
+regexp (starting with \#^), or any other string."
+
   (mapcar (lambda (pair)
 	    (cons (car pair)
-		  (if (cl-ppcre:scan *range-matcher* (cdr pair))
-		      ;; (multiple-value-bind (start end)
-		      ;; 	  (parse-numeric-range (cdr pair))
-		      ;; 	(XXXXXXXXX
-		      (eval `(lambda (s)
-			       (if (cl-ppcre:scan *number-matcher* s)
-				   (let ((num (read-from-string s)))
-				     ;; TODO verify num is within the range.
-			       ))))
+		  (cond
+		    ((cl-ppcre:scan *range-matcher* (cdr pair))
+		     (multiple-value-bind (start end)
+		       	 (parse-numeric-range (cdr pair))
+		       (eval `(lambda (s)
+				(and (cl-ppcre:scan *number-matcher* s)
+				     (let ((num (read-from-string s)))
+				       (and (>= num ,start)
+					    (<= num ,end))))))))
+		    ((eq (char (cdr pair) 0) #\^)
 		      (eval `(lambda (s)
 			       (cl-ppcre:scan
 				,(cl-ppcre:create-scanner
-				  (str:concat "^" (cdr pair) "$"))
-				s))))))
+				  (str:concat (cdr pair) "$"))
+				s))))
+		    (t
+		      (eval `(lambda (s)
+			       (string= s ,(cdr pair))))))))
 	  matcher))
-
-; (apply (cdr (car (cdr (compile-scanners '(( 1 . "a" ) (2 . "c")))))) '("c"))
 
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
