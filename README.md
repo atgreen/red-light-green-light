@@ -56,7 +56,7 @@ automation framework, such as a [jenkins](https://jenkins.io)
 pipeline.  Here's an example workflow:
 
 - First, we must log into our Red Light Green Light server with `rlgl`
-cli tool the like so:
+cli tool like so:
 ```
 $ rlgl login -u USERNAME -p PASSWORD http://rlgl-server.example.com
 ```
