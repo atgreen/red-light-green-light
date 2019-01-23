@@ -29,8 +29,9 @@
 	       (:file "oscap-oval")
 	       (:file "aqua")
 	       (:file "junit")
+	       (:file "db")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
-			:inferior-shell :cl-fad :hunchentoot :spinneret
-			:cl-json-util :cl-fad :str :log4cl :cl-ppcre
-			:cxml :cl-dbi :pooler))
+	       :inferior-shell :cl-fad :hunchentoot :spinneret
+	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
+	       :cxml :cl-dbi :pooler))

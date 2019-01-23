@@ -22,7 +22,9 @@
 	      (drakma:http-request "http://localhost:8080/evaluate"
 				   :method :post
 				   :content-type "application/json"
-				   :content (format nil "{ \"ref\": \"~A\" }" *upload-ref*))))
+				   :content (format nil "{ \"id\": \"~A\", \"ref\": \"~A\" }"
+						    (rlgl.util:random-hex-string 7)
+						    *upload-ref*))))
     )
 
 

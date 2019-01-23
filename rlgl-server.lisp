@@ -27,6 +27,8 @@
 "storage-driver = \"local\"
 server-uri = \"http://localhost:8080\"
 policy-dir = \"/tmp/policy5/\"
+db = \"sqlite\"
+sqlite-db-filename = \"/tmp/rlgl5.db\"
 ")
 
 (defvar *server-uri* nil)
@@ -83,27 +85,32 @@ policy-dir = \"/tmp/policy5/\"
 	 (json:decode-json-from-string
 	  (funcall
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
-    (let ((policy-name (cdr (assoc :POLICY json))))
+    (let ((policy-name (cdr (assoc :POLICY json)))
+	  (player (cdr (assoc :ID json))))
       (if (rlgl.util:valid-url? policy-name)
 	  (setf *policy* (make-policy policy-name))
-	  (print "NO POLICY")))
-    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
-	   (parser (recognize-report doc))
-	   (tests (parse-report parser doc)))
-      (if (null tests)
-	  "ERROR"
-	  (multiple-value-bind (red-or-green processed-results)
-	      (apply-policy *policy* tests)
-	    (let ((stream (make-string-output-stream)))
-	      (render stream (cdr (assoc :REF json)) processed-results
-		      (title parser)
-		      (commit-url-format *policy*))
-	      (format nil "~A: ~A/doc?id=~A~%"
-		      red-or-green
-		      *server-uri*
-		      (store-document *storage-driver*
-				      (flexi-streams:string-to-octets
-				       (get-output-stream-string stream))))))))))
+	  (print "NO POLICY"))
+      (unless player
+	"ERROR: missing ID")
+      (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
+	     (parser (recognize-report doc))
+	     (tests (parse-report parser doc)))
+	(if (null tests)
+	    "ERROR"
+	    (multiple-value-bind (red-or-green processed-results)
+		(apply-policy *policy* tests)
+	      (let ((stream (make-string-output-stream)))
+		(render stream (cdr (assoc :REF json)) processed-results
+			(title parser)
+			(commit-url-format *policy*))
+		(let ((ref (store-document *storage-driver*
+						   (flexi-streams:string-to-octets
+						    (get-output-stream-string stream)))))
+		  (rlgl.db:log-evaluation player ref)
+		  (format nil "~A: ~A/doc?id=~A~%"
+			  red-or-green
+			  *server-uri*
+			  ref)))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
@@ -283,6 +290,17 @@ policy-dir = \"/tmp/policy5/\"
   (setf *server-uri* (gethash "server-uri" *config*))
   (log:info *server-uri*)
 
+  ;; Set up DB 
+  ;;
+  (let ((db (gethash "db" *config*)))
+    (alexandria:eswitch (db :test #'equal)
+      ("sqlite"
+       (let ((sqlite-db-filename (gethash "sqlite-db-filename" *config*)))
+	 (if sqlite-db-filename
+	     (rlgl.db:initialize :sqlite3
+				 :sqlite-db-filename sqlite-db-filename)
+	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
+
   ;;
   ;; This is the directory where we check out policies.
   ;;
@@ -290,7 +308,7 @@ policy-dir = \"/tmp/policy5/\"
 			     (str:concat (gethash "policy-dir" *config*) "/")))
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
-  
+
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
 
