@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl-server
   :description "The Red Light Green Light server."
   :author "Anthony Green <green@moxielogic.com>"
-           :version "0"
+  :version "0"
   :serial t
   :components ((:file "util")
 	       (:file "matcher")
@@ -33,4 +33,4 @@
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 			:inferior-shell :cl-fad :hunchentoot :spinneret
 			:cl-json-util :cl-fad :str :log4cl :cl-ppcre
-			:cxml))
+			:cxml :cl-dbi :pooler))
