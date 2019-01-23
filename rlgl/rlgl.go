@@ -177,6 +177,47 @@ func main() {
 			},
 		},
 		{
+			Name:    "log",
+			Usage:   "log evaluations",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "id",
+					Value:       "",
+					Usage:       "player ID",
+					Destination: &player,
+				},
+			},
+
+			Action: func(c *cli.Context) error {
+
+				if (config.Host == "") {
+					exitErr(fmt.Errorf("Login to server first"))
+				}
+				
+				if player == "" {
+					exitErr(fmt.Errorf("Missing player ID"))
+				}
+
+				if c.NArg() != 0 {
+					exitErr(fmt.Errorf("Too many arguments"))
+				}
+
+				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player));
+
+				if err != nil {
+					exitErr(err);
+				}
+
+				responseData, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Print(string(responseData))
+
+				return nil
+			},
+		},
+		{
 			Name:    "evaluate",
 			Aliases: []string{"e"},
 			Usage:   "evaluate test results",
@@ -205,7 +246,7 @@ func main() {
 					exitErr(fmt.Errorf("Missing policy"))
 				}
 
-				if policy == "" {
+				if player == "" {
 					exitErr(fmt.Errorf("Missing player ID"))
 				}
 

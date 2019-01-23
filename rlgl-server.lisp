@@ -80,6 +80,9 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 (snooze:defroute login (:get :text/plain)
   "rlgl-server v0.1 connected")
 
+(snooze:defroute report-log (:get :text/plain &key id)
+  (rlgl.db:report-log id))
+
 (snooze:defroute evaluate (:post :application/json)
   (let ((json
 	 (json:decode-json-from-string
