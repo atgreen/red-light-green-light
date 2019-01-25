@@ -7,7 +7,8 @@ all:
 		--entry "rlgl-server:start-rlgl-server"
 
 check: clean
-	sbcl --eval '(ql:quickload :prove)' \
+	sbcl --disable-debugger \
+	     --eval '(ql:quickload :prove)' \
 	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
 	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
 	     --eval '(ql:register-local-projects)' \
@@ -18,7 +19,8 @@ check: clean
 	     --eval '(sb-ext:quit)'
 
 cover: clean
-	sbcl --eval '(require :sb-cover)' \
+	sbcl --disable-debugger \
+	     --eval '(require :sb-cover)' \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(declaim (optimize sb-cover:store-coverage-data))' \
 	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
@@ -30,7 +32,7 @@ cover: clean
 	     --eval '(sb-ext:quit)'
 
 coveralls: clean
-	COVERALLS=true sbcl \
+	COVERALLS=true sbcl --disable-debugger \
 		--eval '(ql:quickload :cl-coveralls)' \
 		--eval '(pushnew (truename ".") ql:*local-project-directories* )' \
 		--eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
