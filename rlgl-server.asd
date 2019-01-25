@@ -34,7 +34,7 @@
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :cl-fad :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
-	       :cxml :cl-dbi :pooler :cl-date-time-parser
+	       :cxml :cl-dbi :cl-date-time-parser
 	       :local-time :prometheus
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
