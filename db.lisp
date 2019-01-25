@@ -30,6 +30,8 @@
 (defun initialize (db &key (sqlite-db-filename nil) (fresh nil))
   (setf *pool*
 	(pooler:make-pool
+	 :capacity (ecase db
+		     (:sqlite3 1))
 	 :item-maker (ecase db
 		       (:sqlite3
 			#'(lambda () (dbi:connect :sqlite3 :database-name sqlite-db-filename))))
