@@ -301,8 +301,7 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
        (let ((sqlite-db-filename (gethash "sqlite-db-filename" *config*)))
 	 (if sqlite-db-filename
 	     (rlgl.db:initialize :sqlite3
-				 :sqlite-db-filename sqlite-db-filename
-				 :fresh t)
+				 :sqlite-db-filename sqlite-db-filename)
 	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
 
   ;;
