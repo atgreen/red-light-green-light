@@ -33,17 +33,17 @@
     (when fresh
       (dbi:do-sql db "drop table log;"))
     ;;    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), result varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
-    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
+    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
       (dbi:execute query))))
 
 (defun record-log (player version result report)
   (dbi:do-sql (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)
-    (format nil "insert into log(id, version, result, report) values (\"~A\", \"~A\", \"~A\", \"~A\");"
+    (format nil "insert into log(id, version, colour, report) values (\"~A\", \"~A\", \"~A\", \"~A\");"
 	    player version result report)))
 
 (defun report-log (player)
   (let* ((query (dbi:prepare (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)
-			     (format nil "select timestamp, result, version, report from log where id = \"~A\";" player)))
+			     (format nil "select timestamp, colour, version, report from log where id = \"~A\";" player)))
 	 (result (dbi:execute query))
 	 (fstr (make-array '(0) :element-type 'base-char
                            :fill-pointer 0 :adjustable t)))
