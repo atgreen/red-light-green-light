@@ -24,6 +24,7 @@
   (:export #:start-rlgl-server #:stop-rlgl-server
 	   #:parser/oscap-oval
 	   #:parser/aqua
-	   #:parser/junit))
+	   #:parser/junit
+	   #:*server-uri*))
 
 (in-package #:rlgl-server)

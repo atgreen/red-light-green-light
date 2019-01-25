@@ -55,8 +55,11 @@
       (with-output-to-string (s fstr)
 	(loop for row = (dbi:fetch result)
 	   while row
-	   do (format s "~A~%" row)))
-      fstr)))
-
-
-
+	   do (destructuring-bind (j1 time j2 result j3 version j4 report)
+		  row
+		(local-time:format-timestring
+		 s (local-time:universal-to-timestamp
+		    (cl-date-time-parser:parse-date-time time))
+		 :format local-time:+rfc-1123-format+)
+		(format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
+	fstr))))

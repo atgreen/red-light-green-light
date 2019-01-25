@@ -86,8 +86,6 @@ based on URL."
 		    (error (format nil "Policy file \"~A\" missing." file))))
 		(list xfail-file pass-file fail-file))
 
-	  (print "******************************************************************")
-	  
 	  (let ((p (make-instance 'policy)))
 	    (setf (slot-value p 'version)
 		  (inferior-shell:run/ss
