@@ -34,8 +34,8 @@
 		     (:sqlite3 1))
 	 :item-maker (ecase db
 		       (:sqlite3
-			#'(lambda () (dbi:connect :sqlite3 :database-name sqlite-db-filename))))
-	 :item-destroyer #'(lambda (item) (dbi:disconnect item))))
+			#'(lambda () (print "*** CREATING CONNECTION ***") (dbi:connect :sqlite3 :database-name sqlite-db-filename))))
+	 :item-destroyer #'(lambda (item) (print "*** DESTROYING CONNECTION ***") (dbi:disconnect item))))
   
   (pooler:with-pool (db *pool*)
     (when fresh
