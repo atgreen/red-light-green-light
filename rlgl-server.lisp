@@ -46,10 +46,11 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
             (prom:make-counter :name "http_requests_total"
                                :help "Counts http request by type"
                                :labels '("method" "app")))
-      (setf *http-request-duration* (prom:make-histogram :name "http_request_duration_milliseconds"
-                                                         :help "HTTP requests duration[ms]"
-                                                         :labels '("method" "app")
-                                                         :buckets '(10 25 50 75 100 250 500 750 1000 1500 2000 3000)))
+      (setf *http-request-duration*
+	    (prom:make-histogram :name "http_request_duration_milliseconds"
+                                 :help "HTTP requests duration[ms]"
+                                 :labels '("method" "app")
+                                 :buckets '(10 25 50 75 100 250 500 750 1000 1500 2000 3000)))
       #+sbcl
       (prom.sbcl:make-memory-collector)
       #+sbcl
@@ -196,8 +197,8 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
        (:body
 	(:header
 	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
-	       (:a :class "navbar-brand" :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")
-	 ))
+	       (:a :class "navbar-brand"
+		   :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
 	(:main :role "main" :class "container"
 	       (:div :class "row"
 		     (:div :class "col"
@@ -213,7 +214,8 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 			       (alist (cdr item)))
 			   (:tr :class "view" :class (kind matcher)
 				(:td (kind matcher))
-				(:td (:a :href (cdr (assoc :URL alist)) :target "_blank" (cdr (assoc :ID alist)))))
+				(:td (:a :href (cdr (assoc :URL alist))
+					 :target "_blank" (cdr (assoc :ID alist)))))
 			   (:tr :class "fold"
 				(:td :colspan "2")
 				(:div :class "fold-content"
