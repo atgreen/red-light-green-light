@@ -33,7 +33,7 @@
     (when fresh
       (dbi:do-sql db "drop table log;"))
     ;;    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), result varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
-    (let ((query (dbi:prepare db "create table if not exists log (id char(12), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
+    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
       (dbi:execute query))))
 
 (defun record-log (player version result report)
