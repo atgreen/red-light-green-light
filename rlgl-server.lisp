@@ -34,6 +34,29 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 (defvar *server-uri* nil)
 
 ;; ----------------------------------------------------------------------------
+(defparameter *rlgl-registry* nil)
+(defparameter *http-requests-counter* nil)
+(defparameter *http-request-duration* nil)
+
+(defun initialize-metrics ()
+  (unless *rlgl-registry*
+    (setf *rlgl-registry* (prom:make-registry))
+    (let ((prom:*default-registry* *rlgl-registry*))
+      (setf *http-requests-counter*
+            (prom:make-counter :name "http_requests_total"
+                               :help "Counts http request by type"
+                               :labels '("method" "app")))
+      (setf *http-request-duration* (prom:make-histogram :name "http_request_duration_milliseconds"
+                                                         :help "HTTP requests duration[ms]"
+                                                         :labels '("method" "app")
+                                                         :buckets '(10 25 50 75 100 250 500 750 1000 1500 2000 3000)))
+      #+sbcl
+      (prom.sbcl:make-memory-collector)
+      #+sbcl
+      (prom.sbcl:make-threads-collector)
+      (prom.process:make-process-collector))))
+
+;; ----------------------------------------------------------------------------
 ;; Storage backends
 
 (defclass storage-backend ()
@@ -254,15 +277,26 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
                            :defaults (rlgl-root))))
    (snooze:make-hunchentoot-app)))
 
+(defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)
+  ())
+
+(defclass application (hunchentoot:easy-acceptor)
+  ((exposer :initarg :exposer :reader application-metrics-exposer)
+   (mute-access-logs :initform t :initarg :mute-access-logs :reader mute-access-logs)
+   (mute-messages-logs :initform t :initarg :mute-error-logs :reader mute-messages-logs)))
+
 (defmacro start-server (&key (handler '*handler*) (port 8080))
   "Initialize an HTTP handler"
   `(progn
      (setf snooze:*catch-errors* :verbose)
      (setf *print-pretty* nil)
      (setf hunchentoot:*dispatch-table* *rlgl-dispatch-table*)
-     (setf ,handler (hunchentoot:start (make-instance 'hunchentoot:easy-acceptor
-						      :document-root #p"./"
-						      :port ,port)))))
+     (setf prom:*default-registry* *rlgl-registry*)
+     (let ((exposer (make-instance 'exposer-acceptor :registry *rlgl-registry* :port 9101)))
+       (setf ,handler (hunchentoot:start (make-instance 'application
+							:document-root #p"./"
+							:port ,port
+							:exposer exposer))))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -314,7 +348,9 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
-  
+
+  (initialize-metrics)
+
   (let ((srvr (start-server)))
     ;; If ARG is NIL, then exit right away.  This is used by the
     ;; testsuite.
@@ -326,3 +362,18 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 (defun stop-rlgl-server ()
   "Stop the web application."
   (stop-server))
+
+(defmethod hunchentoot:start ((app application))
+  (hunchentoot:start (application-metrics-exposer app))
+  (call-next-method))
+
+(defmethod hunchentoot:stop ((app application) &key soft)
+  (call-next-method)
+  (hunchentoot:stop (application-metrics-exposer app) :soft soft))
+
+(defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
+  (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
+		      "rlgl_app")))
+    (prom:counter.inc *http-requests-counter* :labels labels)
+    (prom:histogram.time (prom:get-metric *http-request-duration* labels)
+      (call-next-method))))

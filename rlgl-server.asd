@@ -35,4 +35,8 @@
 	       :inferior-shell :cl-fad :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
 	       :cxml :cl-dbi :pooler :cl-date-time-parser
-	       :local-time))
+	       :local-time :prometheus
+	       :prometheus.formats.text
+	       :prometheus.exposers.hunchentoot
+	       :prometheus.collectors.sbcl
+	       :prometheus.collectors.process))
