@@ -21,7 +21,7 @@
 (defpackage #:rlgl.db
   (:use #:cl)
   (:shadow #:package)
-  (:export #:initialize #:log-evaluation #:report-log))
+  (:export #:initialize #:record-log #:report-log))
 
 (in-package #:rlgl.db)
 
@@ -38,16 +38,17 @@
   (pooler:with-pool (db *pool*)
     (when fresh
       (dbi:do-sql db "drop table log;"))
-    (dbi:do-sql db "create table if not exists log (id char(12), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
+    (dbi:do-sql db "create table if not exists log (id char(12), version char(40), result varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
 
-(defun log-evaluation (player report)
+(defun record-log (player version result report)
   (pooler:with-pool (db *pool*)
     (dbi:do-sql db
-      (format nil "insert into log(id, report) values (\"~A\", \"~A\");" player report))))
+      (format nil "insert into log(id, version, result, report) values (\"~A\", \"~A\", \"~A\", \"~A\");"
+	      player version result report))))
 
 (defun report-log (player)
   (pooler:with-pool (db *pool*)
-    (let* ((query (dbi:prepare db (format nil "select timestamp, report from log where id = \"~A\";" player)))
+    (let* ((query (dbi:prepare db (format nil "select timestamp, result, version, report from log where id = \"~A\";" player)))
 	   (result (dbi:execute query))
 	   (fstr (make-array '(0) :element-type 'base-char
                             :fill-pointer 0 :adjustable t)))

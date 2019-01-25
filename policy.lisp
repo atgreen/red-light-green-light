@@ -21,8 +21,8 @@
 (defpackage #:policy
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
-  (:export #:*policy-dir* #:make-policy #:apply-policy #:commit-url-format
-	   #:compile-scanners))
+  (:export #:*policy-dir* #:make-policy #:apply-policy
+	   #:commit-url-format #:version #:compile-scanners))
 
 (in-package #:policy)
 
@@ -31,13 +31,14 @@
 (defvar *policy-dir* nil)
 
 (defvar *git-log-table* (make-hash-table :test 'equal))
+(defvar *git-commit-table* (make-hash-table :test 'equal))
 
 (defclass policy ()
-  ((xfail-matchers :reader xfail-matchers)
+  ((version :reader version)
+   (xfail-matchers :reader xfail-matchers)
    (pass-matchers  :reader pass-matchers)
    (fail-matchers  :reader fail-matchers)
-   (commit-url-format :reader commit-url-format))
-  )
+   (commit-url-format :reader commit-url-format)))
 
 (defun guess-commit-url-format (url)
   "Guess the commit URL format string based on URL."
@@ -46,7 +47,7 @@
   ;; in MAKE-POLICY.
   ;; FIXME: this is a hardcoded for now.  Write this function.
   "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A")
-  
+
 (defun make-policy (url &key (commit-url-format (guess-commit-url-format url)))
   "Create an intance of a POLICY object based on the contents of the
 git repo at URL.  If :COMMIT-URL-FORMAT is provided, use that as the
@@ -84,12 +85,28 @@ based on URL."
 		  (unless (file-exists-p (namestring file))
 		    (error (format nil "Policy file \"~A\" missing." file))))
 		(list xfail-file pass-file fail-file))
+
+	  (print "******************************************************************")
 	  
 	  (let ((p (make-instance 'policy)))
+	    (setf (slot-value p 'version)
+		  (inferior-shell:run/ss
+		   (format nil "bash -c \"(cd ~A; git rev-parse HEAD)\""
+			   policy-dirname)))
 	    (setf (slot-value p 'commit-url-format) commit-url-format)
 	    (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
 	    (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
 	    (setf (slot-value p 'fail-matchers) (read-json-patterns :FAIL fail-file))
+
+	    ;; Map all of the commit hashes to this policy for future
+	    ;; reference.
+	    (let ((hash-log (inferior-shell:run/lines
+			     (format nil "bash -c \"(cd ~A; git log --pretty=%H)\""
+				     policy-dirname))))
+	      (mapc (lambda (key)
+		      (setf (gethash key *git-commit-table*) p))
+		    hash-log))
+
 	    p))))))
 
 ;; regex matcher for the special case of numeric ranges: two floating

@@ -109,7 +109,7 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 		(let ((ref (store-document *storage-driver*
 						   (flexi-streams:string-to-octets
 						    (get-output-stream-string stream)))))
-		  (rlgl.db:log-evaluation player ref)
+		  (rlgl.db:record-log player (version *policy*) red-or-green ref)
 		  (format nil "~A: ~A/doc?id=~A~%"
 			  red-or-green
 			  *server-uri*
@@ -301,7 +301,8 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
        (let ((sqlite-db-filename (gethash "sqlite-db-filename" *config*)))
 	 (if sqlite-db-filename
 	     (rlgl.db:initialize :sqlite3
-				 :sqlite-db-filename sqlite-db-filename)
+				 :sqlite-db-filename sqlite-db-filename
+				 :fresh t)
 	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
 
   ;;
@@ -314,7 +315,7 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 
   (setf *policy* (make-policy
 		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
-
+  
   (let ((srvr (start-server)))
     ;; If ARG is NIL, then exit right away.  This is used by the
     ;; testsuite.
