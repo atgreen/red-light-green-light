@@ -77,6 +77,8 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 ;; Run all of the scripts in recog.d until we find
 ;; a match.
 (defun recognize-report (doc)
+  "Try to recognize the report type in the string DOC.  If we
+recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((fname
 	 (cl-fad:with-output-to-temporary-file (stream)
 	   (print doc stream))))
@@ -91,8 +93,9 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 		   (> (length output) 0)))
 	       scripts)
       (delete-file fname)
-      (make-instance (read-from-string
-		      (str:concat "rlgl-server:parser/" result))))))
+      (when (> (length result) 0)
+	(make-instance (read-from-string
+			(str:concat "rlgl-server:parser/" result)))))))
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
@@ -120,24 +123,28 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
       (unless player
 	"ERROR: missing ID")
       (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
-	     (parser (recognize-report doc))
+	     (filename (cdr (assoc :NAME json)))
+	     (parser (or (recognize-report doc)
+			 (when (str:ends-with? ".csv" filename)
+			   (make-instance 'parser/csv))))
 	     (tests (parse-report parser doc)))
 	(if (null tests)
 	    "ERROR"
-	    (multiple-value-bind (red-or-green processed-results)
-		(apply-policy *policy* tests)
-	      (let ((stream (make-string-output-stream)))
-		(render stream (cdr (assoc :REF json)) processed-results
-			(title parser)
-			(commit-url-format *policy*))
-		(let ((ref (store-document *storage-driver*
-						   (flexi-streams:string-to-octets
-						    (get-output-stream-string stream)))))
-		  (rlgl.db:record-log player (version *policy*) red-or-green ref)
-		  (format nil "~A: ~A/doc?id=~A~%"
-			  red-or-green
-			  *server-uri*
-			  ref)))))))))
+	    (progn
+	      (multiple-value-bind (red-or-green processed-results)
+		  (apply-policy *policy* tests)
+		(let ((stream (make-string-output-stream)))
+		  (render stream (cdr (assoc :REF json)) processed-results
+			  (title parser)
+			  (commit-url-format *policy*))
+		  (let ((ref (store-document *storage-driver*
+					     (flexi-streams:string-to-octets
+					      (get-output-stream-string stream)))))
+		    (rlgl.db:record-log player (version *policy*) red-or-green ref)
+		    (format nil "~A: ~A/doc?id=~A~%"
+			    red-or-green
+			    *server-uri*
+			    ref))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
