@@ -64,15 +64,16 @@ based on URL."
 						 :sha1 (flexi-streams:string-to-octets url)))
 					       0 8))))
 
-      (when (fad:directory-exists-p policy-dirname)
-	  (sb-ext:delete-directory policy-dirname :recursive t))
-      
-      (let ((output (inferior-shell:run
+      (let ((cmd (if (fad:directory-exists-p policy-dirname)
+		     (format nil "bash -c \"(cd ~A; git pull)\""
+			     policy-dirname)
 		     (format nil "/usr/bin/git clone ~A ~A"
 			     url policy-dirname))))
-	(mapc (lambda (line)
-		(format t line))
-	      output))
+		     
+	(let ((output (inferior-shell:run cmd)))
+	  (mapc (lambda (line)
+		  (print line))
+		output)))
 
       (let ((policy-pathname
 	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
