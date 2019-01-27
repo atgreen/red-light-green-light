@@ -29,12 +29,15 @@
 
 (defmethod parse-report ((parser parser/csv) doc)
   "Parse CSV content where the first row specifies the field names."
-  (let* ((csv (cl-csv:read-csv doc))
+  (let* ((csv (cl-csv:read-csv doc
+			       :trim-outer-whitespace t))
 	 (fields (make-array (length (car csv))
 			     :initial-contents (car csv))))
-    (mapcar
-     (lambda (row)
-       (json:decode-json-from-string
-	(let ((l (loop for i from 0 for e in row collect (list (aref fields i) e))))
-	  (format nil "{ ~{\"~A\": \"~A\"~^, ~} }" (alexandria:flatten l)))))
-     (cdr csv))))
+    (loop for row in (cdr csv)
+	  ;; Filter out blank lines
+	  unless (and (= (length row) 1)
+		    (equalp "" (car row)))
+       collect (json:decode-json-from-string
+		  (let ((l (loop for i from 0 for e in row collect (list (aref fields i) e))))
+		    (format nil "{ ~{\"~A\": \"~A\"~^, ~} }" (alexandria:flatten l)))))))
+
