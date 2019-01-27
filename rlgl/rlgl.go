@@ -274,7 +274,11 @@ func main() {
 				message, _ := ioutil.ReadAll(res.Body)
 				// check that it is OK?
 
-				values := map[string]string{"policy": policy, "title": title, "id": player, "name": file.Name(), "ref": string(message[:])}
+				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": string(message[:])}
+				if (title != "") {
+					values["title"] = title;
+				}
+
 				jsonValue, _ := json.Marshal(values)
 
 				response, err := http.Post(fmt.Sprintf("%s/evaluate", config.Host), "application/json", bytes.NewBuffer(jsonValue))
