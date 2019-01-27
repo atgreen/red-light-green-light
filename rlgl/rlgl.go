@@ -106,6 +106,7 @@ func xdgSupport() bool {
 func main() {
 	var policy string
 	var player string
+	var title string
 	var config Config
 
 	cfgPath, cfgExists := getConfigPath()
@@ -234,6 +235,12 @@ func main() {
 					Usage:       "player ID",
 					Destination: &player,
 				},
+				cli.StringFlag{
+					Name:        "title",
+					Value:       "",
+					Usage:       "report title",
+					Destination: &title,
+				},
 			},
 
 			Action: func(c *cli.Context) error {
@@ -267,7 +274,7 @@ func main() {
 				message, _ := ioutil.ReadAll(res.Body)
 				// check that it is OK?
 
-				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": string(message[:])}
+				values := map[string]string{"policy": policy, "title": title, "id": player, "name": file.Name(), "ref": string(message[:])}
 				jsonValue, _ := json.Marshal(values)
 
 				response, err := http.Post(fmt.Sprintf("%s/evaluate", config.Host), "application/json", bytes.NewBuffer(jsonValue))
