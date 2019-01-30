@@ -356,7 +356,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (sb-ext:quit))
 
   (setf *policy* (make-policy
-		  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy.git"))
+		  "https://github.com/atgreen/test-policy"))
 
   (initialize-metrics)
 
