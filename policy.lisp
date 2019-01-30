@@ -42,11 +42,9 @@
 
 (defun guess-commit-url-format (url)
   "Guess the commit URL format string based on URL."
-  ;; We should be able to guess github, gitlab and gogs commit URLs.
-  ;; This is only ever called when we aren't handed a commit URL
-  ;; in MAKE-POLICY.
-  ;; FIXME: this is a hardcoded for now.  Write this function.
-  "https://gogs-labdroid.apps.home.labdroid.net/green/test-policy/commit/~A")
+  ;; They mostly look like this (gogs & github).  Haven't seen
+  ;; anything different yet...
+  (str:concat url "/commit/~A"))
 
 (defun make-policy (url &key (commit-url-format (guess-commit-url-format url)))
   "Create an intance of a POLICY object based on the contents of the
