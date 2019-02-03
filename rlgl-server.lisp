@@ -321,9 +321,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
 
-(defun start-rlgl-server (arg)
-  "Start the web application and have the main thread sleep forever,
-  unless INTERACTIVE is nil."
+(defun start-rlgl-server (&optional (sleep-forever? nil))
+  "Start the web application and have the main thread sleep forever if
+  SLEEP-FOREVER? is not NIL."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
 
@@ -361,9 +361,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (initialize-metrics)
 
   (let ((srvr (start-server)))
-    ;; If ARG is NIL, then exit right away.  This is used by the
+    ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
     ;; testsuite.
-    (when arg
+    (when sleep-forever?
       (loop
 	 (sleep 3000)))
     srvr))

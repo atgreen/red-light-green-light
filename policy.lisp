@@ -44,7 +44,10 @@
   "Guess the commit URL format string based on URL."
   ;; They mostly look like this (gogs & github).  Haven't seen
   ;; anything different yet...
-  (str:concat url "/commit/~A"))
+  (str:concat  (if (str:ends-with? ".git" url)
+		   (str:substring 0 (- (length url) 5) url)
+		   url)
+	       "/commit/~A"))
 
 (defun make-policy (url &key (commit-url-format (guess-commit-url-format url)))
   "Create an intance of a POLICY object based on the contents of the
