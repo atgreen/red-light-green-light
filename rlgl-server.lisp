@@ -79,6 +79,8 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 (defun recognize-report (doc)
   "Try to recognize the report type in the string DOC.  If we
 recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
+  (log:info "*load-pathname* ~A~%" *load-pathname*)
+  (log:info "*load-truename* ~A~%" *load-truename*)
   (let ((fname
 	 (cl-fad:with-output-to-temporary-file (stream)
 	   (print doc stream))))
