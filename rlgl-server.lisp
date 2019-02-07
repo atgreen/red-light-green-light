@@ -85,6 +85,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (let ((scripts (cl-fad:list-directory "recog.d"))
 	  (result nil))
       (find-if (lambda (script)
+		 (log:info "Testing ~A~%" script)
 		 (let ((output (inferior-shell:run/ss
 				(str:concat
 				 (namestring script) " "
