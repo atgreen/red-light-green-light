@@ -348,6 +348,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *default-config*)))
   (setf *server-uri* (or (gethash "server-uri" *config*)
 			 (gethash "server-uri" *default-config*)))
+  (unless (rlgl.util:valid-url? *server-uri*)
+    (error "server-uri is not valid URL: ~A" *server-uri*))
   (log:info *server-uri*)
   
   ;; Set up DB 
