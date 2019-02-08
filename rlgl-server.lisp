@@ -79,12 +79,14 @@ sqlite-db-filename = \"/tmp/rlgl5.db\"
 (defun recognize-report (doc)
   "Try to recognize the report type in the string DOC.  If we
 recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
-  (log:info "*load-pathname* ~A~%" *load-pathname*)
-  (log:info "*load-truename* ~A~%" *load-truename*)
   (let ((fname
 	 (cl-fad:with-output-to-temporary-file (stream)
 	   (print doc stream))))
-    (let ((scripts (cl-fad:list-directory "recog.d"))
+    (let ((scripts (cl-fad:list-directory
+		    (fad:pathname-as-directory
+		     (make-pathname :name "recog"
+				    :type "d"
+				    :defaults (rlgl-root)))))
 	  (result nil))
       (find-if (lambda (script)
 		 (log:info "Testing ~A~%" script)
@@ -285,8 +287,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                            :defaults (rlgl-root))))
    (hunchentoot:create-folder-dispatcher-and-handler
     "/css/" (fad:pathname-as-directory
-            (make-pathname :name "css"
-                           :defaults (rlgl-root))))
+             (make-pathname :name "css"
+                            :defaults (rlgl-root))))
    (snooze:make-hunchentoot-app)))
 
 (defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)
