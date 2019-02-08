@@ -365,12 +365,17 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
 
   ;;
-  ;; This is the directory where we check out policies.
+  ;; This is the directory where we check out policies.  Make sure it
+  ;; ends with a trailing '/'.
   ;;
-  (setf policy:*policy-dir* (pathname
-			     (str:concat
-			      (or (gethash "policy-dir" *config*)
-				  (gethash "policy-dir" *default-config*) "/"))))
+  (let ((dir (or (gethash "policy-dir" *config*)
+		 (gethash "policy-dir" *default-config*))))
+    (setf policy:*policy-dir*
+	  (pathname
+	   (if (str:ends-with? "/" dir)
+	       dir
+	       (str:concat dir "/")))))
+
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
