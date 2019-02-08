@@ -23,6 +23,7 @@
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
 (defvar *config* nil)
+(defvar *default-config* nil)
 (defparameter *default-config-text*
 "storage-driver = \"local\"
 server-uri = \"http://localhost:8080\"
@@ -333,20 +334,31 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (setf hunchentoot:*show-lisp-backtraces-p* t)
 
   ;; Read the built-in configuration settings.
-  (setf *config* (cl-toml:parse *default-config-text*))
+  (setf *default-config* (cl-toml:parse *default-config-text*))
   (log:info *default-config-text*)
 
-  ;; FIXME: lookup storage driver
-  ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *config*)))
-  (setf *server-uri* (gethash "server-uri" *config*))
-  (log:info *server-uri*)
+  ;; Read the user configuration settings.
+  (setf *config*
+	(if (file-exists-p "/etc/rlgl.ini")
+	    (cl-toml:parse
+	     (rlgl.util:read-file-into-string "/etc/rlgl.ini"))
+	    (make-hash-table)))
 
+  ;; FIXME: lookup storage driver
+  ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *default-config*)))
+  (setf *server-uri* (or (gethash "server-uri" *config*)
+			 (gethash "server-uri" *default-config*)))
+  (log:info *server-uri*)
+  
   ;; Set up DB 
   ;;
-  (let ((db (gethash "db" *config*)))
+  (let ((db (or (gethash "db" *config*)
+		(gethash "db" *default-config*))))
     (alexandria:eswitch (db :test #'equal)
       ("sqlite"
-       (let ((sqlite-db-filename (gethash "sqlite-db-filename" *config*)))
+       (let ((sqlite-db-filename
+	       (or (gethash "sqlite-db-filename" *config*)
+		   (gethash "sqlite-db-filename" *default-config*))))
 	 (if sqlite-db-filename
 	     (rlgl.db:initialize :sqlite3
 				 :sqlite-db-filename sqlite-db-filename)
@@ -356,7 +368,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   ;; This is the directory where we check out policies.
   ;;
   (setf policy:*policy-dir* (pathname
-			     (str:concat (gethash "policy-dir" *config*) "/")))
+			     (str:concat
+			      (or (gethash "policy-dir" *config*)
+				  (gethash "policy-dir" *default-config*) "/"))))
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
