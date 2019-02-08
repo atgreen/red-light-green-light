@@ -37,12 +37,6 @@
 
 ;; ----------------------------------------------------------------------------
 
-(defun read-file-into-string (filename)
-  (with-open-file (stream filename :external-format :UTF-8)
-    (let ((contents (make-string (file-length stream))))
-      (read-sequence contents stream)
-      contents)))
-
 (defclass local-storage-backend (storage-backend)
   ((local-dir       :initarg :local-dir    :reader local-dir))
   (:default-initargs
@@ -52,7 +46,7 @@
   "Initialize a local storage backend."
   (let ((filename (format nil "~A/.key" (local-dir backend))))
     (if (probe-file filename)
-	(setf (slot-value backend 'key) (read-file-into-string filename))
+	(setf (slot-value backend 'key) (rlgl.util:read-file-into-string filename))
 	(let ((key (generate-random-string)))
 	  (with-open-file (stream filename
 				  :direction :output
@@ -63,7 +57,7 @@
 
 (defmethod read-document ((backend local-storage-backend) ref)
   "Return a string containing the document."
-  (read-file-into-string
+  (rlgl.util:read-file-into-string
    (format nil "~A/~A" (local-dir backend) ref)))
 
 (defmethod store-document ((backend local-storage-backend) document)

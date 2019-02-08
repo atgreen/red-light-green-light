@@ -19,7 +19,7 @@
 (defpackage #:rlgl.util
   (:use #:cl)
   (:shadow #:package)
-  (:export #:random-hex-string #:valid-url?))
+  (:export #:random-hex-string #:valid-url? #:read-file-into-string))
 
 (in-package #:rlgl.util)
 
@@ -29,6 +29,12 @@
   (let ((chars "abcdef0123456789"))
     (coerce (loop repeat length collect (aref chars (random (length chars))))
             'string)))
+
+(defun read-file-into-string (filename)
+  (with-open-file (stream filename :external-format :UTF-8)
+    (let ((contents (make-string (file-length stream))))
+      (read-sequence contents stream)
+      contents)))
 
 (defvar *url-scanner*
     (cl-ppcre:create-scanner "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[\\-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9\\.\\-]+|(?:www\\.|[\\-;:&=\\+\\$,\\w]+@)[A-Za-z0-9\\.\\-]+)((?:\\/[\\+~%\\/\\.\\w\\-_]*)?\\??(?:[\\-\\+=&;%@\\.\\w_]*)#?(?:[\\.\\!\\/\\\\\\w]*))?)"))

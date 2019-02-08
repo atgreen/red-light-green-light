@@ -339,7 +339,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   ;; Read the user configuration settings.
   (setf *config*
-	(if (file-exists-p "/etc/rlgl.ini")
+	(if (fad:file-exists-p "/etc/rlgl.ini")
 	    (cl-toml:parse
 	     (rlgl.util:read-file-into-string "/etc/rlgl.ini"))
 	    (make-hash-table)))
