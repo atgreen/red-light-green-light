@@ -339,9 +339,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   ;; Read the user configuration settings.
   (setf *config*
-	(if (fad:file-exists-p "/etc/rlgl.ini")
+	(if (fad:file-exists-p "/etc/rlgl/config.ini")
 	    (cl-toml:parse
-	     (rlgl.util:read-file-into-string "/etc/rlgl.ini"))
+	     (rlgl.util:read-file-into-string "/etc/rlgl/config.ini"))
 	    (make-hash-table)))
 
   ;; FIXME: lookup storage driver
