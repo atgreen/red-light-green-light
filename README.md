@@ -189,6 +189,26 @@ score of less than 7 we add the following to our `XFAIL` file:
 Every element of the matchmaking expression must match the test result
 in order to qualify as a match.
 
+A matchmaking expression may be followed by an expiration date, a time
+after which the matchmaker no longer applies.
+
+    # Whitelist this failure until April 1, 2019 and 9am
+    { "result": "FAIL", "id": "CVE-2014-4043" } 2019-04-01 9:00
+
+The date expiration time can be in any of the following formats:
+RFC822 (RFC1123, RFC2822, RFC5322), asctime, RFC850 (RFC1036), ISO8601
+(1988, 2000, 2004, except for no-year format), W3CDTF (subset of ISO
+8601), RFC3339.  Examples of these include:
+
+* "Thu, 23 Jul 2013 19:42:23 GMT" (RFC1123),
+* "Thu Jul 23 19:42:23 2013" (asctime),
+* "Thursday, 23-Jul-13 19:42:23 GMT" (RFC1036),
+* "2013-07-23T19:42:23Z" (RFC3339),
+* "20130723T194223Z" (ISO8601:2004), etc.
+
+If no time is specified, then it is interpreted to mean just after
+midnight at the start of the day.
+
 JSON matchmaking expressions cannot span more than one line of text.
 This is required in order to attribute policy changes to individuals
 via `git blame`.  These changelogs are available through the `rlgl`
