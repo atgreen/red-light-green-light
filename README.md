@@ -206,7 +206,7 @@ RFC822 (RFC1123, RFC2822, RFC5322), asctime, RFC850 (RFC1036), ISO8601
 * "2013-07-23T19:42:23Z" (RFC3339),
 * "20130723T194223Z" (ISO8601:2004), etc.
 
-If no time is specified, then it is interpreted to mean just after
+If a date is provided but no time, then it is interpreted to mean just after
 midnight at the start of the day.
 
 JSON matchmaking expressions cannot span more than one line of text.
