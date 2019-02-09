@@ -65,13 +65,16 @@ based on URL."
 						 :sha1 (flexi-streams:string-to-octets url)))
 					       0 8))))
 
-      (let ((cmd (if (fad:directory-exists-p policy-dirname)
-		     (format nil "bash -c \"(cd ~A; git pull)\""
-			     policy-dirname)
-		     (format nil "/usr/bin/git clone ~A ~A"
-			     url policy-dirname))))
+      ;; (let ((cmd (if (fad:directory-exists-p policy-dirname)
+      ;; 		     (format nil "bash -c \"(cd ~A; git pull)\""
+      ;; 			     policy-dirname)
+      ;; 		     (format nil "/usr/bin/git clone ~A ~A"
+      ;; 			     url policy-dirname))))
 		     
-	(let ((output (inferior-shell:run cmd)))
+      (unless (fad:directory-exists-p policy-dirname)
+	(let ((output (inferior-shell:run
+		       (format nil "/usr/bin/git clone ~A ~A"
+			       url policy-dirname))))
 	  (mapc (lambda (line)
 		  (print line))
 		output)))
@@ -160,6 +163,17 @@ regexp (starting with \#^), or any other string."
 			       (string= s ,(cdr pair))))))))
 	  matcher))
 
+(defun extract-expiration-date (line)
+  "Given a matcher string LINE, return a universal time value if one
+exists after the JSON object, or NIL otherwise."
+  (let* ((last-brace (position #\} line :from-end t))
+	 (date-string (str:trim (str:substring (+ last-brace 1) t line))))
+    (and (> (length date-string) 0)
+	 (date-time-parser:parse-date-time date-string))))
+
+;; An arbitratily far-away date, representing "never"
+(defparameter *the-year-3000* (date-time-parser:parse-date-time "3000"))
+
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
     (let ((matcher-lines (inferior-shell:run/lines
@@ -179,7 +193,9 @@ regexp (starting with \#^), or any other string."
 			  (setf patterns (cons (make-policy-matcher :kind kind
 								    :githash githash
 								    :lineno lineno
-								    :matcher json)
+								    :matcher json
+								    :expiration-date (or (extract-expiration-date line)
+											 *the-year-3000*))
 					       patterns))))))))
 	    matcher-lines)
 
@@ -207,28 +223,32 @@ regexp (starting with \#^), or any other string."
   returns two values: :GREEN or :RED, as well as a list of pairs made
   by consing the matcher object with the test result alist."
   
-  (let ((red-or-green :GREEN))
+  (let ((red-or-green :GREEN)
+	(now (get-universal-time)))
     (let ((result (mapcar (lambda (result)
 			    (cons
 			     (or
 			      ;; Check for exceptions
 			      (find-if (lambda (matcher)
-					 (match-candidate-pattern
-					  result (matcher matcher)))
+					 (and (match-candidate-pattern
+					       result (matcher matcher))
+					      (< now (expiration-date matcher))))
 				       (xfail-matchers policy))
 			      ;; Now check for failures
 			      (let ((red-match
 				     (find-if (lambda (matcher)
-						(match-candidate-pattern
-						 result (matcher matcher)))
+						(and (match-candidate-pattern
+						      result (matcher matcher))
+						     (< now (expiration-date matcher))))
 					      (fail-matchers policy))))
 				(when red-match
 				  (setf red-or-green :RED))
 				red-match)
 			      ;; No check for passes
 			      (find-if (lambda (matcher)
-					 (match-candidate-pattern
-					  result (matcher matcher)))
+					 (and (match-candidate-pattern
+					       result (matcher matcher))
+					      (< now (expiration-date matcher))))
 				       (pass-matchers policy))
 			      ;; We don't have a match. Let's fail.
 			      (progn
@@ -237,4 +257,6 @@ regexp (starting with \#^), or any other string."
 			     result))
 			  candidate-result-list)))
       (values red-or-green result))))
+
+
 
