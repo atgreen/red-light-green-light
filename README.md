@@ -200,11 +200,14 @@ RFC822 (RFC1123, RFC2822, RFC5322), asctime, RFC850 (RFC1036), ISO8601
 (1988, 2000, 2004, except for no-year format), W3CDTF (subset of ISO
 8601), RFC3339.  Examples of these include:
 
-* "Thu, 23 Jul 2013 19:42:23 GMT" (RFC1123),
-* "Thu Jul 23 19:42:23 2013" (asctime),
-* "Thursday, 23-Jul-13 19:42:23 GMT" (RFC1036),
-* "2013-07-23T19:42:23Z" (RFC3339),
-* "20130723T194223Z" (ISO8601:2004), etc.
+* `Thu, 23 Jul 2013 19:42:23 GMT` (RFC1123),
+* `Thu Jul 23 19:42:23 2013` (asctime),
+* `Thursday, 23-Jul-13 19:42:23 GMT` (RFC1036),
+* `2013-07-23T19:42:23Z` (RFC3339),
+* `20130723T194223Z` (ISO8601:2004), etc.
+
+Red Light Green Light will also do it's best to interpret variations
+of said standards, as in the example above (`2019-04-01 9:00`).
 
 If a date is provided but no time, then it is interpreted to mean just after
 midnight at the start of the day.
