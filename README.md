@@ -209,7 +209,7 @@ RFC822 (RFC1123, RFC2822, RFC5322), asctime, RFC850 (RFC1036), ISO8601
 Red Light Green Light will also do it's best to interpret variations
 of said standards, as in the example above (`2019-04-01 9:00`).
 
-If a date is provided but no time, then it is interpreted to mean just after
+If a date is provided but no time, then it is interpreted as just after
 midnight at the start of the day.
 
 JSON matchmaking expressions cannot span more than one line of text.
