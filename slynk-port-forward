@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: slynk-port-forward PROJECT"
+    exit 1
+fi
+
+oc project $1
+if [ $? ] ; then
+  POD=$(oc get pods | grep red-light-green-light | grep Running | awk '{ print $1 }')
+  oc port-forward $POD 4005
+else
+    exit 1
+fi
+
+
+
