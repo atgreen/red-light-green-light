@@ -17,7 +17,8 @@ matrix:
         provider: releases
         api_key: $AUTH_TOKEN
         file:
-          - "rlgl/rlgl-linux-amd64.tgz"
-          - "rlgl/rlgl-darwin-amd64.tgz"
-          - "rlgl/rlgl-windows-amd64.tgz"
+          - "rlgl/build/rlgl-darwin-amd64.tgz"
+          - "rlgl/build/rlgl-linux-amd64.tgz"
+          - "rlgl/build/rlgl-linux-arm.tgz"
+          - "rlgl/build/rlgl-windows-amd64.zip"
         skip_cleanup: true
