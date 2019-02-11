@@ -1,14 +1,13 @@
-language: common-lisp
-
 sudo: required
 
-env:
-  LISP=sbcl
-
-install:
-  # Install lisp support...
-  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
-  - apt list --installed
-
-script:
-  - make coveralls
+matrix:
+  include:
+    - language: common-lisp
+      env:
+        LISP=sbcl
+      install:
+        # Install lisp support...
+        - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+        - apt list --installed
+      script:
+        - make coveralls
