@@ -12,7 +12,7 @@ matrix:
       script:
         - make coveralls
     - language: go
-      install:
+      before_install: cd rlgl
       before_deploy:
         - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
         - |
@@ -25,15 +25,15 @@ matrix:
             else
               build_cmd="CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-d -w -s'"
             fi
-            (cd rlgl; eval $build_cmd)
+            eval $build_cmd
             if [ $? ]; then
               echo Failed building rlrl cli for $PLATFORM" && return 1
             fi
 
             if [ "$GOOS" = "windows" ]; then
-              (cd rlgl; zip rlgl-${GOOS}-${GOARCH}.zip rlgl)
+              zip rlgl-${GOOS}-${GOARCH}.zip rlgl
             else
-              (cd rlgl; tar cvzf rlgl-${GOOS}-${GOARCH}.tgz rlgl
+              tar cvzf rlgl-${GOOS}-${GOARCH}.tgz rlgl
             fi
           done
           
