@@ -13,7 +13,7 @@ matrix:
         - make coveralls
     - language: go
       before_install: cd rlgl
-      before_deploy:
+      install:
         - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
         - |
           for PLATFORM in ${PLATFORMS[@]"; do
