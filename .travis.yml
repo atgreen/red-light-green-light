@@ -11,3 +11,36 @@ matrix:
         - apt list --installed
       script:
         - make coveralls
+    - language: go
+      before_deploy:
+        - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
+        - |
+          for PLATFORM in ${PLATFORMS[@]"; do
+            echo "Building $PLATFORM"
+            GOOS=${PLATFORM%/*}
+            GOARCH=${PLATFORM%*/}
+            if [ "$GOOS" = "windows" ]; then
+              build_cmd="GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-w -s'"
+            else
+              build_cmd="CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-d -w -s'"
+            fi
+            (cd rlgl; eval $build_cmd)
+            if [ $? ]; then
+              echo Failed building rlrl cli for $PLATFORM" && return 1
+            fi
+
+            if [ "$GOOS" = "windows" ]; then
+              (cd rlgl; zip rlgl-${GOOS}-${GOARCH}.zip rlgl)
+            else
+              (cd rlgl; tar cvzf rlgl-${GOOS}-${GOARCH}.tgz rlgl
+            fi
+          done
+          
+      - deploy:
+          provider: releases
+          apu_key: $AUTH_TOKEN
+          file:
+            - "rlgl/rlgl-linux-amd64.tgz"
+            - "rlgl/rlgl-darwin-amd64.tgz"
+            - "rlgl/rlgl-windows-amd64.tgz"
+          skip_cleanup: true
