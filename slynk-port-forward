@@ -8,7 +8,7 @@ fi
 oc project $1
 if [ $? ] ; then
   POD=$(oc get pods | grep red-light-green-light | grep Running | awk '{ print $1 }')
-  oc port-forward $POD 4005
+  oc port-forward $POD 4008
 else
     exit 1
 fi
