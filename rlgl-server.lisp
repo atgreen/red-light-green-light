@@ -106,6 +106,60 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; ----------------------------------------------------------------------------
 ;; API routes
 
+(setf snooze:*home-resource* :index)
+
+(snooze:defroute index (:get :text/*)
+    (with-html-string
+      (:doctype)
+      (:html
+       (:head
+	(:meta :charset "utf-8")
+	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
+	(:link :rel "icon" :href "images/rlgl.svg.png")
+	(:title "Red Light Green Light")
+	(:link :rel "stylesheet" :href "css/rlgl.css")
+	(:link :attrs (list :rel "stylesheet"
+			    :href "https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+			    :integrity "sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+			    :crossorigin "anonymous"))
+	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+       (:body
+	(:header
+	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
+	       (:a :class "navbar-brand"
+		   :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
+	(:main :role "main" :class "container"
+	       (:div :class "row"
+		     (:div :class "col"
+			   (:div :style "width:100px"
+				 (:div :class "rlgl-svg"))
+			   (:h1 :class "mt-5" "Welcome!")
+			   (:br)
+			   "Red Light Green Light is an experimental git-centric tool designed to accelerate CI/CD pipelines."
+			   (:br)
+			   (:br)
+			   (:h4 "Downloads")
+			   (:ul
+			    (:li "rlgl command-line tool for x86-64 Linux")
+			    (:li "rlgl command-line tool for MacOS")
+			    (:li "rlgl command-line tool for Windows"))
+			   (:hr)
+			   "Red Light Green Light was written by Anthony Green "
+			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
+			   " and is available in source form from "
+			   (:a :href "http://github.com/atgreen/red-light-green-light" "http://github.com/atgreen/red-light-green-light") "."
+			   ))))
+       (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+			     :integrity "sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "js/index.js")))))
+
 (snooze:defroute start (:get :text/plain)
   ;; Return a random 7 character hash
   (rlgl.util:random-hex-string 7))
