@@ -140,9 +140,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:br)
 			   (:h4 "Downloads")
 			   (:ul
-			    (:li "rlgl command-line tool for x86-64 Linux")
-			    (:li "rlgl command-line tool for MacOS")
-			    (:li "rlgl command-line tool for Windows"))
+			    (:li "rlgl command-line tool for 64-bit x86 Linux")
+			    (:li "rlgl command-line tool for 64-bit ARM Linux")
+			    (:li "rlgl command-line tool for 64-bit x86 OSX")
+			    (:li "rlgl command-line tool for 64-bit x86 Windows"))
 			   (:hr)
 			   "Red Light Green Light was written by Anthony Green "
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
