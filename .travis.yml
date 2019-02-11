@@ -16,7 +16,7 @@ matrix:
       install:
         - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
         - |
-          for PLATFORM in ${PLATFORMS[@]"; do
+          for PLATFORM in "${PLATFORMS[@]}"; do
             echo "Building $PLATFORM"
             GOOS=${PLATFORM%/*}
             GOARCH=${PLATFORM%*/}
