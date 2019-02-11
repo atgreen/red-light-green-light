@@ -19,7 +19,7 @@ matrix:
           for PLATFORM in "${PLATFORMS[@]}"; do
             echo "Building $PLATFORM"
             GOOS=${PLATFORM%/*}
-            GOARCH=${PLATFORM%*/}
+            GOARCH=${PLATFORM#*/}
             if [ "$GOOS" = "windows" ]; then
               build_cmd="GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-w -s'"
             else
