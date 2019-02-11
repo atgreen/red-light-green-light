@@ -12,7 +12,7 @@ matrix:
       script:
         - make coveralls
     - language: go
-      before_install: cd rlgl
+      before_install: cd rlgl && make depend
       deploy:
         provider: releases
         api_key: $AUTH_TOKEN
