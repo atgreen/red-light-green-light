@@ -1,8 +1,9 @@
-cli/rlgl
 rlgl-server
 *~
 rlgl-server/coverage
 test-policy/
 system-index.txt
 rlgl/rlgl
-/rlgl/rlgl.exe
+rlgl/rlgl.exe
+rlgl/vendor
+rlgl/build

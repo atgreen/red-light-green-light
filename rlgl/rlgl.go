@@ -8,13 +8,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
-	"strings"
 	"regexp"
+	"strings"
+	"time"
 
-	"github.com/urfave/cli"
 	"github.com/fatih/color"
 	"github.com/naoina/toml"
+	"github.com/urfave/cli"
 )
 
 var (
@@ -23,12 +23,11 @@ var (
 )
 
 type Config struct {
-	Host string;
+	Host string
 }
 
 func NewConfig() *Config {
-	return &Config{
-	}
+	return &Config{}
 }
 
 func output(s string) {
@@ -111,7 +110,7 @@ func main() {
 
 	cfgPath, cfgExists := getConfigPath()
 	if !cfgExists {
-		config.Write(cfgPath);
+		config.Write(cfgPath)
 	} else {
 		f, err := os.Open(cfgPath)
 		if err != nil {
@@ -122,7 +121,7 @@ func main() {
 			exitErr(err)
 		}
 	}
-	
+
 	app := cli.NewApp()
 
 	app.Commands = []cli.Command{
@@ -136,7 +135,7 @@ func main() {
 					exitErr(fmt.Errorf("Missing server URL"))
 				}
 
-				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()));
+				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()))
 
 				if err != nil {
 					exitErr(err)
@@ -158,11 +157,11 @@ func main() {
 			Usage:   "create a Player ID",
 			Action: func(c *cli.Context) error {
 
-				if (config.Host == "") {
+				if config.Host == "" {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
-				
-				response, err := http.Get(fmt.Sprintf("%s/start", config.Host));
+
+				response, err := http.Get(fmt.Sprintf("%s/start", config.Host))
 
 				if err != nil {
 					exitErr(err)
@@ -178,8 +177,8 @@ func main() {
 			},
 		},
 		{
-			Name:    "log",
-			Usage:   "log evaluations",
+			Name:  "log",
+			Usage: "log evaluations",
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:        "id",
@@ -191,10 +190,10 @@ func main() {
 
 			Action: func(c *cli.Context) error {
 
-				if (config.Host == "") {
+				if config.Host == "" {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
-				
+
 				if player == "" {
 					exitErr(fmt.Errorf("Missing player ID"))
 				}
@@ -203,10 +202,10 @@ func main() {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
 
-				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player));
+				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player))
 
 				if err != nil {
-					exitErr(err);
+					exitErr(err)
 				}
 
 				responseData, err := ioutil.ReadAll(response.Body)
@@ -245,10 +244,10 @@ func main() {
 
 			Action: func(c *cli.Context) error {
 
-				if (config.Host == "") {
+				if config.Host == "" {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
-				
+
 				if policy == "" {
 					exitErr(fmt.Errorf("Missing policy"))
 				}
@@ -275,8 +274,8 @@ func main() {
 				// check that it is OK?
 
 				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": string(message[:])}
-				if (title != "") {
-					values["title"] = title;
+				if title != "" {
+					values["title"] = title
 				}
 
 				jsonValue, _ := json.Marshal(values)
@@ -284,7 +283,7 @@ func main() {
 				response, err := http.Post(fmt.Sprintf("%s/evaluate", config.Host), "application/json", bytes.NewBuffer(jsonValue))
 
 				if err != nil {
-					exitErr(err);
+					exitErr(err)
 				}
 
 				responseData, err := ioutil.ReadAll(response.Body)
@@ -293,10 +292,10 @@ func main() {
 				}
 				fmt.Print(string(responseData))
 
-				if (strings.HasPrefix(string(responseData), "GREEN:")) {
+				if strings.HasPrefix(string(responseData), "GREEN:") {
 					os.Exit(0)
 				} else {
-					if (strings.HasPrefix(string(responseData), "RED:")) {
+					if strings.HasPrefix(string(responseData), "RED:") {
 						os.Exit(1)
 					} else {
 						os.Exit(2)

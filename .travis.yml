@@ -13,30 +13,6 @@ matrix:
         - make coveralls
     - language: go
       before_install: cd rlgl
-      install:
-        - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
-        - |
-          for PLATFORM in "${PLATFORMS[@]}"; do
-            echo "Building $PLATFORM"
-            GOOS=${PLATFORM%/*}
-            GOARCH=${PLATFORM#*/}
-            if [ "$GOOS" = "windows" ]; then
-              build_cmd="GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-w -s'"
-            else
-              build_cmd="CGO_ENABLED=0 GOOS=$GOOS GOARCH=$GOARCH go build -ldflags '-d -w -s'"
-            fi
-            eval $build_cmd
-            if [ $? ]; then
-              echo "Failed building rlrl cli for $PLATFORM" && return 1
-            fi
-
-            if [ "$GOOS" = "windows" ]; then
-              zip rlgl-${GOOS}-${GOARCH}.zip rlgl
-            else
-              tar cvzf rlgl-${GOOS}-${GOARCH}.tgz rlgl
-            fi
-          done
-          
       deploy:
         provider: releases
         api_key: $AUTH_TOKEN
