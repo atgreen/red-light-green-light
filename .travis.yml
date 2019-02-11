@@ -27,7 +27,7 @@ matrix:
             fi
             eval $build_cmd
             if [ $? ]; then
-              echo Failed building rlrl cli for $PLATFORM" && return 1
+              echo "Failed building rlrl cli for $PLATFORM" && return 1
             fi
 
             if [ "$GOOS" = "windows" ]; then
