@@ -38,7 +38,7 @@ matrix:
           
       - deploy:
           provider: releases
-          apu_key: $AUTH_TOKEN
+          api_key: $AUTH_TOKEN
           file:
             - "rlgl/rlgl-linux-amd64.tgz"
             - "rlgl/rlgl-darwin-amd64.tgz"
