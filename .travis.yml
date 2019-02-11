@@ -36,11 +36,11 @@ matrix:
             fi
           done
           
-      - deploy:
-          provider: releases
-          api_key: $AUTH_TOKEN
-          file:
-            - "rlgl/rlgl-linux-amd64.tgz"
-            - "rlgl/rlgl-darwin-amd64.tgz"
-            - "rlgl/rlgl-windows-amd64.tgz"
-          skip_cleanup: true
+      deploy:
+        provider: releases
+        api_key: $AUTH_TOKEN
+        file:
+          - "rlgl/rlgl-linux-amd64.tgz"
+          - "rlgl/rlgl-darwin-amd64.tgz"
+          - "rlgl/rlgl-windows-amd64.tgz"
+        skip_cleanup: true
