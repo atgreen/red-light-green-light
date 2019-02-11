@@ -12,6 +12,7 @@ matrix:
       script:
         - make coveralls
     - language: go
+      install:
       before_deploy:
         - PLATFORMS=(darwin/amd64 linux/amd64 windows/amd64)
         - |
