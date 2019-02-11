@@ -178,34 +178,36 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
     (let ((policy-name (cdr (assoc :POLICY json)))
 	  (player (cdr (assoc :ID json))))
-      (if (rlgl.util:valid-url? policy-name)
-	  (setf *policy* (make-policy policy-name))
-	  (print "NO POLICY"))
-      (unless player
-	"ERROR: missing ID")
-      (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
-	     (filename (cdr (assoc :NAME json)))
-	     (parser (or (recognize-report doc)
-			 (when (str:ends-with? ".csv" filename)
-			   (make-instance 'parser/csv))))
-	     (tests (parse-report parser doc)))
-	(if (null tests)
-	    "ERROR"
-	    (progn
-	      (multiple-value-bind (red-or-green processed-results)
-		  (apply-policy *policy* tests)
-		(let ((stream (make-string-output-stream)))
-		  (render stream (cdr (assoc :REF json)) processed-results
-			  (title parser)
-			  (commit-url-format *policy*))
-		  (let ((ref (store-document *storage-driver*
-					     (flexi-streams:string-to-octets
-					      (get-output-stream-string stream)))))
-		    (rlgl.db:record-log player (version *policy*) red-or-green ref)
-		    (format nil "~A: ~A/doc?id=~A~%"
-			    red-or-green
-			    *server-uri*
-			    ref))))))))))
+      (if (not (and (rlgl.util:valid-url? policy-name)
+		    player))
+	  (progn
+	    (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
+	    "ERROR: missing POLICY or ID")
+	  (progn
+	    (setf *policy* (make-policy policy-name))
+	    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
+		   (filename (cdr (assoc :NAME json)))
+		   (parser (or (recognize-report doc)
+			       (when (str:ends-with? ".csv" filename)
+				 (make-instance 'parser/csv))))
+		   (tests (parse-report parser doc)))
+	      (if (null tests)
+		  "ERROR"
+		  (progn
+		    (multiple-value-bind (red-or-green processed-results)
+			(apply-policy *policy* tests)
+		      (let ((stream (make-string-output-stream)))
+			(render stream (cdr (assoc :REF json)) processed-results
+				(title parser)
+				(commit-url-format *policy*))
+			(let ((ref (store-document *storage-driver*
+						   (flexi-streams:string-to-octets
+						    (get-output-stream-string stream)))))
+			  (rlgl.db:record-log player (version *policy*) red-or-green ref)
+			  (format nil "~A: ~A/doc?id=~A~%"
+				  red-or-green
+				  *server-uri*
+				  ref))))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
@@ -298,10 +300,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 					  (:br)))
 				      (:div :id "border"
 					    (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
-	(:footer :class "fixed-bottom bg-light"
-		 (:div :class "container"
-		       (:span :class "text-muted" "Red Light Green Light (c) 2018, 2019 Anthony Green <green@moxielogic.com>"
-			      )))
 	(:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			      :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 			      :crossorigin "anonymous"))
@@ -436,8 +434,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
-  (setf *policy* (make-policy
-		  "https://github.com/atgreen/test-policy"))
+  ;; (setf *policy* (make-policy
+  ;; 		  "https://github.com/atgreen/test-policy"))
 
   (initialize-metrics)
 

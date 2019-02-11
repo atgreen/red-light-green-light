@@ -22,8 +22,9 @@
 	      (drakma:http-request "http://localhost:8080/evaluate"
 				   :method :post
 				   :content-type "application/json"
-				   :content (format nil "{ \"id\": \"~A\", \"ref\": \"~A\" }"
+				   :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
 						    (rlgl.util:random-hex-string 7)
+						    "http://github.com/atgreen/test-policy"
 						    *upload-ref*))))
     )
 
