@@ -12,7 +12,7 @@ matrix:
       script:
         - make coveralls
     - language: go
-      before_install: cd rlgl
+      before_install: cd rlgl && make depend
       before_script: make build
 deploy:
         provider: releases
