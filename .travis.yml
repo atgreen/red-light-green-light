@@ -12,13 +12,13 @@ matrix:
   - language: go
     before_install: cd rlgl && make depend
     before_script: make build
+before_deploy: "pwd && find ."
 deploy:
   provider: s3
   access_key_id: AKIAJR65LD2QEV6X4WOQ
   secret_access_key:
     secure: zdAqxbqNpWQ5GKQBu/ouIyXueBd268NdqWkMZsrLA84peTcn/YJTSj36Qg03FMdqArtp8DYzYmHApSQK7f851ldm+t7wLswRaQ1Av16vJf8oWVm2grgbB5e+7NofA/DyX29LGZAAWoz5nW4zH7fYkWN85fExVUD7BU/rxa1eIKZ9vq9TAC/zrYltNtuSwzA/LrzkuhX/hR13fPc9b704+2kuS8bAbHrmm+jGMthzEWIAePJY8ONdRvPP6D7JC124vSdAPBCbSh2CL9zGTwctirH7emSUfFp74E8imnOCoi1xcuaFRh7FxG5CZDavydLKkC7iBYpH2MKROF5g2fHup/quI3kW7f0Yi0UAMiyNb51rskcZIW967KBfWkdpWS9XbWUyxtsGs3jZT5A++pY9We0Z5qIAkimdR1OYbabfXlgnGjInNYCeUxefMtbr8Abdn4ywA9Qwj087ZTFgkPU2AHRDnTCyxo9rxKcZE07ci7sq5PKHpNmp7d0yGPIQpi0oYJ6gs/s4pNoX0T/PUI+Zo0RGAT8nx1BAj3pf9qtrXHsZ8Du1/d18H9vbGZ1TzEYpBnWl3qoCRdKNgLzq5CjSWH84hpTEHHbkrfUmfVfNKcsoz5gwHCN8JO6zVPue8eNmjAO3p/LG0yXGSGkIN3J2cnQtmvExr/6xeWN/U3JDNQ0=
   bucket: rlgl-cli
-  local-dir: build
   acl: public_read
   on:
     repo: atgreen/red-light-green-light
