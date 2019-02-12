@@ -1,25 +1,24 @@
 sudo: required
-
 matrix:
   include:
-    - language: common-lisp
-      env:
-        LISP=sbcl
-      install:
-        # Install lisp support...
-        - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
-        - apt list --installed
-      script:
-        - make coveralls
-    - language: go
-      before_install: cd rlgl && make depend
-      before_script: make build
+  - language: common-lisp
+    env: LISP=sbcl
+    install:
+    - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh |
+      bash
+    - apt list --installed
+    script:
+    - make coveralls
+  - language: go
+    before_install: cd rlgl && make depend
+    before_script: make build
 deploy:
-        provider: releases
-        api_key: $AUTH_TOKEN
-        file:
-          - "build/rlgl-darwin-amd64.tgz"
-          - "build/rlgl-linux-amd64.tgz"
-          - "build/rlgl-linux-arm.tgz"
-          - "build/rlgl-windows-amd64.zip"
-        skip_cleanup: true
+  provider: s3
+  access_key_id: AKIAJR65LD2QEV6X4WOQ
+  secret_access_key:
+    secure: zdAqxbqNpWQ5GKQBu/ouIyXueBd268NdqWkMZsrLA84peTcn/YJTSj36Qg03FMdqArtp8DYzYmHApSQK7f851ldm+t7wLswRaQ1Av16vJf8oWVm2grgbB5e+7NofA/DyX29LGZAAWoz5nW4zH7fYkWN85fExVUD7BU/rxa1eIKZ9vq9TAC/zrYltNtuSwzA/LrzkuhX/hR13fPc9b704+2kuS8bAbHrmm+jGMthzEWIAePJY8ONdRvPP6D7JC124vSdAPBCbSh2CL9zGTwctirH7emSUfFp74E8imnOCoi1xcuaFRh7FxG5CZDavydLKkC7iBYpH2MKROF5g2fHup/quI3kW7f0Yi0UAMiyNb51rskcZIW967KBfWkdpWS9XbWUyxtsGs3jZT5A++pY9We0Z5qIAkimdR1OYbabfXlgnGjInNYCeUxefMtbr8Abdn4ywA9Qwj087ZTFgkPU2AHRDnTCyxo9rxKcZE07ci7sq5PKHpNmp7d0yGPIQpi0oYJ6gs/s4pNoX0T/PUI+Zo0RGAT8nx1BAj3pf9qtrXHsZ8Du1/d18H9vbGZ1TzEYpBnWl3qoCRdKNgLzq5CjSWH84hpTEHHbkrfUmfVfNKcsoz5gwHCN8JO6zVPue8eNmjAO3p/LG0yXGSGkIN3J2cnQtmvExr/6xeWN/U3JDNQ0=
+  bucket: rlgl-cli
+  local-dir: rlgl/build
+  acl: public_read
+  on:
+    repo: atgreen/red-light-green-light
