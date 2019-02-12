@@ -18,8 +18,8 @@ deploy:
         provider: releases
         api_key: $AUTH_TOKEN
         file:
-          - "rlgl/build/rlgl-darwin-amd64.tgz"
-          - "rlgl/build/rlgl-linux-amd64.tgz"
-          - "rlgl/build/rlgl-linux-arm.tgz"
-          - "rlgl/build/rlgl-windows-amd64.zip"
+          - "build/rlgl-darwin-amd64.tgz"
+          - "build/rlgl-linux-amd64.tgz"
+          - "build/rlgl-linux-arm.tgz"
+          - "build/rlgl-windows-amd64.zip"
         skip_cleanup: true
