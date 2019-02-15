@@ -318,6 +318,8 @@ func main() {
 	app.Usage = "Red Light Green Light"
 	app.Action = func(c *cli.Context) error {
 
+		cli.ShowAppHelp(c);
+
 		return nil
 	}
 
