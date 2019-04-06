@@ -386,6 +386,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
 
+  ;; We never git commit, but git will complain even when cloning if
+  ;; we run in a container without a known user unless...
+  (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
+  (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
+  
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse *default-config-text*))
   (log:info *default-config-text*)
