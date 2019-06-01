@@ -65,16 +65,14 @@ based on URL."
 						 :sha1 (flexi-streams:string-to-octets url)))
 					       0 8))))
 
-      ;; (let ((cmd (if (fad:directory-exists-p policy-dirname)
-      ;; 		     (format nil "bash -c \"(cd ~A; git pull)\""
-      ;; 			     policy-dirname)
-      ;; 		     (format nil "/usr/bin/git clone ~A ~A"
-      ;; 			     url policy-dirname))))
-		     
       (unless (fad:directory-exists-p policy-dirname)
-	(let ((output (inferior-shell:run
-		       (format nil "/usr/bin/git clone ~A ~A"
-			       url policy-dirname))))
+	(let ((output (if (not (fad:directory-exists-p policy-dirname))
+			  (inferior-shell:run
+			   (format nil "/usr/bin/git clone ~A ~A"
+				   url policy-dirname))
+			  (inferior-shell:run
+      			   (format nil "bash -c \"(cd ~A; git pull)\""
+      				   policy-dirname)))))
 	  (mapc (lambda (line)
 		  (print line))
 		output)))
