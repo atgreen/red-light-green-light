@@ -108,6 +108,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (setf snooze:*home-resource* :index)
 
+
+;; Render the home page.
 (snooze:defroute index (:get :text/*)
     (with-html-string
       (:doctype)
@@ -183,31 +185,30 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	  (progn
 	    (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
 	    "ERROR: missing POLICY or ID")
-	  (progn
-	    (setf *policy* (make-policy policy-name))
-	    (let* ((doc (read-document *storage-driver* (cdr (assoc :REF json))))
-		   (filename (cdr (assoc :NAME json)))
-		   (parser (or (recognize-report doc)
-			       (when (str:ends-with? ".csv" filename)
-				 (make-instance 'parser/csv))))
-		   (tests (parse-report parser doc)))
-	      (if (null tests)
-		  "ERROR"
-		  (progn
-		    (multiple-value-bind (red-or-green processed-results)
-			(apply-policy *policy* tests)
-		      (let ((stream (make-string-output-stream)))
-			(render stream (cdr (assoc :REF json)) processed-results
-				(title parser)
-				(commit-url-format *policy*))
-			(let ((ref (store-document *storage-driver*
-						   (flexi-streams:string-to-octets
-						    (get-output-stream-string stream)))))
-			  (rlgl.db:record-log player (version *policy*) red-or-green ref)
-			  (format nil "~A: ~A/doc?id=~A~%"
-				  red-or-green
-				  *server-uri*
-				  ref))))))))))))
+	  (let* ((policy (make-policy policy-name))
+		 (doc (read-document *storage-driver* (cdr (assoc :REF json))))
+		 (filename (cdr (assoc :NAME json)))
+		 (parser (or (recognize-report doc)
+			     (when (str:ends-with? ".csv" filename)
+			       (make-instance 'parser/csv))))
+		 (tests (parse-report parser doc)))
+	    (if (null tests)
+		"ERROR"
+		(progn
+		  (multiple-value-bind (red-or-green processed-results)
+		      (apply-policy policy tests)
+		    (let ((stream (make-string-output-stream)))
+		      (render stream (cdr (assoc :REF json)) processed-results
+			      (title parser)
+			      (commit-url-format policy))
+		      (let ((ref (store-document *storage-driver*
+						 (flexi-streams:string-to-octets
+						  (get-output-stream-string stream)))))
+			(rlgl.db:record-log player (version policy) red-or-green ref)
+			(format nil "~A: ~A/doc?id=~A~%"
+				red-or-green
+				*server-uri*
+				ref)))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
@@ -311,15 +312,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			      :crossorigin "anonymous"))
 	(:script :attrs (list :src "js/index.js"))))))
 	      
-;;; Read JSON pattern ---------------------------------------------------------
-
-;; Read policy files.  Ignore all blank lines and comments, which are
-;; lines starting with #, ; or -.  Each json matcher should be on a
-;; single line of text.  Record the line number of each matcher along
-;; with the matcher.
-
-(defvar *policy* nil)
-
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
@@ -438,9 +430,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
-
-  ;; (setf *policy* (make-policy
-  ;; 		  "https://github.com/atgreen/test-policy"))
 
   (initialize-metrics)
 
