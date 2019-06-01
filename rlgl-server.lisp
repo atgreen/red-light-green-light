@@ -273,45 +273,45 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:main :role "main" :class "container"
 	       (:div :class "row"
 		     (:div :class "col"
-	       (:div :style "width:100px"
-		     (:div :class "rlgl-svg"))
-	       (:h1 :class "mt-5" title)
-	       (:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
-		   :target "_blank" "Original Report")
-	       (:table :class "fold-table" :id "results"
-		       (:tr (:th "RESULT") (:th "ID"))
-		       (dolist (item results)
-			 (let ((matcher (car item))
-			       (alist (cdr item)))
-			   (:tr :class "view" :class (kind matcher)
-				(:td (kind matcher))
-				(:td (:a :href (cdr (assoc :URL alist))
-					 :target "_blank" (cdr (assoc :ID alist)))))
-			   (:tr :class "fold"
-				(:td :colspan "2")
-				(:div :class "fold-content"
-				      (when (and matcher
-						 (not (eq (kind matcher) :unknown)))
-					(let ((log-lines (log-entry matcher)))
-					  (:div :id "border"
-						(:a :href (format nil commit-url-format (githash matcher))
-						    :target "_blank"
-						    (:pre (str:trim (car log-lines))))
-						(:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
-					  (:br)))
-				      (:div :id "border"
-					    (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
-	(:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
-			      :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-			      :crossorigin "anonymous"))
-	(:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-			      :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-			      :crossorigin "anonymous"))
-	(:script :attrs (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-			      :integrity "sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-			      :crossorigin "anonymous"))
-	(:script :attrs (list :src "js/index.js"))))))
-	      
+			   (:div :style "width:100px"
+				 (:div :class "rlgl-svg"))
+			   (:h1 :class "mt-5" title)
+			   (:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
+			       :target "_blank" "Original Report")
+			   (:table :class "fold-table" :id "results"
+				   (:tr (:th "RESULT") (:th "ID"))
+				   (dolist (item results)
+				     (let ((matcher (car item))
+					   (alist (cdr item)))
+				       (:tr :class "view" :class (kind matcher)
+					    (:td (kind matcher))
+					    (:td (:a :href (cdr (assoc :URL alist))
+						     :target "_blank" (cdr (assoc :ID alist)))))
+				       (:tr :class "fold"
+					    (:td :colspan "2")
+					    (:div :class "fold-content"
+						  (when (and matcher
+							     (not (eq (kind matcher) :unknown)))
+						    (let ((log-lines (log-entry matcher)))
+						      (:div :id "border"
+							    (:a :href (format nil commit-url-format (githash matcher))
+								:target "_blank"
+								(:pre (str:trim (car log-lines))))
+							    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
+						      (:br)))
+						  (:div :id "border"
+							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
+       (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+			     :integrity "sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "js/index.js"))))))
+
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
