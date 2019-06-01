@@ -1,6 +1,8 @@
 all:
 	buildapp --output rlgl-server \
 		--asdf-tree `pwd`/.. \
+		--asdf-tree `pwd`/3rd-party/cl-dbi \
+		--asdf-tree `pwd`/3rd-party/cl-json-util \
 		--asdf-tree ~/quicklisp/dists/quicklisp/software \
 		--load-system rlgl-server \
 		--compress-core \
