@@ -40,7 +40,11 @@
 			      (matcher nil)
 			      expiration-date)
   (make-instance 'policy-matcher
-		 :kind kind :githash githash :lineno lineno :matcher matcher :expiration-date expiration-date))
+		 :kind kind
+		 :githash githash
+		 :lineno lineno
+		 :matcher matcher
+		 :expiration-date expiration-date))
 
 (defun match-pair-in-alist (pair alist)
   "Given a cons PAIR, return non-NIL if PAIR matches in ALIST using
