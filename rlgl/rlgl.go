@@ -91,7 +91,7 @@ func basedir(path string) string {
 	return strings.Join((parts[0 : len(parts)-1]), "/")
 }
 
-// Test for environemnt supporting XDG spec
+// Test for environment supporting XDG spec
 func xdgSupport() bool {
 	re := regexp.MustCompile("^XDG_*")
 	for _, e := range os.Environ() {
