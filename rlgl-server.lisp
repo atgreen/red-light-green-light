@@ -137,15 +137,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				 (:div :class "rlgl-svg"))
 			   (:h1 :class "mt-5" "Welcome!")
 			   (:br)
-			   "Red Light Green Light is an experimental git-centric tool designed to accelerate CI/CD pipelines."
+			   "Red Light Green Light is a git-centric tool designed to accelerate CI/CD pipelines."
 			   (:br)
 			   (:br)
 			   (:h4 "Downloads")
 			   (:ul
-			    (:li "rlgl command-line tool for 64-bit x86 Linux")
-			    (:li "rlgl command-line tool for 64-bit ARM Linux")
-			    (:li "rlgl command-line tool for 64-bit x86 OSX")
-			    (:li "rlgl command-line tool for 64-bit x86 Windows"))
+			    (:li (:a :href "cli/amd64/rlgl" "rlgl command-line tool for 64-bit x86 Linux"))
+			    (:li (:a :href "cli/arm64/rlgl" "rlgl command-line tool for 64-bit ARM Linux"))
+			    (:li (:a :href "cli/osx/rlgl" "rlgl command-line tool for 64-bit x86 OSX"))
+			    (:li (:a :href "cli/windows/rlgl" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:hr)
 			   "Red Light Green Light was written by Anthony Green "
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
@@ -334,6 +334,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
    (hunchentoot:create-folder-dispatcher-and-handler
     "/css/" (fad:pathname-as-directory
              (make-pathname :name "css"
+                            :defaults (rlgl-root))))
+   (hunchentoot:create-folder-dispatcher-and-handler
+    "/cli/" (fad:pathname-as-directory
+             (make-pathname :name "cli"
                             :defaults (rlgl-root))))
    (snooze:make-hunchentoot-app)))
 

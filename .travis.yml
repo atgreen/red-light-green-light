@@ -1,14 +1,11 @@
 sudo: required
-matrix:
-  include:
-  - language: common-lisp
-    env: LISP=sbcl
-    install:
-    - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh |
-      bash
-    - apt list --installed
-    script:
-    - make coveralls
-  - language: go
-    before_install: cd rlgl && make depend
-    before_script: make build
+
+services:
+  - docker
+
+before_install:
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - (cd rlgl && make depend && make build)
+  - mv rlgl/rlgl cli/amd64
+  - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
+  - make coveralls
