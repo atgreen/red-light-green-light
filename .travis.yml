@@ -5,6 +5,7 @@ services:
 
 env:
   LISP=sbcl
+  REPO=moxielogic/rlgl-server
 
 language: go
 go:
@@ -16,4 +17,13 @@ before_install:
   - (ls -l && cd rlgl && make depend && make build)
   - mv rlgl/build/* cli
   - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
-  - make coveralls
+#  - make coveralls
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+      docker tag $REPO:latest $REPO:$COMMIT;
+      docker push $REPO:latest;
+      docker push $REPO:$COMMIT;
+    fi
+  - echo All done.
