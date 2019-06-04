@@ -17,6 +17,7 @@ before_install:
   - (ls -l && cd rlgl && make depend && make build)
   - mv rlgl/build/* cli
   - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
+
 #  - make coveralls
 
 after_success:
