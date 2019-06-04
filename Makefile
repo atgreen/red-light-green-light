@@ -1,4 +1,6 @@
 all:
+
+binary:
 	buildapp --output rlgl-server \
 		--asdf-tree `pwd`/.. \
 		--asdf-tree `pwd`/3rd-party/cl-dbi \
