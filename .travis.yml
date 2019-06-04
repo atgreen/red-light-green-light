@@ -23,8 +23,6 @@ before_install:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-      docker tag $REPO:latest $REPO:$COMMIT;
       docker push $REPO:latest;
-      docker push $REPO:$COMMIT;
     fi
   - echo All done.
