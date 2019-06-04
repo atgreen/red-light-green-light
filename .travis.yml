@@ -3,8 +3,12 @@ sudo: required
 services:
   - docker
 
+env:
+  LISP=sbcl
+
 before_install:
-  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh | bash
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
+    | bash
   - (cd rlgl && make depend && make build)
   - mv rlgl/rlgl cli/amd64
   - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
