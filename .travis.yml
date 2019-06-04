@@ -14,8 +14,6 @@ before_install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
     | bash
   - (ls -l && cd rlgl && make depend && make build)
-  - find . -name \*.gz
-  - find . -name \*.zip
-  - mv rlgl/rlgl cli/amd64
+  - mv rlgl/build/* cli
   - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
   - make coveralls
