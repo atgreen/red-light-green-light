@@ -396,7 +396,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   ;; FIXME: lookup storage driver
   ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *default-config*)))
-  (setf *server-uri* (or (gethash "server-uri" *config*)
+  (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
+		         (gethash "server-uri" *config*)
 			 (gethash "server-uri" *default-config*)))
   (unless (rlgl.util:valid-url? *server-uri*)
     (error "server-uri is not valid URL: ~A" *server-uri*))
