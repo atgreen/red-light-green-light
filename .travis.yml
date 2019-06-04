@@ -3,8 +3,10 @@ sudo: required
 services:
   - docker
 
-env:
-  LISP=sbcl
+language: go
+go:
+- 1.9
+
 
 before_install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
