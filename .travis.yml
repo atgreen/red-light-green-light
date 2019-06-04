@@ -13,7 +13,7 @@ go:
 before_install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
     | bash
-  - (cd rlgl && make depend && make build)
+  - (ls -l && cd rlgl && make depend && make build)
   - mv rlgl/rlgl cli/amd64
   - docker build -f Dockerfile -t atgreen/rlgl-server:latest .
   - make coveralls
