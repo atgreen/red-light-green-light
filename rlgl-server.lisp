@@ -129,7 +129,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:header
 	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
 	       (:a :class "navbar-brand"
-		   :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
+		   :href *server-uri* "Red Light Green Light")))
 	(:main :role "main" :class "container"
 	       (:div :class "row"
 		     (:div :class "col"
@@ -149,7 +149,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:hr)
 			   "Red Light Green Light was written by Anthony Green "
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
-			   " and is available in source form from "
+			   " and is available in source form under the terms of the AGPLv3 license from "
 			   (:a :href "http://github.com/atgreen/red-light-green-light" "http://github.com/atgreen/red-light-green-light") "."
 			   ))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
