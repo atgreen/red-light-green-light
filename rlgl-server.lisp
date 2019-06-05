@@ -64,9 +64,8 @@ sqlite-db-filename = \"/var/rlgl/rlgl.db\"
 (defclass storage-backend ()
   ((key :initarg :key :reader key)))
 
-(defvar *storage-driver*
-  (make-instance 'local-storage-backend))
-(init *storage-driver*)
+;; Set this at runtime
+(defvar *storage-driver* (make-instance 'local-storage-backend))
 
 ;; ----------------------------------------------------------------------------
 ;; Parsing backends
@@ -400,6 +399,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   ;; FIXME: lookup storage driver
   ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *default-config*)))
+  (init *storage-driver*)
+
   (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 		         (gethash "server-uri" *config*)
 			 (gethash "server-uri" *default-config*)))
