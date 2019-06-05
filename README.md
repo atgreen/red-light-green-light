@@ -6,7 +6,44 @@
 [![Build Status](https://travis-ci.org/atgreen/red-light-green-light.svg?branch=master)](https://travis-ci.org/atgreen/red-light-green-light)
 [![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
-**This is an experimental work in progress**
+Quick Start
+-----------
+
+Run the pre-built server container with your favorite container
+runtime (podman!), or docker, like so:
+
+    $ docker run --rm -t -i -p 8080:8080 moxielogic/rlgl-server
+    
+If running on a container platform, like OpenShift, tell the server
+about the ingress route by setting the `RLGL_SERVER_URI` environment
+variable within the container.
+
+Point your browser at http://localhost:8080 and download and install
+one of the cli tools hosted within that image.  Now login to the
+server like so...
+
+    $ rlgl l http://localhost:8080
+    
+Generate and inspect a player ID, like so...
+
+    $ ID=$(rlgl s)
+    $ echo $ID
+
+Generate an OpenSCAP report, or grab one from here:
+
+    $ curl https://raw.githubusercontent.com/atgreen/red-light-green-light/master/test/report.html > report.html
+    
+Evaluate the report against a sample policy:
+
+    $ rlgl e --id=$ID --policy=http://github.com/atgreen/test-policy report.html
+    
+Click on the resulting URL and explore.  Try forking the test policy
+report and making changes.
+
+Produce a log of reports for this player ID:
+
+    $ rlgl log --id=$ID
+
 
 Problem Statement
 ----------------
