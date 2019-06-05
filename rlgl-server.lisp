@@ -27,9 +27,9 @@
 (defparameter *default-config-text*
 "storage-driver = \"local\"
 server-uri = \"http://localhost:8080\"
-policy-dir = \"/tmp/policy5/\"
+policy-dir = \"/var/rlgl/policy/\"
 db = \"sqlite\"
-sqlite-db-filename = \"/tmp/rlgl5.db\"
+sqlite-db-filename = \"/var/rlgl/rlgl.db\"
 ")
 
 (defvar *server-uri* nil)

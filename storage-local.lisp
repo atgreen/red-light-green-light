@@ -40,7 +40,7 @@
 (defclass local-storage-backend (storage-backend)
   ((local-dir       :initarg :local-dir    :reader local-dir))
   (:default-initargs
-   :local-dir  "/tmp"))
+   :local-dir  "/var/rlgl/docs"))
 
 (defmethod init ((backend local-storage-backend))
   "Initialize a local storage backend."
