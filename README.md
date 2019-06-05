@@ -279,6 +279,6 @@ Author and License
 
 Red Light Green Light was written by [Anthony
 Green](https://github.com/atgreen), and is distributed under the terms
-of the GNU GPLv3.  See
-[COPYING3](https://raw.githubusercontent.com/atgreen/red-light-green-light/master/COPYING3)
+of the GNU Affero General Public License, Version 3.  See
+[COPYING](https://raw.githubusercontent.com/atgreen/red-light-green-light/master/COPYING)
 for details.
