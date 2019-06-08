@@ -213,7 +213,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 (snooze:defroute doc (:get :text/html &key id)
-  (read-document *storage-driver* id))
+  (handler-case (read-document *storage-driver* id)
+    (error (c)
+      (rlgl.util:read-file-into-string "missing-doc.html"))))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
