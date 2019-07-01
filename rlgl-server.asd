@@ -26,6 +26,7 @@
 	       (:file "policy")
 	       (:file "package")
 	       (:file "storage-local")
+	       (:file "storage-s3")
 	       (:file "oscap-oval")
 	       (:file "aqua")
 	       (:file "junit")
@@ -37,7 +38,7 @@
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
                :cxml :cl-dbi :cl-date-time-parser :quri
 	       :local-time :cl-csv :prometheus
-	       :dbd-sqlite3
+	       :dbd-sqlite3 :zs3
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
 	       :prometheus.collectors.sbcl
