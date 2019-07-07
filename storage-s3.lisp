@@ -55,36 +55,22 @@
 ;; ----------------------------------------------------------------------------
 
 (defclass s3-storage-backend (storage-backend)
-  ((s3-dir       :initarg :s3-dir    :reader s3-dir))
+  ((s3-endpoint       :initarg :s3-endpoint    :reader s3-endpoint)
+   (s3-bucket         :initarg :s3-bucket      :reader s3-bucket))
   (:default-initargs
-   :s3-dir  "/var/rlgl/docs"))
+   :s3-endpoint  "s3.amazonaws.com"))
 
 (defmethod init ((backend s3-storage-backend))
   "Initialize a s3 storage backend."
-  (let ((filename (format nil "~A/.key" (s3-dir backend))))
-    (if (probe-file filename)
-	(setf (slot-value backend 'key) (rlgl.util:read-file-into-string filename))
-	(let ((key (generate-random-string)))
-	  (with-open-file (stream filename
-				  :direction :output
-				  :if-exists :supersede
-				  :if-does-not-exist :create)
-	    (format stream key)
-	    (setf (slot-value backend 'key) key))))))
+  (unless (zs3:bucket-exists-p (s3-bucket s3-storage-backend))
+    (zs3:create-bucket (s3-bucket s3-storage-backend))))
 
 (defmethod read-document ((backend s3-storage-backend) ref)
-  "Return a string containing the document."
-  (rlgl.util:read-file-into-string
-   (format nil "~A/~A" (s3-dir backend) ref)))
+  "Return a string containing the document.")
 
 (defmethod store-document ((backend s3-storage-backend) document)
   "Store a document into s3 storage."
-  (let* ((filename (format nil "RLGL-~A"
-			   (generate-random-string))))
-    (with-open-file (stream (format nil "~A/~A" (s3-dir backend) filename)
-			    :direction :output
-			    :if-exists :supersede
-			    :if-does-not-exist :create
-			    :element-type '(unsigned-byte 8))
-      (write-sequence document stream)
-      filename)))
+  (let ((filename (format nil "RLGL-~A"
+			  (generate-random-string))))
+    (put-vector document (s3-bucket s3-storage-backend) filename)
+    filename))
