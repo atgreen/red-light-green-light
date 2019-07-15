@@ -149,7 +149,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   "Red Light Green Light was written by Anthony Green "
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
 			   " and is available in source form under the terms of the AGPLv3 license from "
-			   (:a :href "http://github.com/atgreen/red-light-green-light" "http://github.com/atgreen/red-light-green-light") "."
+			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
 			   ))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
