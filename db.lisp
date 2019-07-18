@@ -28,6 +28,7 @@
 (defvar *sqlite-db-filename* nil)
 
 (defun initialize (db &key (sqlite-db-filename nil) (fresh nil))
+  (declare (ignore db))
   (setf *sqlite-db-filename* sqlite-db-filename)
   (let ((db (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)))
     (when fresh
@@ -48,12 +49,12 @@
                            :fill-pointer 0 :adjustable t)))
       (with-output-to-string (s fstr)
 	(loop for row = (dbi:fetch result)
-	   while row
-	   do (destructuring-bind (j1 time j2 result j3 version j4 report)
-		  row
-		(local-time:format-timestring
-		 s (local-time:universal-to-timestamp
-		    (cl-date-time-parser:parse-date-time time))
-		 :format local-time:+rfc-1123-format+)
-		(format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
+	      while row
+	      do (destructuring-bind (j1 time j2 result j3 version j4 report)
+		     row
+		   (local-time:format-timestring
+		    s (local-time:universal-to-timestamp
+		       (cl-date-time-parser:parse-date-time time))
+		    :format local-time:+rfc-1123-format+)
+		   (format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
