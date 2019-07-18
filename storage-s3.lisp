@@ -21,21 +21,11 @@
 ;;; MVP storage driver using s3 storage
 
 ;; ----------------------------------------------------------------------------
-;; Credentials object to pull AWS credentials from environment variables.
+;; Make an AWS credentials list from environment variables
 
-(defclass environment-credentials () ())
-
-(defmethod access-key ((credentials environment-credentials))
-  (declare (ignore credentials))
-  (getenv "AWS_ACCESS_KEY"))
-
-(defmethod secret-key ((credentials environment-credentials))
-  (declare (ignore credentials))
-  (getenv "AWS_SECRET_KEY"))
-
-(setf *credentials* (make-instance 'environment-credentials))
-
-;; The rest of this file is a big TODO...
+(defun getenv-aws-credentials ()
+  (list (uiop:getenv "AWS_ACCESS_KEY")
+	(uiop:getenv "AWS_SECRET_KEY")))
 
 ;; ----------------------------------------------------------------------------
 ;; Utility functions for random filenames...
@@ -58,19 +48,22 @@
   ((s3-endpoint       :initarg :s3-endpoint    :reader s3-endpoint)
    (s3-bucket         :initarg :s3-bucket      :reader s3-bucket))
   (:default-initargs
-   :s3-endpoint  "s3.amazonaws.com"))
+   :s3-endpoint  "s3.amazonaws.com"
+   :s3-bucket    "rlgl-docs"))
 
 (defmethod init ((backend s3-storage-backend))
   "Initialize a s3 storage backend."
-  (unless (zs3:bucket-exists-p (s3-bucket s3-storage-backend))
-    (zs3:create-bucket (s3-bucket s3-storage-backend))))
+  (setf zs3:*credentials* (getenv-aws-credentials))
+  (unless (zs3:bucket-exists-p (s3-bucket backend))
+    (zs3:create-bucket (s3-bucket backend))))
 
 (defmethod read-document ((backend s3-storage-backend) ref)
-  "Return a string containing the document.")
+  "Return a string containing the document."
+  (zs3:get-string (s3-bucket backend) ref))
 
 (defmethod store-document ((backend s3-storage-backend) document)
   "Store a document into s3 storage."
-  (let ((filename (format nil "RLGL-~A"
-			  (generate-random-string))))
-    (put-vector document (s3-bucket s3-storage-backend) filename)
-    filename))
+  (let ((ref (format nil "RLGL-~A"
+		     (generate-random-string))))
+    (zs3:put-vector document (s3-bucket backend) ref)
+    ref))
