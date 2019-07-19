@@ -30,11 +30,19 @@
     (coerce (loop repeat length collect (aref chars (random (length chars))))
             'string)))
 
+(defparameter *root-path* (asdf:component-pathname (asdf:find-system "rlgl-server")))
+
 (defun read-file-into-string (filename)
-  (with-open-file (stream filename :external-format :UTF-8)
-    (let ((contents (make-string (file-length stream))))
-      (read-sequence contents stream)
-      contents)))
+  "Read FILENAME into a string and return that.
+   If filename is not an absolute path, find it relative to the
+   rlgl-server system (provided by asdf)."
+  (let ((absolute-filename (if (cl-fad:pathname-absolute-p filename)
+			       filename
+			       (merge-pathnames *root-path* filename))))
+    (with-open-file (stream absolute-filename :external-format :UTF-8)
+      (let ((contents (make-string (file-length stream))))
+	(read-sequence contents stream)
+	contents))))
 
 (defun valid-url? (string)
   "Returns T if STRING is a valid http or https url."
