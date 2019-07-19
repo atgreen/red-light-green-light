@@ -61,11 +61,8 @@
 (defmethod read-document ((backend s3-storage-backend) ref)
   "Return a string containing the document."
   (log:info "Reading ~A from s3 bucket ~A~%" ref (s3-bucket backend))
-  (let ((s (handler-case (zs3:get-string (s3-bucket backend) ref)
-	     (error (c)
-	       (log:info "ERROR: ~A~%" c)))))
-    s))
-
+  (zs3:get-string (s3-bucket backend)
+		  (format nil "~A" ref)))
 
 (defmethod store-document ((backend s3-storage-backend) document)
   "Store a document into s3 storage."

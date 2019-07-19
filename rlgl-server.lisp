@@ -216,6 +216,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute doc (:get :text/html &key id)
   (handler-case (read-document *storage-driver* id)
     (error (c)
+      (log:error "~A" c)
       (rlgl.util:read-file-into-string "missing-doc.html"))))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
