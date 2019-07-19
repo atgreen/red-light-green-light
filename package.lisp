@@ -25,6 +25,8 @@
 	   #:parser/oscap-oval
 	   #:parser/aqua
 	   #:parser/junit
+	   #:local-storage-backend
+	   #:s3-storage-backend
 	   #:*server-uri*))
 
 (in-package #:rlgl-server)

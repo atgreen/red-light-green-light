@@ -65,7 +65,8 @@ sqlite-db-filename = \"/var/rlgl/rlgl.db\"
   ((key :initarg :key :reader key)))
 
 ;; Set this at runtime
-(defvar *storage-driver* (make-instance 'local-storage-backend))
+; (defvar *storage-driver* (make-instance 'local-storage-backend))
+(defvar *storage-driver* nil)
 
 ;; ----------------------------------------------------------------------------
 ;; Parsing backends
@@ -399,10 +400,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	     (rlgl.util:read-file-into-string "/etc/rlgl/config.ini"))
 	    (make-hash-table)))
 
-  ;; FIXME: lookup storage driver
-  ;; (setf *storage-driver (fixme-lookup (gethash "storage-driver" *default-config*)))
-  (init *storage-driver*)
-
   (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 		         (gethash "server-uri" *config*)
 			 (gethash "server-uri" *default-config*)))
@@ -424,7 +421,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				 :sqlite-db-filename sqlite-db-filename)
 	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
 
+  ;; Define the storage backend.
   ;;
+  (let ((storage-driver (or (gethash "storage-driver" *config*)
+			    (gethash "storage-driver" *default-config*))))
+    (setf *storage-driver* (make-instance
+			    (read-from-string
+			     (str:concat "rlgl-server:" storage-driver "-storage-backend")))))
+  (init *storage-driver*)
+
   ;; This is the directory where we check out policies.  Make sure it
   ;; ends with a trailing '/'.
   ;;
