@@ -49,7 +49,7 @@
    (s3-bucket         :initarg :s3-bucket      :reader s3-bucket))
   (:default-initargs
    :s3-endpoint  "s3.amazonaws.com"
-   :s3-bucket    "rlgl-docs"))
+   :s3-bucket    "rlgl-docs-2"))
 
 (defmethod init ((backend s3-storage-backend))
   "Initialize a s3 storage backend."
