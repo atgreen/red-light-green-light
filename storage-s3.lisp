@@ -53,6 +53,7 @@
 
 (defmethod init ((backend s3-storage-backend))
   "Initialize a s3 storage backend."
+  (log:info "Initializing s3-storage-backend")
   (setf zs3:*credentials* (getenv-aws-credentials))
   (unless (zs3:bucket-exists-p (s3-bucket backend))
     (zs3:create-bucket (s3-bucket backend))))

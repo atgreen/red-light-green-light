@@ -44,6 +44,7 @@
 
 (defmethod init ((backend local-storage-backend))
   "Initialize a local storage backend."
+  (log:info "Initializing local-storage-backend")
   (let ((filename (format nil "~A/.key" (local-dir backend))))
     (if (probe-file filename)
 	(setf (slot-value backend 'key) (rlgl.util:read-file-into-string filename))
