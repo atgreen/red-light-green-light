@@ -29,6 +29,7 @@
 	       (:file "storage-s3")
 	       (:file "oscap-oval")
 	       (:file "aqua")
+	       (:file "clair")
 	       (:file "junit")
 	       (:file "csv")
 	       (:file "db")
