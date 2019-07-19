@@ -22,9 +22,10 @@
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
   (:shadow #:package)
   (:export #:start-rlgl-server #:stop-rlgl-server
-	   #:parser/oscap-oval
 	   #:parser/aqua
+	   #:parser/clair
 	   #:parser/junit
+	   #:parser/oscap-oval
 	   #:local-storage-backend
 	   #:s3-storage-backend
 	   #:*server-uri*))
