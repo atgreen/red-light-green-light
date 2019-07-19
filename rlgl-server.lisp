@@ -192,23 +192,21 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			     (when (str:ends-with? ".csv" filename)
 			       (make-instance 'parser/csv))))
 		 (tests (parse-report parser doc)))
-	    (if (null tests)
-		"ERROR"
-		(progn
-		  (multiple-value-bind (red-or-green processed-results)
-		      (apply-policy policy tests)
-		    (let ((stream (make-string-output-stream)))
-		      (render stream (cdr (assoc :REF json)) processed-results
-			      (title parser)
-			      (commit-url-format policy))
-		      (let ((ref (store-document *storage-driver*
-						 (flexi-streams:string-to-octets
-						  (get-output-stream-string stream)))))
-			(rlgl.db:record-log player (version policy) red-or-green ref)
-			(format nil "~A: ~A/doc?id=~A~%"
-				red-or-green
-				*server-uri*
-				ref)))))))))))
+	    (progn
+	      (multiple-value-bind (red-or-green processed-results)
+		  (apply-policy policy tests)
+		(let ((stream (make-string-output-stream)))
+		  (render stream (cdr (assoc :REF json)) processed-results
+			  (title parser)
+			  (commit-url-format policy))
+		  (let ((ref (store-document *storage-driver*
+					     (flexi-streams:string-to-octets
+					      (get-output-stream-string stream)))))
+		    (rlgl.db:record-log player (version policy) red-or-green ref)
+		    (format nil "~A: ~A/doc?id=~A~%"
+			    red-or-green
+			    *server-uri*
+			    ref))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
