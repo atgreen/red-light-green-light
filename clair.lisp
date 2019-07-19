@@ -28,7 +28,14 @@
    :title  "Clair Scan Report"))
 
 (defmethod parse-report ((parser parser/clair) doc)
-  (let ((report (json:decode-json-from-string doc))
-	(tests-fail (list))
-	(tests-pass (list)))
+  (let* ((report (json:decode-json-from-string doc))
+	 (tests-pass (list))
+	 (tests-fail
+	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))
+	     (mapcar (lambda (v)
+		       (json:decode-json-from-string
+			(format nil "{ \"report\": \"clair\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+				(cdr (assoc :VULNERABILITY v))
+				(cdr (assoc :LINK v)))))
+		     vulnerabilities))))
     (append tests-fail tests-pass)))

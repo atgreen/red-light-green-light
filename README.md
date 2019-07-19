@@ -262,6 +262,7 @@ Currently supported report parsers include:
 * [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
 * [JUnit](https://junit.org/junit5/) XML results report
 * [AquaSec](https://github.com/aquasecurity/microscanner) container microscanner reports
+* [Clair](https://github.com/coreos/clair) container scanner json reports
 
 A generic CSV parser is in the works, allowing you to implement policy
 on any arbitrary metric (file size, performance results, etc).

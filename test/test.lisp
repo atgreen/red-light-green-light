@@ -68,6 +68,7 @@
   (test-eval "test/report.html") 
   (test-eval "test/sample-junit.xml")
   (test-eval "test/mysql-aqua.html")
+  (test-eval "test/clair-report.json")
 
   (finalize)
 
