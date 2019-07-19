@@ -60,6 +60,7 @@
 
 (defmethod read-document ((backend s3-storage-backend) ref)
   "Return a string containing the document."
+  (log:info "Reading ~A from s3 bucket ~A~%" ref (s3-bucket backend))
   (zs3:get-string (s3-bucket backend) ref))
 
 (defmethod store-document ((backend s3-storage-backend) document)
