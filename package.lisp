@@ -26,8 +26,11 @@
 	   #:parser/clair
 	   #:parser/junit
 	   #:parser/oscap-oval
-	   #:local-storage-backend
-	   #:s3-storage-backend
+	   #:db
+	   #:db/sqlite
+	   #:db/postgresql
+	   #:storage/local
+	   #:storage/s3
 	   #:*server-uri*))
 
 (in-package #:rlgl-server)

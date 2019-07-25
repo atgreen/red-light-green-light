@@ -44,27 +44,27 @@
 
 ;; ----------------------------------------------------------------------------
 
-(defclass s3-storage-backend (storage-backend)
+(defclass storage/s3 (storage-backend)
   ((s3-endpoint       :initarg :s3-endpoint    :reader s3-endpoint)
    (s3-bucket         :initarg :s3-bucket      :reader s3-bucket))
   (:default-initargs
    :s3-endpoint  "s3.amazonaws.com"
    :s3-bucket    "rlgl-docs-2"))
 
-(defmethod init ((backend s3-storage-backend))
+(defmethod initialize-instance :after ((backend storage/s3) &key)
   "Initialize a s3 storage backend."
-  (log:info "Initializing s3-storage-backend")
+  (log:info "Initializing storage/s3")
   (setf zs3:*credentials* (getenv-aws-credentials))
   (unless (zs3:bucket-exists-p (s3-bucket backend))
     (zs3:create-bucket (s3-bucket backend))))
 
-(defmethod read-document ((backend s3-storage-backend) ref)
+(defmethod read-document ((backend storage/s3) ref)
   "Return a string containing the document."
   (log:info "Reading ~A from s3 bucket ~A~%" ref (s3-bucket backend))
   (zs3:get-string (s3-bucket backend)
 		  (format nil "~A" ref)))
 
-(defmethod store-document ((backend s3-storage-backend) document)
+(defmethod store-document ((backend storage/s3) document)
   "Store a document into s3 storage."
   (let ((ref (format nil "RLGL-~A"
 		     (generate-random-string))))

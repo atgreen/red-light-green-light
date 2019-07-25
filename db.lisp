@@ -1,4 +1,4 @@
-;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
+;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
@@ -21,28 +21,27 @@
 (defpackage #:rlgl.db
   (:use #:cl)
   (:shadow #:package)
-  (:export #:initialize #:record-log #:report-log))
+  (:export #:record-log #:report-log #:db/sqlite #:db/postgresql))
 
 (in-package #:rlgl.db)
 
-(defvar *sqlite-db-filename* nil)
+(defclass db-backend ()
+  ((key :initarg :key :reader key)))
 
-(defun initialize (db &key (sqlite-db-filename nil) (fresh nil))
-  (declare (ignore db))
-  (setf *sqlite-db-filename* sqlite-db-filename)
-  (let ((db (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)))
-    (when fresh
-      (dbi:do-sql db "drop table log;"))
-    (let ((query (dbi:prepare db "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
+(defmethod initialize-instance :after ((db db-backend) &key)
+  (let ((dbc (connect-cached db)))
+    (when (fresh db)
+      (dbi:do-sql dbc "drop table log;"))
+    (let ((query (dbi:prepare dbc "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
       (dbi:execute query))))
 
-(defun record-log (player version result report)
-  (dbi:do-sql (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)
+(defmethod record-log ((db db-backend) player version result report)
+  (dbi:do-sql (connect-cached db)
     (format nil "insert into log(id, version, colour, report) values (\"~A\", \"~A\", \"~A\", \"~A\");"
 	    player version result report)))
 
-(defun report-log (player)
-  (let* ((query (dbi:prepare (dbi:connect-cached :sqlite3 :database-name *sqlite-db-filename*)
+(defmethod report-log ((db db-backend) player)
+  (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select timestamp, colour, version, report from log where id = \"~A\";" player)))
 	 (result (dbi:execute query))
 	 (fstr (make-array '(0) :element-type 'base-char
@@ -58,3 +57,4 @@
 		    :format local-time:+rfc-1123-format+)
 		   (format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
+

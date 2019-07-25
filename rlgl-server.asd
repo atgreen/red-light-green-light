@@ -27,12 +27,14 @@
 	       (:file "package")
 	       (:file "storage-local")
 	       (:file "storage-s3")
+	       (:file "db")
+	       (:file "db-sqlite")
+	       (:file "db-postgresql")
 	       (:file "oscap-oval")
 	       (:file "aqua")
 	       (:file "clair")
 	       (:file "junit")
 	       (:file "csv")
-	       (:file "db")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :cl-fad :hunchentoot :spinneret

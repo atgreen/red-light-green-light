@@ -59,14 +59,18 @@ sqlite-db-filename = \"/var/rlgl/rlgl.db\"
       (prom.process:make-process-collector))))
 
 ;; ----------------------------------------------------------------------------
-;; Storage backends
+;; Document storage backends
+;;
 
 (defclass storage-backend ()
   ((key :initarg :key :reader key)))
 
-;; Set this at runtime
-; (defvar *storage-driver* (make-instance 'local-storage-backend))
 (defvar *storage-driver* nil)
+
+;; ----------------------------------------------------------------------------
+;; Database backends
+
+(defvar *db* nil)
 
 ;; ----------------------------------------------------------------------------
 ;; Parsing backends
@@ -171,7 +175,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   "rlgl-server v0.1 connected")
 
 (snooze:defroute report-log (:get :text/plain &key id)
-  (rlgl.db:report-log id))
+  (rlgl.db:report-log *db* id))
 
 (snooze:defroute evaluate (:post :application/json)
   (let ((json
@@ -202,7 +206,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		  (let ((ref (store-document *storage-driver*
 					     (flexi-streams:string-to-octets
 					      (get-output-stream-string stream)))))
-		    (rlgl.db:record-log player (version policy) red-or-green ref)
+		    (rlgl.db:record-log *db* player (version policy) red-or-green ref)
 		    (format nil "~A: ~A/doc?id=~A~%"
 			    red-or-green
 			    *server-uri*
@@ -411,14 +415,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((db (or (gethash "db" *config*)
 		(gethash "db" *default-config*))))
     (alexandria:eswitch (db :test #'equal)
-      ("sqlite"
-       (let ((sqlite-db-filename
-	       (or (gethash "sqlite-db-filename" *config*)
-		   (gethash "sqlite-db-filename" *default-config*))))
-	 (if sqlite-db-filename
-	     (rlgl.db:initialize :sqlite3
-				 :sqlite-db-filename sqlite-db-filename)
-	     (error "Missing sqlite-db-filename in rlgl.conf"))))))
+			("sqlite"
+			 (let ((sqlite-db-filename
+				(or (gethash "sqlite-db-filename" *config*)
+				    (gethash "sqlite-db-filename" *default-config*))))
+			   (setf *db* (make-instance 'rlgl.db:db/sqlite :filename sqlite-db-filename))))))
 
   ;; Define the storage backend.
   ;;
@@ -426,8 +427,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (gethash "storage-driver" *default-config*))))
     (setf *storage-driver* (make-instance
 			    (read-from-string
-			     (str:concat "rlgl-server:" storage-driver "-storage-backend")))))
-  (init *storage-driver*)
+			     (str:concat "rlgl-server:storage/" storage-driver)))))
 
   ;; This is the directory where we check out policies.  Make sure it
   ;; ends with a trailing '/'.

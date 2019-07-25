@@ -37,14 +37,14 @@
 
 ;; ----------------------------------------------------------------------------
 
-(defclass local-storage-backend (storage-backend)
+(defclass storage/local (storage-backend)
   ((local-dir       :initarg :local-dir    :reader local-dir))
   (:default-initargs
    :local-dir  "/var/rlgl/docs"))
 
-(defmethod init ((backend local-storage-backend))
+(defmethod initialize-instance :after ((backend storage/local) &key)
   "Initialize a local storage backend."
-  (log:info "Initializing local-storage-backend")
+  (log:info "Initializing storage/local")
   (let ((filename (format nil "~A/.key" (local-dir backend))))
     (if (probe-file filename)
 	(setf (slot-value backend 'key) (rlgl.util:read-file-into-string filename))
@@ -56,12 +56,12 @@
 	    (format stream key)
 	    (setf (slot-value backend 'key) key))))))
 
-(defmethod read-document ((backend local-storage-backend) ref)
+(defmethod read-document ((backend storage/local) ref)
   "Return a string containing the document."
   (rlgl.util:read-file-into-string
    (format nil "~A/~A" (local-dir backend) ref)))
 
-(defmethod store-document ((backend local-storage-backend) document)
+(defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."
   (let ((filename (format nil "RLGL-~A"
 			  (generate-random-string))))
