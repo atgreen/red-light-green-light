@@ -1,4 +1,4 @@
-;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
+;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
 ;;;                         
@@ -228,25 +228,25 @@ exists after the JSON object, or NIL otherwise."
 			     (or
 			      ;; Check for exceptions
 			      (find-if (lambda (matcher)
-					 (and (match-candidate-pattern
-					       result (matcher matcher))
-					      (< now (expiration-date matcher))))
+					 (and (< now (expiration-date matcher))
+					      (match-candidate-pattern
+					       result (matcher matcher))))
 				       (xfail-matchers policy))
 			      ;; Now check for failures
 			      (let ((red-match
 				     (find-if (lambda (matcher)
-						(and (match-candidate-pattern
-						      result (matcher matcher))
-						     (< now (expiration-date matcher))))
+						(and (< now (expiration-date matcher))
+						     (match-candidate-pattern
+						      result (matcher matcher))))
 					      (fail-matchers policy))))
 				(when red-match
 				  (setf red-or-green :RED))
 				red-match)
 			      ;; No check for passes
 			      (find-if (lambda (matcher)
-					 (and (match-candidate-pattern
-					       result (matcher matcher))
-					      (< now (expiration-date matcher))))
+					 (and (< now (expiration-date matcher))
+					      (match-candidate-pattern
+					       result (matcher matcher))))
 				       (pass-matchers policy))
 			      ;; We don't have a match. Let's fail.
 			      (progn
