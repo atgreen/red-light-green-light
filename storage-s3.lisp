@@ -68,5 +68,7 @@
   "Store a document into s3 storage."
   (let ((ref (format nil "RLGL-~A"
 		     (generate-random-string))))
+    (log:info "S3: storing ~A" ref)
     (zs3:put-vector document (s3-bucket backend) ref)
+    (log:info "S3: stored ~A" ref)
     ref))

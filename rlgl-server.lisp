@@ -196,6 +196,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			     (when (str:ends-with? ".csv" filename)
 			       (make-instance 'parser/csv))))
 		 (tests (parse-report parser doc)))
+	    (log:info "Evaluating ~A" (cdr (assoc :REF json)))
 	    (progn
 	      (multiple-value-bind (red-or-green processed-results)
 		  (apply-policy policy tests)
