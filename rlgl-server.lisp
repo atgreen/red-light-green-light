@@ -194,6 +194,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	  (progn
 	    (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
 	    "ERROR: missing POLICY or ID")
+	  (log:info (read-document *storage-driver* (cdr (assoc :REF json))))
 	  (let* ((policy (make-policy policy-name))
 		 (doc (read-document *storage-driver* (cdr (assoc :REF json))))
 		 (filename (cdr (assoc :NAME json)))
@@ -219,7 +220,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    ref))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
-  (store-document *storage-driver* (hunchentoot:raw-post-data)))
+  (let ((doc (store-document *storage-driver* (hunchentoot:raw-post-data))))
+    (log:info "upload stored doc '~A'" doc)
+    doc))
 
 (snooze:defroute doc (:get :text/html &key id)
   (handler-case (read-document *storage-driver* id)
@@ -398,7 +401,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
   
-  (log:info "Starting B")
+  (log:info "Starting C")
   
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse *default-config-text*))
