@@ -9,7 +9,7 @@
 Quickest Start
 --------------
 
-Try out the hosted version at https://rl.gl .
+Try out the hosted version at [https://rl.gl](https://rl.gl).
 
 Quick Start
 -----------
@@ -278,6 +278,11 @@ Lisp](https://github.com/container-lisp), and adding additional report
 types requires modifying the `rlgl-server` lisp code.  External parser
 support is planned, allowing you to invoke report parsers through a
 simple API.
+
+Monitoring & Observability
+--------------------------
+
+The Red Light Green Light server exports Prometheus metrics on port 9101.
 
 
 Author and License
