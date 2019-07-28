@@ -178,12 +178,17 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute evaluate (:post :application/json)
+  (log:info "evaluate: ~A"
+	    (funcall
+	     (read-from-string "hunchentoot:raw-post-data") :force-text t))
   (let ((json
 	 (json:decode-json-from-string
 	  (funcall
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
     (let ((policy-name (cdr (assoc :POLICY json)))
 	  (player (cdr (assoc :ID json))))
+      (log:info "policy-name ~A" policy-name)
+      (log:info "player ~A" player)
       (if (not (and (rlgl.util:valid-url? policy-name)
 		    player))
 	  (progn
@@ -393,7 +398,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
   
-  (log:info "Starting A")
+  (log:info "Starting B")
   
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse *default-config-text*))
