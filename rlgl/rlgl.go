@@ -214,6 +214,8 @@ func main() {
 					exitErr(fmt.Errorf("Missing player ID"))
 				}
 
+				// TODO: validate ID is a hex number
+				
 				if c.NArg() != 0 {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
@@ -279,6 +281,7 @@ func main() {
 				file, err := os.Open(c.Args().Get(0))
 				defer file.Close()
 
+				fmt.Print("About to upload file\n");
 				res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
 				if err != nil {
 					exitErr(err)
@@ -287,6 +290,9 @@ func main() {
 				defer res.Body.Close()
 
 				message, _ := ioutil.ReadAll(res.Body)
+
+				fmt.Print("Uploaded result: ", string(message), "\n")
+
 				// check that it is OK?
 
 				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": string(message[:])}
