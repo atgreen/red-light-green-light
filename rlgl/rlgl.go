@@ -294,6 +294,7 @@ func main() {
 				}
 
 				fmt.Print("Code: ", res.Status, "\n");
+				fmt.Print("Location: ", res.Header.Get("Location"))
 
 				defer res.Body.Close()
 
