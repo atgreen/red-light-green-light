@@ -21,7 +21,16 @@
 (in-package :rlgl-server)
 
 ;; ----------------------------------------------------------------------------
+;; Get the version number at compile time
+
+(eval-when (:compile-toplevel)
+  (defun get-version-from-git ()
+    (inferior-shell:run/ss "git describe --tags --dirty=+")))
+(defmacro rlgl-version () (get-version-from-git))
+
+;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
+
 (defvar *config* nil)
 (defvar *default-config* nil)
 (defparameter *default-config-text*
@@ -403,7 +412,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
   
-  (log:info "Starting C")
+  (log:info "Starting rlgl-server ~A" (rlgl-server))
   
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse *default-config-text*))
