@@ -25,7 +25,7 @@
 
 (eval-when (:compile-toplevel)
   (defun get-version-from-git ()
-    (inferior-shell:run/ss "git describe --tags --dirty=+")))
+    (inferior-shell:run/ss "(cd /tmp/src; git describe --tags --dirty=+)")))
 (defmacro rlgl-version () (get-version-from-git))
 
 ;; ----------------------------------------------------------------------------
