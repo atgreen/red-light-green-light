@@ -412,7 +412,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
   
-  (log:info "Starting rlgl-server ~A" (rlgl-server))
+  (log:info "Starting rlgl-server version ~A" (rlgl-version))
   
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse *default-config-text*))
