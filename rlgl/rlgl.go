@@ -280,9 +280,14 @@ func main() {
 				}
 
 				file, err := os.Open(c.Args().Get(0))
+
+				if err != nil {
+					exitErr(err)
+				}
+
 				defer file.Close()
 
-				fmt.Print("About to upload file\n");
+				fmt.Print("About to upload file ", c.Args().Get(0), "\n");
 				res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
 				if err != nil {
 					exitErr(err)
