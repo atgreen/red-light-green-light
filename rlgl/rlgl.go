@@ -279,18 +279,20 @@ func main() {
 					exitErr(fmt.Errorf("Missing report"))
 				}
 
-				file, err := os.Open(c.Args().Get(0))
-
-				if err != nil {
-					exitErr(err)
-				}
-
-				defer file.Close()
-
 				var n string;
+				var name string;
 				
 				for {
-				
+					file, err := os.Open(c.Args().Get(0))
+
+					name = file.Name()
+					
+					if err != nil {
+						exitErr(err)
+					}
+					
+					defer file.Close()
+					
 					fmt.Print("About to upload file ", c.Args().Get(0), "\n");
 					res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
 					if err != nil {
@@ -316,7 +318,7 @@ func main() {
 
 				// check that it is OK?
 
-				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": n}
+				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
 					values["title"] = title
 				}
