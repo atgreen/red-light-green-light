@@ -34,6 +34,7 @@ import (
 )
 
 var (
+	VERSION = "undefined"
 	red  = color.New(color.FgRed).SprintFunc()
 	cyan = color.New(color.FgCyan).SprintFunc()
 )
@@ -289,7 +290,11 @@ func main() {
 
 				defer res.Body.Close()
 
-				message, _ := ioutil.ReadAll(res.Body)
+				message, err := ioutil.ReadAll(res.Body)
+
+				if err != nil {
+					exitErr(err)
+				}
 
 				fmt.Print("Uploaded result: ", string(message), "\n")
 
@@ -329,6 +334,7 @@ func main() {
 	}
 
 	app.Name = "rlgl"
+	app.Version = VERSION
 	app.Copyright = "(c) 2018, 2019 Anthony Green"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
