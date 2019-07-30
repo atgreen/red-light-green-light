@@ -287,7 +287,7 @@ func main() {
 
 				defer file.Close()
 
-				var res http.Response;
+				var n string;
 				
 				for {
 				
@@ -299,24 +299,24 @@ func main() {
 					
 					fmt.Print("Code: ", res.Status, "\n");
 					fmt.Print("Location: ", res.Header.Get("Location"), "\n")
-					if (res.StatusCode != 200) {
+					if (res.StatusCode == 200) {
+						message, err := ioutil.ReadAll(res.Body)
+						if err != nil {
+							exitErr(err)
+						}
+						n = string(message)
+						
 						break;
 					}
 					
 					defer res.Body.Close()
 				} 
 					
-				message, err := ioutil.ReadAll(res.Body)
-
-				if err != nil {
-					exitErr(err)
-				}
-
-				fmt.Print("Uploaded result: ", string(message), "\n")
+				fmt.Print("Uploaded result: ", n, "\n")
 
 				// check that it is OK?
 
-				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": string(message[:])}
+				values := map[string]string{"policy": policy, "id": player, "name": file.Name(), "ref": n}
 				if title != "" {
 					values["title"] = title
 				}
