@@ -287,17 +287,25 @@ func main() {
 
 				defer file.Close()
 
-				fmt.Print("About to upload file ", c.Args().Get(0), "\n");
-				res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
-				if err != nil {
-					exitErr(err)
-				}
-
-				fmt.Print("Code: ", res.Status, "\n");
-				fmt.Print("Location: ", res.Header.Get("Location"))
-
-				defer res.Body.Close()
-
+				var res http.Response;
+				
+				for {
+				
+					fmt.Print("About to upload file ", c.Args().Get(0), "\n");
+					res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
+					if err != nil {
+						exitErr(err)
+					}
+					
+					fmt.Print("Code: ", res.Status, "\n");
+					fmt.Print("Location: ", res.Header.Get("Location"), "\n")
+					if (res.StatusCode != 200) {
+						break;
+					}
+					
+					defer res.Body.Close()
+				} 
+					
 				message, err := ioutil.ReadAll(res.Body)
 
 				if err != nil {
