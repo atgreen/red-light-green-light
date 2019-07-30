@@ -293,6 +293,8 @@ func main() {
 					exitErr(err)
 				}
 
+				fmt.Print("Code: ", res.Status, "\n");
+
 				defer res.Body.Close()
 
 				message, err := ioutil.ReadAll(res.Body)
