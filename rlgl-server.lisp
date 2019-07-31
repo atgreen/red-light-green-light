@@ -40,6 +40,8 @@ server-uri = \"http://localhost:8080\"
 policy-dir = \"/var/rlgl/policy/\"
 db = \"sqlite\"
 sqlite-db-filename = \"/var/rlgl/rlgl.db\"
+postgresql-host = \"localhost\"
+postgresql-port = 5432
 ")
 
 (defvar *server-uri* nil)
@@ -197,44 +199,37 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
     (let ((policy-name (cdr (assoc :POLICY json)))
 	  (player (cdr (assoc :ID json))))
-      (log:info "policy-name '~A'" policy-name)
-      (log:info "player '~A'" player)
       (if (not (and (rlgl.util:valid-url? policy-name)
 		    player))
 	  (progn
 	    (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
 	    "ERROR: missing POLICY or ID")
-	  (progn
-	    (log:info (read-document *storage-driver* (cdr (assoc :REF json))))
-
-	    (let* ((policy (make-policy policy-name))
-		   (doc (read-document *storage-driver* (cdr (assoc :REF json))))
-		   (filename (cdr (assoc :NAME json)))
-		   (parser (or (recognize-report doc)
-			       (when (str:ends-with? ".csv" filename)
-				 (make-instance 'parser/csv))))
-		   (tests (parse-report parser doc)))
-	      (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
-	      (progn
-		(multiple-value-bind (red-or-green processed-results)
-		    (apply-policy policy tests)
-		  (let ((stream (make-string-output-stream)))
-		    (render stream (cdr (assoc :REF json)) processed-results
-			    (title parser)
-			    (commit-url-format policy))
-		    (let ((ref (store-document *storage-driver*
-					       (flexi-streams:string-to-octets
-						(get-output-stream-string stream)))))
-		      (rlgl.db:record-log *db* player (version policy) red-or-green ref)
-		      (format nil "~A: ~A/doc?id=~A~%"
-			      red-or-green
-			      *server-uri*
-			      ref)))))))))))
+	  (let* ((policy (make-policy policy-name))
+		 (doc (read-document *storage-driver* (cdr (assoc :REF json))))
+		 (filename (cdr (assoc :NAME json)))
+		 (parser (or (recognize-report doc)
+			     (when (str:ends-with? ".csv" filename)
+			       (make-instance 'parser/csv))))
+		 (tests (parse-report parser doc)))
+	    (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
+	    (progn
+	      (multiple-value-bind (red-or-green processed-results)
+		  (apply-policy policy tests)
+		(let ((stream (make-string-output-stream)))
+		  (render stream (cdr (assoc :REF json)) processed-results
+			  (title parser)
+			  (commit-url-format policy))
+		  (let ((ref (store-document *storage-driver*
+					     (flexi-streams:string-to-octets
+					      (get-output-stream-string stream)))))
+		    (rlgl.db:record-log *db* player (version policy) red-or-green ref)
+		    (format nil "~A: ~A/doc?id=~A~%"
+			    red-or-green
+			    *server-uri*
+			    ref))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
-  (let ((doc (store-document *storage-driver* (hunchentoot:raw-post-data))))
-    (log:info "upload stored doc '~A'" doc)
-    doc))
+  (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 (snooze:defroute doc (:get :text/html &key id)
   (handler-case (read-document *storage-driver* id)
@@ -426,43 +421,46 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	     (rlgl.util:read-file-into-string "/etc/rlgl/config.ini"))
 	    (make-hash-table)))
 
-  (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
-		         (gethash "server-uri" *config*)
-			 (gethash "server-uri" *default-config*)))
-  (unless (rlgl.util:valid-url? *server-uri*)
-    (error "server-uri is not valid URL: ~A" *server-uri*))
-  (log:info *server-uri*)
+  (flet ((get-config-value (key)
+	   (or (gethash key *config*)
+	       (gethash key *default-config*))))
   
-  ;; Set up DB 
-  ;;
-  (let ((db (or (gethash "db" *config*)
-		(gethash "db" *default-config*))))
-    (alexandria:eswitch (db :test #'equal)
-			("sqlite"
-			 (let ((sqlite-db-filename
-				(or (gethash "sqlite-db-filename" *config*)
-				    (gethash "sqlite-db-filename" *default-config*))))
-			   (setf *db* (make-instance 'rlgl.db:db/sqlite :filename sqlite-db-filename))))))
+    (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
+			   (get-config-value "server-uri")))
+    (unless (rlgl.util:valid-url? *server-uri*)
+      (error "server-uri is not valid URL: ~A" *server-uri*))
 
-  ;; Define the storage backend.
-  ;;
-  (let ((storage-driver (or (gethash "storage-driver" *config*)
-			    (gethash "storage-driver" *default-config*))))
-    (setf *storage-driver* (make-instance
-			    (read-from-string
-			     (str:concat "rlgl-server:storage/" storage-driver)))))
-
-  ;; This is the directory where we check out policies.  Make sure it
-  ;; ends with a trailing '/'.
-  ;;
-  (let ((dir (or (gethash "policy-dir" *config*)
-		 (gethash "policy-dir" *default-config*))))
+    ;; Set up DB 
+    ;;
+    (setf *db*
+	  (let ((db (get-config-value "db")))
+	    (alexandria:eswitch (db :test #'equal)
+	      ("sqlite"
+	       (make-instance 'rlgl.db:db/sqlite 
+			      :filename (get-config-value "sqlite-db-filename")))
+	      ("postgresql"
+	       (make-instance 'rlgl.db:db/postgresql
+			      :host (get-config-value "postresql-host")
+			      :port (get-config-value "postresql-port"))))))
+  
+    ;; Define the storage backend.
+    ;;
+    (setf *storage-driver*
+	  (make-instance
+	   (read-from-string
+	    (str:concat "rlgl-server:storage/"
+			(get-config-value "storage-driver")))))
+    
+    ;; This is the directory where we check out policies.  Make sure it
+    ;; ends with a trailing '/'.
+    ;;
     (setf policy:*policy-dir*
-	  (pathname
-	   (if (str:ends-with? "/" dir)
-	       dir
-	       (str:concat dir "/")))))
-
+	  (let ((dir (get-config-value "policy-dir")))
+	    (pathname
+	     (if (str:ends-with? "/" dir)
+		 dir
+		 (str:concat dir "/"))))))
+  
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
