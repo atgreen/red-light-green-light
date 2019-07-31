@@ -281,37 +281,41 @@ func main() {
 
 				var n string;
 				var name string;
+
+				var location string;
+
+				location = fmt.Sprintf("%s/upload", config.Host);
 				
 				for {
-					file, err := os.Open(c.Args().Get(0))
-
-					name = file.Name()
-					
-					if err != nil {
-						exitErr(err)
-					}
-					
-					defer file.Close()
-					
 					fmt.Print("About to upload file ", c.Args().Get(0), "\n");
-					res, err := http.Post(fmt.Sprintf("%s/upload", config.Host), "application/octet-stream", file)
-					if err != nil {
-						exitErr(err)
-					}
-					
-					fmt.Print("Code: ", res.Status, "\n");
-					fmt.Print("Location: ", res.Header.Get("Location"), "\n")
-					if (res.StatusCode == 200) {
-						message, err := ioutil.ReadAll(res.Body)
+
+					{
+						file, err := os.Open(c.Args().Get(0))
 						if err != nil {
 							exitErr(err)
 						}
-						n = string(message)
-						
-						break;
-					}
+						name = file.Name()
+						defer file.Close()
+						res, err := http.Post(location, "application/octet-stream", file)
+						if err != nil {
+							exitErr(err)
+						}
 					
-					defer res.Body.Close()
+						fmt.Print("Code: ", res.Status, "\n");
+						location = res.Header.Get("Location");
+						fmt.Print("Location: ", location, "\n");
+						if (res.StatusCode == 200) {
+							message, err := ioutil.ReadAll(res.Body)
+							if err != nil {
+								exitErr(err)
+							}
+							n = string(message)
+							
+							break;
+						}
+					
+						defer res.Body.Close()
+					}
 				} 
 					
 				fmt.Print("Uploaded result: ", n, "\n")
