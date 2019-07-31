@@ -21,15 +21,25 @@
 (in-package #:rlgl.db)
 
 (defclass db/postgresql (db-backend)
-  ((postgresql-db-filename
-    :initarg :filename
+  ((postgresql-db-name
+    :initarg :db-name
     :reader filename)
+   (host
+    :initarg :host
+    :reader :host)
+   (port
+    :initarg :port
+    :reader :port)
    (fresh
     :initarg :fresh
     :initform nil
     :reader fresh))
   (:default-initargs
-      :filename (error "Must supply a filename.")))
+   :filename (error "Must supply a filename.")
+   :host "localhost"
+   :port 5432))
 
 (defmethod connect-cached ((db db/postgresql))
-    (dbi:connect-cached :postgres :database-name (filename db) :username "rlgl" :password "rlgl"))
+  (dbi:connect-cached :postgres :database-name (db-name db)
+				:host (host db) :port (port db)
+				:username "rlgl" :password "rlgl"))
