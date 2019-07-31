@@ -287,8 +287,6 @@ func main() {
 				location = fmt.Sprintf("%s/upload", config.Host);
 				
 				for {
-					fmt.Print("About to upload file ", c.Args().Get(0), "\n");
-
 					{
 						file, err := os.Open(c.Args().Get(0))
 						if err != nil {
@@ -300,10 +298,7 @@ func main() {
 						if err != nil {
 							exitErr(err)
 						}
-					
-						fmt.Print("Code: ", res.Status, "\n");
 						location = res.Header.Get("Location");
-						fmt.Print("Location: ", location, "\n");
 						if (res.StatusCode == 200) {
 							message, err := ioutil.ReadAll(res.Body)
 							if err != nil {
@@ -313,14 +308,10 @@ func main() {
 							
 							break;
 						}
-					
+						
 						defer res.Body.Close()
 					}
 				} 
-					
-				fmt.Print("Uploaded result: ", n, "\n")
-
-				// check that it is OK?
 
 				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
