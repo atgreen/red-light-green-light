@@ -45,7 +45,7 @@
   (log:info "db db-name ~A" (slot-value db 'db-name))
   (log:info "db host ~A" (slot-value db 'host))
   (log:info "db port ~A" (slot-value db 'port))
-  (dbi:connect-cached :postgres :database-name (dn-name db)
+  (dbi:connect-cached :postgres :database-name (db-name db)
 				:host (host db)
 				:port (port db)
 				:username "rlgl" :password "c0p0$g0g0"))
