@@ -425,9 +425,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	    (make-hash-table)))
 
   (flet ((get-config-value (key)
-	   (or (gethash key *config*)
-	       (gethash key *default-config*)
-	       (error "config does not contain key '~A'" key))))
+	   (let ((value (or (gethash key *config*)
+			    (gethash key *default-config*)
+			    (error "config does not contain key '~A'" key))))
+	     ;; Some of the users of these values are very strict
+	     ;; when it comes to string types... I'm looking at you,
+	     ;; SB-BSD-SOCKETS:GET-HOST-BY-NAME.
+	     (if (subtypep (type-of value) 'vector)
+		 (coerce value 'simple-string)
+		 value))))
   
     (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 			   (get-config-value "server-uri")))
