@@ -60,7 +60,6 @@
 
 (defmethod read-document ((backend storage/s3) ref)
   "Return a string containing the document."
-  (log:info "Reading ~A from s3 bucket ~A~%" ref (s3-bucket backend))
   (zs3:get-string (s3-bucket backend)
 		  (format nil "~A" ref)))
 
@@ -68,7 +67,5 @@
   "Store a document into s3 storage."
   (let ((ref (format nil "RLGL-~A"
 		     (generate-random-string))))
-    (log:info "S3: storing ~A" ref)
     (zs3:put-vector document (s3-bucket backend) ref)
-    (log:info "S3: stored ~A" ref)
     ref))
