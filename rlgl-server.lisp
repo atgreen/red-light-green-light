@@ -21,7 +21,9 @@
 (in-package :rlgl-server)
 
 ;; ----------------------------------------------------------------------------
-;; Get the version number at compile time
+;; Get the version number at compile time.  This comes from
+;; RLGL_VERSION (set on the linux container build commandline), or
+;; from git at compile-time.  Use UNKNOWN if all else fails.
 
 (eval-when (:compile-toplevel)
   (defun get-version-from-git ()
