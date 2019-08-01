@@ -3,4 +3,4 @@
   Compress all documents before hitting the storage driver, then serve
   the stored content up directly.
 
-* S3 Storage Driver
+
