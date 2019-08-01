@@ -21,7 +21,7 @@
 (in-package #:rlgl.db)
 
 (defclass db/postgresql (db-backend)
-  ((postgresql-db-name
+  ((db-name
     :initarg :db-name
     :reader :db-name)
    (host
@@ -40,6 +40,8 @@
    :port 5432))
 
 (defmethod connect-cached ((db db/postgresql))
-  (dbi:connect-cached :postgres :database-name (db-name db)
-				:host (host db) :port (port db)
+  (log:info "postgresql connect-cached")
+  (dbi:connect-cached :postgres :database-name (slot-value db 'db-name)
+				:host (slot-value db 'host)
+				:port (slot-value db 'port)
 				:username "rlgl" :password "c0p0$g0g0"))
