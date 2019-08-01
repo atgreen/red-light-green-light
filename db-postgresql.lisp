@@ -40,7 +40,11 @@
    :port 5432))
 
 (defmethod connect-cached ((db db/postgresql))
-  (log:info "postgresql connect-cached")
+  (log:info "establishing postgresql connection at ~A:~A"
+	    (host db)
+	    (port db))
+  (log:info "postgresql host IP: ~A"
+	    (sb-bsd-sockets:get-host-by-name (host db)))
   (dbi:connect-cached :postgres :database-name (db-name db)
 				:host (host db)
 				:port (port db)
