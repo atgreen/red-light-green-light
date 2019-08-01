@@ -426,7 +426,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   (flet ((get-config-value (key)
 	   (or (gethash key *config*)
-	       (gethash key *default-config*))))
+	       (gethash key *default-config*)
+	       (error "config does not contain key '~A'" key))))
   
     (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 			   (get-config-value "server-uri")))
@@ -443,8 +444,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			      :filename (get-config-value "sqlite-db-filename")))
 	      ("postgresql"
 	       (make-instance 'rlgl.db:db/postgresql
-			      :host (get-config-value "postresql-host")
-			      :port (get-config-value "postresql-port"))))))
+			      :host (get-config-value "postgresql-host")
+			      :port (get-config-value "postgresql-port"))))))
   
     ;; Define the storage backend.
     ;;

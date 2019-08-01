@@ -23,13 +23,13 @@
 (defclass db/postgresql (db-backend)
   ((db-name
     :initarg :db-name
-    :reader :db-name)
+    :reader db-name)
    (host
     :initarg :host
-    :reader :host)
+    :reader host)
    (port
     :initarg :port
-    :reader :port)
+    :reader port)
    (fresh
     :initarg :fresh
     :initform nil
@@ -45,7 +45,7 @@
   (log:info "db db-name ~A" (slot-value db 'db-name))
   (log:info "db host ~A" (slot-value db 'host))
   (log:info "db port ~A" (slot-value db 'port))
-  (dbi:connect-cached :postgres :database-name (slot-value db 'db-name)
-				:host (slot-value db 'host)
-				:port (slot-value db 'port)
+  (dbi:connect-cached :postgres :database-name (dn-name db)
+				:host (host db)
+				:port (port db)
 				:username "rlgl" :password "c0p0$g0g0"))
