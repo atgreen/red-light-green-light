@@ -23,7 +23,7 @@
 (defclass db/postgresql (db-backend)
   ((postgresql-db-name
     :initarg :db-name
-    :reader filename)
+    :reader :db-name)
    (host
     :initarg :host
     :reader :host)
@@ -35,11 +35,11 @@
     :initform nil
     :reader fresh))
   (:default-initargs
-   :filename (error "Must supply a filename.")
+   :db-name "rlgl"
    :host "localhost"
    :port 5432))
 
 (defmethod connect-cached ((db db/postgresql))
   (dbi:connect-cached :postgres :database-name (db-name db)
 				:host (host db) :port (port db)
-				:username "rlgl" :password "rlgl"))
+				:username "rlgl" :password "c0p0$g0g0"))
