@@ -73,9 +73,8 @@ based on URL."
 			  (inferior-shell:run
       			   (format nil "bash -c \"(cd ~A; git pull)\""
       				   policy-dirname)))))
-	  (mapc (lambda (line)
-		  (print line))
-		output)))
+	  (dolist (line output)
+	    (print line))))
 
       (let ((policy-pathname
 	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
@@ -84,10 +83,9 @@ based on URL."
 	      (pass-file (merge-pathnames-as-file policy-pathname #p"PASS"))
 	      (fail-file (merge-pathnames-as-file policy-pathname #p"FAIL")))
 
-	  (mapc (lambda (file)
-		  (unless (file-exists-p (namestring file))
-		    (error (format nil "Policy file \"~A\" missing." file))))
-		(list xfail-file pass-file fail-file))
+	  (dolist (file (list xfail-file pass-file fail-file))
+	    (unless (file-exists-p (namestring file))
+	      (error (format nil "Policy file \"~A\" missing." file))))
 
 	  (let ((p (make-instance 'policy)))
 	    (setf (slot-value p 'version)
@@ -104,9 +102,8 @@ based on URL."
 	    (let ((hash-log (inferior-shell:run/lines
 			     (format nil "bash -c \"(cd ~A; git log --pretty=%H)\""
 				     policy-dirname))))
-	      (mapc (lambda (key)
-		      (setf (gethash key *git-commit-table*) p))
-		    hash-log))
+	      (dolist (key hash-log)
+		(setf (gethash key *git-commit-table*) p)))
 
 	    p))))))
 
@@ -177,42 +174,38 @@ exists after the JSON object, or NIL otherwise."
     (let ((matcher-lines (inferior-shell:run/lines
 			  (format nil "bash -c \"(cd $(dirname ~A); git blame -s -l $(basename ~A))\""
 				  filename filename))))
-      (mapc (lambda (matcher-line)
-	      (let ((githash (subseq (remove #\^ matcher-line) 0 40)))
-		(multiple-value-bind (lineno location)
-		    (read-from-string (subseq matcher-line 40))
-		  (let ((line (string-trim '(#\Space #\Tab)
-					   (subseq matcher-line (+ 41 location)))))
-		    (when (and (> (length line) 0)
-			       (null (find (char line 0) "#;-")))
-			(let ((json
-			       (compile-scanners
-				(json:decode-json-from-string line))))
-			  (setf patterns (cons (make-policy-matcher :kind kind
-								    :githash githash
-								    :lineno lineno
-								    :matcher json
-								    :expiration-date (or (extract-expiration-date line)
-											 *the-year-3000*))
-					       patterns))))))))
-	    matcher-lines)
+      (dolist (matcher-line matcher-lines)
+	(let ((githash (subseq (remove #\^ matcher-line) 0 40)))
+	  (multiple-value-bind (lineno location)
+	      (read-from-string (subseq matcher-line 40))
+	    (let ((line (string-trim '(#\Space #\Tab)
+				     (subseq matcher-line (+ 41 location)))))
+	      (when (and (> (length line) 0)
+			 (null (find (char line 0) "#;-")))
+		(let ((json
+			(compile-scanners
+			 (json:decode-json-from-string line))))
+		  (setf patterns (cons (make-policy-matcher :kind kind
+							    :githash githash
+							    :lineno lineno
+							    :matcher json
+							    :expiration-date (or (extract-expiration-date line)
+										 *the-year-3000*))
+				       patterns))))))))
 
       ;; Now go through git logs
-      (mapc (lambda (matcher)
-	      (let* ((githash (githash matcher))
-		     (log-entry (gethash githash *git-log-table*)))
-		(when (and (null log-entry)
-			   (not (string= githash ; check for local change
-					 "0000000000000000000000000000000000000000")))
-		  (progn
-		    (setf log-entry (inferior-shell:run/lines
-				     (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
-					     filename githash filename)))
-		    (setf (gethash githash *git-log-table*) log-entry)))
-		(setf (slot-value matcher 'log-entry) log-entry)))
-	    patterns)
-
-      patterns)))
+      (dolist (matcher patterns)
+	(let* ((githash (githash matcher))
+	       (log-entry (gethash githash *git-log-table*)))
+	  (when (and (null log-entry)
+		     (not (string= githash ; check for local change
+				   "0000000000000000000000000000000000000000")))
+	    (progn
+	      (setf log-entry (inferior-shell:run/lines
+			       (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
+				       filename githash filename)))
+	      (setf (gethash githash *git-log-table*) log-entry)))
+	  (setf (slot-value matcher 'log-entry) log-entry))))))
 
 (defun apply-policy (policy candidate-result-list)
   "Apply a POLICY to CANDIDATE-RESULT-LIST, a list of test results,
