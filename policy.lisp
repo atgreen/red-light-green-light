@@ -109,19 +109,19 @@ based on URL."
 
 ;; regex matcher for the special case of numeric ranges: two floating
 ;; point numbers separated by "..".
-(defparameter *range-matcher*
+(defparameter +range-matcher+
   (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)\.\.[0-9]+(|\.[0-9]*)$"))
 
-(defparameter *number-matcher*
+(defparameter +number-matcher+
   (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)"))
 
-(defparameter *numeric-range*
+(defparameter +numeric-range+
   (cl-ppcre:create-scanner "^(.+)\.\.(.+)$"))
 
 (defun parse-numeric-range (value)
   "Extract the numeric values for a double-dotted range."
   (multiple-value-bind (x y start-array end-array) 
-      (cl-ppcre:scan *numeric-range* value)
+      (cl-ppcre:scan +numeric-range+ value)
     (values
      (read-from-string
       (subseq value (aref start-array 0) (aref end-array 0)))
@@ -139,11 +139,11 @@ regexp (starting with \#^), or any other string."
   (mapcar (lambda (pair)
 	    (cons (car pair)
 		  (cond
-		    ((cl-ppcre:scan *range-matcher* (cdr pair))
+		    ((cl-ppcre:scan +range-matcher+ (cdr pair))
 		     (multiple-value-bind (start end)
 		       	 (parse-numeric-range (cdr pair))
 		       (eval `(lambda (s)
-				(and (cl-ppcre:scan *number-matcher* s)
+				(and (cl-ppcre:scan +number-matcher+ s)
 				     (let ((num (read-from-string s)))
 				       (and (>= num ,start)
 					    (<= num ,end))))))))
@@ -167,7 +167,7 @@ exists after the JSON object, or NIL otherwise."
 	 (date-time-parser:parse-date-time date-string))))
 
 ;; An arbitratily far-away date, representing "never"
-(defparameter *the-year-3000* (date-time-parser:parse-date-time "3000"))
+(defparameter +the-year-3000+ (date-time-parser:parse-date-time "3000"))
 
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
@@ -190,7 +190,7 @@ exists after the JSON object, or NIL otherwise."
 							    :lineno lineno
 							    :matcher json
 							    :expiration-date (or (extract-expiration-date line)
-										 *the-year-3000*))
+										 +the-year-3000+))
 				       patterns))))))))
 
       ;; Now go through git logs

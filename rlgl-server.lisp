@@ -37,7 +37,7 @@
 
 (defvar *config* nil)
 (defvar *default-config* nil)
-(defparameter *default-config-text*
+(defparameter +default-config-text+
 "storage-driver = \"local\"
 server-uri = \"http://localhost:8080\"
 policy-dir = \"/var/rlgl/policy/\"
@@ -345,7 +345,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                   :type nil
                   :defaults #.(or *compile-file-truename* *load-truename*))))
 
-(defparameter *rlgl-dispatch-table*
+(defparameter +rlgl-dispatch-table+
   (list
    (hunchentoot:create-folder-dispatcher-and-handler
     "/images/" (fad:pathname-as-directory
@@ -378,7 +378,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   `(progn
      (setf snooze:*catch-errors* :verbose)
      (setf *print-pretty* nil)
-     (setf hunchentoot:*dispatch-table* *rlgl-dispatch-table*)
+     (setf hunchentoot:*dispatch-table* +rlgl-dispatch-table+)
      (setf prom:*default-registry* *rlgl-registry*)
      (let ((exposer (make-instance 'exposer-acceptor :registry *rlgl-registry* :port 9101)))
        (setf ,handler (hunchentoot:start (make-instance 'application
@@ -414,8 +414,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (log:info "Starting rlgl-server version ~A" (rlgl-version))
   
   ;; Read the built-in configuration settings.
-  (setf *default-config* (cl-toml:parse *default-config-text*))
-  (log:info *default-config-text*)
+  (setf *default-config* (cl-toml:parse +default-config-text+))
+  (log:info +default-config-text+)
 
   ;; Read the user configuration settings.
   (setf *config*
