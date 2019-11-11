@@ -24,6 +24,7 @@
   (:export #:start-rlgl-server #:stop-rlgl-server
 	   #:parser/aqua
 	   #:parser/clair
+	   #:parser/dejagnu
 	   #:parser/junit
 	   #:parser/oscap-oval
 	   #:db

@@ -33,6 +33,7 @@
 	       (:file "oscap-oval")
 	       (:file "aqua")
 	       (:file "clair")
+	       (:file "dejagnu")
 	       (:file "junit")
 	       (:file "csv")
 	       (:file "rlgl-server"))
