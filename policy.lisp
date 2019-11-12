@@ -45,7 +45,7 @@
   ;; They mostly look like this (gogs & github).  Haven't seen
   ;; anything different yet...
   (str:concat  (if (str:ends-with? ".git" url)
-		   (str:substring 0 (- (length url) 5) url)
+		   (str:substring 0 (- (length url) 4) url)
 		   url)
 	       "/commit/~A"))
 
