@@ -61,7 +61,8 @@
 (defmethod read-document ((backend storage/s3) ref)
   "Return a string containing the document."
   (zs3:get-string (s3-bucket backend)
-		  (format nil "~A" ref)))
+		  (format nil "~A" ref)
+		  :external-format :latin-1))
 
 (defmethod store-document ((backend storage/s3) document)
   "Store a document into s3 storage."

@@ -232,7 +232,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    ref))))))))))
 
 (snooze:defroute upload (:post :application/octet-stream)
-  (store-document *storage-driver* (hunchentoot:raw-post-data)))
+  (handler-case (store-document *storage-driver* (hunchentoot:raw-post-data))
+    (error (c)
+      (log:error "~A" c)
+      (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
   (let ((report
