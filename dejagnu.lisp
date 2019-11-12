@@ -18,14 +18,14 @@
 
 (in-package :rlgl-server)
 
-;;; MVP DejaGNU Results report parser
+;;; MVP DejaGnu Results report parser
 
 ;; ----------------------------------------------------------------------------
 
 (defclass parser/dejagnu (report-parser)
   ()
   (:default-initargs
-   :title  "DejaGNU Summary Report"))
+   :title  "DejaGnu Summary Report"))
 
 (defmethod parse-report ((parser parser/dejagnu) doc)
   (let ((tests (list))
