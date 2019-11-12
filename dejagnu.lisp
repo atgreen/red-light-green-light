@@ -65,11 +65,5 @@
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"id\": \"~A\" }"
 				 host (str:substring 7 nil line)))
 			tests))
-		      ((str:starts-with? "UNSUPPORTED:" line)
-		       (cons
-			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 13 nil line)))
-			tests))
 		      (t tests)))))
     tests))
