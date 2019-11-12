@@ -56,13 +56,13 @@
 		      ((str:starts-with? "XFAIL:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
 				 host (str:substring 7 nil line)))
 			tests))
 		      ((str:starts-with? "XPASS:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"id\": \"~A\" }"
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
 				 host (str:substring 7 nil line)))
 			tests))
 		      (t tests)))))
