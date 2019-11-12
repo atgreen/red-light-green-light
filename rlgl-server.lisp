@@ -187,7 +187,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
-  "rlgl-server v0.1 connected")
+  (format nil "rlgl-server connected -- version ~A" (rlgl-version)))
 
 (snooze:defroute report-log (:get :text/plain &key id)
   (rlgl.db:report-log *db* id))
