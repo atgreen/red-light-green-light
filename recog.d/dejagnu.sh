@@ -1,6 +1,5 @@
 #!/bin/sh
 
-head $1 | grep -q "Test [Rr]un [Bb]y "
-if [ $? -eq 0 ]; then
-    echo "dejagnu";
-fi
+grep -q "Test [Rr]un [Bb]y " $1 \
+    && grep -q "Schedule of variations" $1 \
+	    && echo "dejagnu";
