@@ -33,35 +33,43 @@
     (with-input-from-string (in doc)
       (loop for line = (read-line in nil)
 	    while line do
-	      (cond
-		((str:starts-with? "Host   is" line)
-		 (setf host (str:substring 10 nil line)))
-		((str:starts-with? "PASS:" line)
-		 (setf tests
+	      (setf tests
+		    (cond
+		      ((str:starts-with? "Native configuration is " line)
+		       (setf host (str:substring 24 nil line))
+		       tests)
+		      ((str:starts-with? "Host   is" line)
+		       (setf host (str:substring 10 nil line))
+		       tests)
+		      ((str:starts-with? "PASS:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 6 line)))
-			tests)))
-		((str:starts-with? "FAIL:" line)
-		 (setf tests
+				 host (str:substring 6 nil line)))
+			tests))
+		      ((str:starts-with? "FAIL:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 6 line)))
-			tests)))
-		((str:starts-with? "XFAIL:" line)
-		 (setf tests
+				 host (str:substring 6 nil line)))
+			tests))
+		      ((str:starts-with? "XFAIL:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 7 line)))
-			tests)))
-		((str:starts-with? "XPASS:" line)
-		 (setf tests
+				 host (str:substring 7 nil line)))
+			tests))
+		      ((str:starts-with? "XPASS:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 7 line)))
-			tests))))))
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"id\": \"~A\" }"
+				 host (str:substring 7 nil line)))
+			tests))
+		      ((str:starts-with? "UNSUPPORTED:" line)
+		       (cons
+			(json:decode-json-from-string
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
+				 host (str:substring 13 nil line)))
+			tests))
+		      (t tests)))))
     tests))
