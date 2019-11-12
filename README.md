@@ -286,7 +286,7 @@ example, this CSV file...
 
 ..for you to write policy against...
 
-   { "filesize": "0..1000000" }
+    { "filesize": "0..1000000" }
 
 While the `rlgl` command-line tool is written in
 [Go](https://golang.org/), the server side is written in [Common
