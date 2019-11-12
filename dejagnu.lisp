@@ -18,7 +18,7 @@
 
 (in-package :rlgl-server)
 
-;;; MVP Clair Results report parser
+;;; MVP DejaGNU Results report parser
 
 ;; ----------------------------------------------------------------------------
 
