@@ -235,10 +235,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (store-document *storage-driver* (hunchentoot:raw-post-data)))
 
 (snooze:defroute doc (:get :text/html &key id)
-  (handler-case (read-document *storage-driver* id)
-    (error (c)
-      (log:error "~A" c)
-      (rlgl.util:read-file-into-string "missing-doc.html"))))
+  (let ((report
+	  (handler-case (read-document *storage-driver* id)
+	    (error (c)
+	      (log:error "~A" c)
+	      (rlgl.util:read-file-into-string "missing-doc.html")))))
+    (if (str:starts-with? "<" report)
+	report
+	(format nil "<html><pre>~A</pre></html>" report))))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
