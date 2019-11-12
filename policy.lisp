@@ -205,7 +205,9 @@ exists after the JSON object, or NIL otherwise."
 			       (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
 				       filename githash filename)))
 	      (setf (gethash githash *git-log-table*) log-entry)))
-	  (setf (slot-value matcher 'log-entry) log-entry))))))
+	  (setf (slot-value matcher 'log-entry) log-entry))))
+
+    patterns))
 
 (defun apply-policy (policy candidate-result-list)
   "Apply a POLICY to CANDIDATE-RESULT-LIST, a list of test results,
