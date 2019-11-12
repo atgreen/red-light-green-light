@@ -204,7 +204,7 @@ The format of this log is:
 Policy in Detail
 ---------------
 
-A `rlgl` policy consists of three separate files in a git repo:
+An `rlgl` policy consists of three separate files in a git repo:
 `XFAIL`, `FAIL` and `PASS`. Each file contains JSON matchmaking
 expressions, comments and blank lines.  Comments are lines starting
 with the characters `#` or `;`.  The matchmaking expressions are
@@ -269,9 +269,24 @@ Currently supported report parsers include:
 * [DejaGnu](https://www.gnu.org/software/dejagnu/) testing framework
 * [JUnit](https://junit.org/junit5/) XML results report
 * [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
+* Comma separated values (CSV) for generic policy enforcement on any arbitrary metric (file size, performance results, etc).
 
-A generic CSV parser is in the works, allowing you to implement policy
-on any arbitrary metric (file size, performance results, etc).
+Note that for the CSV parser, the first line of the CSV file defines
+the field strings used in the resulting JSON results objects.  For
+example, this CSV file...
+
+    filename, filesize
+    a.out, 1234567
+    b.out, 87908
+
+..produces the following JSON results objects...
+
+    { "filename": "a.out", "filesize": "1234567" }
+    { "filename": "b.out", "filesize": "87908" }
+
+..for you to write policy against...
+
+   { "filesize": "0..1000000" }
 
 While the `rlgl` command-line tool is written in
 [Go](https://golang.org/), the server side is written in [Common
