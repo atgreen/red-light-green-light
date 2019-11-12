@@ -39,7 +39,7 @@
   (let ((absolute-filename (if (cl-fad:pathname-absolute-p filename)
 			       filename
 			       (merge-pathnames +root-path+ filename))))
-    (with-open-file (stream absolute-filename :external-format :UTF-8)
+    (with-open-file (stream absolute-filename :external-format :latin-1)
       (let ((contents (make-string (file-length stream))))
 	(read-sequence contents stream)
 	contents))))
