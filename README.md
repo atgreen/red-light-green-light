@@ -269,7 +269,7 @@ Currently supported report parsers include:
 * [DejaGnu](https://www.gnu.org/software/dejagnu/) testing framework
 * [JUnit](https://junit.org/junit5/) XML results report
 * [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
-* Comma separated values (CSV) for generic policy enforcement on any arbitrary metric (file size, performance results, etc).
+* Comma separated values (CSV) for generic policy enforcement on arbitrary metrics (file size, performance results, etc).
 
 Note that for the CSV parser, the first line of the CSV file defines
 the field strings used in the resulting JSON results objects.  For
