@@ -36,7 +36,7 @@
 		       (json:decode-json-from-string
 			(format nil "{ \"report\": \"anchore\", \"result\": \"FAIL\", \"id\": \"~A\", \"package name\": \"~A\", \"severity\": \"~A\", \"url\": \"~A\" }"
 				(cdr (assoc :VULN v))
-				(cdr (assoc :PACKAGE_NAME v))
+				(cdr (assoc :PACKAGE--NAME v))
 				(cdr (assoc :SEVERITY v))
 				(cdr (assoc :URL v)))))
 		     vulnerabilities))))
