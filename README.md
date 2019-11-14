@@ -9,7 +9,8 @@
 Quickest Start
 --------------
 
-Try out the hosted version at [https://rl.gl](https://rl.gl).
+Try out the hosted version at [https://rl.gl](https://rl.gl).  Note
+that documents expire after 7 days.
 
 Quick Start
 -----------
