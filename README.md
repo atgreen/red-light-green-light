@@ -12,6 +12,12 @@ Quickest Start
 Try out the hosted version at [https://rl.gl](https://rl.gl).  Note
 that documents expire after 7 days.
 
+For an example of real-world rlgl policy in action, check out the
+policy used to validate unit test reports for
+(libffi)[https://github.com/libffi/libffi] on
+(travis-ci)[https://travis-ci.org/libffi/libffi] builds:
+[https://github.com/libffi/rlgl-policy](https://github.com/libffi/rlgl-policy).
+
 Quick Start
 -----------
 
