@@ -22,6 +22,7 @@
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
   (:shadow #:package)
   (:export #:start-rlgl-server #:stop-rlgl-server
+	   #:parser/anchore
 	   #:parser/aqua
 	   #:parser/clair
 	   #:parser/dejagnu

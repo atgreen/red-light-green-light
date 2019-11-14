@@ -271,6 +271,7 @@ Report Parsers
 
 Currently supported report parsers include:
 
+* [Anchore](https://anchore.com) container vulnerability json reports
 * [AquaSec](https://github.com/aquasecurity/microscanner) container microscanner reports
 * [Clair](https://github.com/coreos/clair) container scanner json reports
 * [DejaGnu](https://www.gnu.org/software/dejagnu/) testing framework

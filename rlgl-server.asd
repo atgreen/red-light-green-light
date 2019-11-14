@@ -31,6 +31,7 @@
 	       (:file "db-sqlite")
 	       (:file "db-postgresql")
 	       (:file "oscap-oval")
+	       (:file "anchore")
 	       (:file "aqua")
 	       (:file "clair")
 	       (:file "dejagnu")
