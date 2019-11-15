@@ -169,7 +169,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)
-			   (:br)
 			   (:h4 "Documentation")
 			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
 			   (:br)
