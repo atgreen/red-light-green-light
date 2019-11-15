@@ -71,7 +71,7 @@ based on URL."
 			   (format nil "/usr/bin/git clone ~A ~A"
 				   url policy-dirname))
 			  (inferior-shell:run
-      			   (format nil "bash -c \"(cd ~A; git pull)\""
+      			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull)\""
       				   policy-dirname)))))
 	  (dolist (line output)
 	    (print line))))
