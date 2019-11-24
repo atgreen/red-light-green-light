@@ -166,6 +166,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:ul
 			    (:li (:a :href "cli/rlgl-linux-amd64.tgz" "rlgl command-line tool for 64-bit x86 Linux"))
 			    (:li (:a :href "cli/rlgl-linux-arm.tgz" "rlgl command-line tool for 64-bit ARM Linux"))
+			    (:li (:a :href "cli/rlgl-linux-ppc64le.tgz" "rlgl command-line tool for 64-bit Little-Endian Power Linux"))
+			    (:li (:a :href "cli/rlgl-linux-s390x.tgz" "rlgl command-line tool for s390x Linux"))
 			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)

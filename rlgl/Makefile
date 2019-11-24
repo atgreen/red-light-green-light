@@ -59,7 +59,7 @@ $(NAME): $(shell find . -name \*.go)
 
 # the standard build produces a "local" executable, a linux tgz, and a darwin (macos) tgz
 # uncomment and join the windows zip if you need it
-build: $(NAME) build/$(NAME)-linux-amd64.tgz build/$(NAME)-darwin-amd64.tgz build/$(NAME)-linux-arm.tgz build/$(NAME)-windows-amd64.zip
+build: $(NAME) build/$(NAME)-linux-amd64.tgz build/$(NAME)-linux-s390x.tgz build/$(NAME)-linux-ppc64le.tgz build/$(NAME)-darwin-amd64.tgz build/$(NAME)-linux-arm.tgz build/$(NAME)-windows-amd64.zip
 
 # create a tgz with the binary and any artifacts that are necessary
 # note the hack to allow for various GOOS & GOARCH combos, sigh
