@@ -65,16 +65,22 @@ based on URL."
 						 :sha1 (flexi-streams:string-to-octets url)))
 					       0 8))))
 
-      (unless (fad:directory-exists-p policy-dirname)
-	(let ((output (if (not (fad:directory-exists-p policy-dirname))
+      ;; Update the policy
+      (let ((output (if (not (fad:directory-exists-p policy-dirname))
+			(progn
+			  (log:info "/usr/bin/git clone --depth=1 ~A ~A"
+				    url policy-dirname)
 			  (inferior-shell:run
-			   (format nil "/usr/bin/git clone ~A ~A"
-				   url policy-dirname))
+			   (format nil "/usr/bin/git clone --depth=1 ~A ~A"
+				   url policy-dirname)))
+			(progn
+			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull)\""
+				    policy-dirname)
 			  (inferior-shell:run
-      			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull)\""
-      				   policy-dirname)))))
-	  (dolist (line output)
-	    (print line))))
+			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull)\""
+				   policy-dirname))))))
+	(dolist (line output)
+	  (log:info line)))
 
       (let ((policy-pathname
 	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
