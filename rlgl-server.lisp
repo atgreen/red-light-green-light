@@ -27,10 +27,15 @@
 
 (eval-when (:compile-toplevel)
   (defun get-version-from-git ()
-    (or (uiop:getenv "RLGL_VERSION")
-	(inferior-shell:run/ss
-	 "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN"))))
-(defmacro rlgl-version () (get-version-from-git))
+    (inferior-shell:run/ss
+     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
+
+(defmacro rlgl-version ()
+  (let ((v (get-version-from-git)))
+    (if (equalp v "UNKNOWN")
+	(or (uiop:getenv "RLGL_VERSION") v)
+	v)))
+      
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
