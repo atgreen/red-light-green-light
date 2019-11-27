@@ -35,7 +35,6 @@
     (if (equalp v "UNKNOWN")
 	(or (uiop:getenv "RLGL_VERSION") v)
 	v)))
-      
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
@@ -185,11 +184,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:br)
 			   (:br)
 			   (:hr)
-			   "Red Light Green Light was written by Anthony Green "
+			   "Red Light Green Light was written by Anthony Green " 
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
 			   " and is available in source form under the terms of the AGPLv3 license from "
 			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
-			   ))))
+			   )))
+	(:footer :class "page-footer font-small special-color-dark pt-4"
+		 (:div :class "footer-copyright text-center py-3" "Version" (rlgl-version) "   //   (C) 2018-2019"
+		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 			     :crossorigin "anonymous"))
@@ -350,7 +352,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 							    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
 						      (:br)))
 						  (:div :id "border"
-							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
+							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist))))))))))))
+	(:footer :class "page-footer font-small special-color-dark pt-4"
+		 (:div :class "footer-copyright text-center py-3" "Generated on "
+		       (simple-date-time:http-date (simple-date-time:now)) " by version" (rlgl-version)
+		       "   //   (C) 2018-2019" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 			     :crossorigin "anonymous"))
