@@ -30,9 +30,9 @@
     (inferior-shell:run/ss
      "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
 
-(defmacro rlgl-version ()
+(defparameter +rlgl-version+
   (let ((v (get-version-from-git)))
-    (if (equalp v "UNKNOWN")
+    (if (equal v "UNKNOWN")
 	(or (uiop:getenv "RLGL_VERSION") v)
 	v)))
 
@@ -190,7 +190,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
 			   )))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
-		 (:div :class "footer-copyright text-center py-3" "Version" (rlgl-version) "   //   (C) 2018-2019"
+		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2019"
 		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -208,7 +208,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
-  (format nil "rlgl-server connected -- version ~A" (rlgl-version)))
+  (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
   (rlgl.db:report-log *db* id))
@@ -355,7 +355,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist))))))))))))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
 		 (:div :class "footer-copyright text-center py-3" "Generated on "
-		       (simple-date-time:http-date (simple-date-time:now)) " by version" (rlgl-version)
+		       (simple-date-time:http-date (simple-date-time:now)) " by version" +rlgl-version+
 		       "   //   (C) 2018-2019" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -443,7 +443,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
   
-  (log:info "Starting rlgl-server version ~A" (rlgl-version))
+  (log:info "Starting rlgl-server version ~A" +rlgl-version+)
   
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse +default-config-text+))
