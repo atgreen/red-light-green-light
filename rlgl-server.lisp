@@ -25,17 +25,20 @@
 ;; RLGL_VERSION (set on the linux container build commandline), or
 ;; from git at compile-time.  Use UNKNOWN if all else fails.
 
-(eval-when (:compile-toplevel)
-  (defparameter +V+ (inferior-shell:run/ss
-		     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
+;; This can come from build time...
+(eval-when (:compile-toplevel :execute :load-toplevel)
+  (defparameter +rlgl-git-version+
+    (inferior-shell:run/ss
+     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
 
-;; (defparameter +rlgl-version+
-;;   (let ((v ,+V+))
-;;     (if (equal v "UNKNOWN")
-;; 	(or (uiop:getenv "RLGL_VERSION") v)
-;; 	v)))
+;; But this must come from runtime...
+(defparameter +rlgl-version+
+  (let ((v +rlgl-git-version+))
+    (if (equal v "UNKNOWN")
+ 	(or (uiop:getenv "RLGL_VERSION") v)
+ 	v)))
 
-(defparameter +rlgl-version+ "0.1")
+; (defparameter +rlgl-version+ +V+)
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
