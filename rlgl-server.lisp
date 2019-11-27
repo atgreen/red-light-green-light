@@ -26,15 +26,16 @@
 ;; from git at compile-time.  Use UNKNOWN if all else fails.
 
 (eval-when (:compile-toplevel)
-  (defun get-version-from-git ()
-    (inferior-shell:run/ss
-     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
+  (defparameter +V+ (inferior-shell:run/ss
+		     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
 
-(defparameter +rlgl-version+
-  (let ((v (get-version-from-git)))
-    (if (equal v "UNKNOWN")
-	(or (uiop:getenv "RLGL_VERSION") v)
-	v)))
+;; (defparameter +rlgl-version+
+;;   (let ((v ,+V+))
+;;     (if (equal v "UNKNOWN")
+;; 	(or (uiop:getenv "RLGL_VERSION") v)
+;; 	v)))
+
+(defparameter +rlgl-version+ "0.1")
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
