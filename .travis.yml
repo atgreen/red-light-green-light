@@ -16,6 +16,11 @@ before_install:
     | bash
   - (cd rlgl && make depend && make build)
   - mv rlgl/build/* cli
+  - echo ===================================================
+  - echo $(git describe --tags --dirty=+)
+  - echo "$(git describe --tags --dirty=+)"
+  - echo `git describe --tags --dirty=+`
+  - echo ===================================================
   - docker build -f Dockerfile --build-arg RLGL_VERSION="$(git describe --tags --dirty=+)" -t $REPO:latest .
 
 #  - make coveralls
