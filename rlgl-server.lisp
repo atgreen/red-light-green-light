@@ -218,43 +218,51 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute evaluate (:post :application/json)
-  (log:info "evaluate: '~A'"
-	    (funcall
-	     (read-from-string "hunchentoot:raw-post-data") :force-text t))
-  (let ((json
-	 (json:decode-json-from-string
-	  (funcall
-	   (read-from-string "hunchentoot:raw-post-data") :force-text t))))
-    (let ((policy-name (cdr (assoc :POLICY json)))
-	  (player (cdr (assoc :ID json))))
-      (if (not (and (rlgl.util:valid-url? policy-name)
-		    player))
-	  (progn
-	    (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
-	    "ERROR: missing POLICY or ID")
-	  (let* ((policy (make-policy policy-name))
-		 (doc (read-document *storage-driver* (cdr (assoc :REF json))))
-		 (filename (cdr (assoc :NAME json)))
-		 (parser (or (recognize-report doc)
-			     (when (str:ends-with? ".csv" filename)
-			       (make-instance 'parser/csv))))
-		 (tests (parse-report parser doc)))
-	    (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
-	    (progn
-	      (multiple-value-bind (red-or-green processed-results)
-		  (apply-policy policy tests)
-		(let ((stream (make-string-output-stream)))
-		  (render stream (cdr (assoc :REF json)) processed-results
-			  (title parser)
-			  (commit-url-format policy))
-		  (let ((ref (store-document *storage-driver*
-					     (flexi-streams:string-to-octets
-					      (get-output-stream-string stream)))))
-		    (rlgl.db:record-log *db* player (version policy) red-or-green ref)
-		    (format nil "~A: ~A/doc?id=~A~%"
-			    red-or-green
-			    *server-uri*
-			    ref))))))))))
+  (handler-case
+      (let ((json-string
+	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
+	(log:info "evaluate: '~A'" json-string)
+	(let ((json (json:decode-json-from-string json-string)))
+	  (let ((policy-name (cdr (assoc :POLICY json)))
+		(player (cdr (assoc :ID json))))
+	    (cond
+	      ((null policy-name)
+	       (error "POLICY missing"))
+	      ((not (rlgl.util:valid-url? policy-name))
+	       (error "POLICY not a valid URL"))
+	      ((null player)
+	       (error "ID missing"))
+	      (t
+	       (let* ((policy (make-policy policy-name))
+		      (doc (read-document *storage-driver* (cdr (assoc :REF json))))
+		      (filename (cdr (assoc :NAME json)))
+		      (parser (or (recognize-report doc)
+				  (when (str:ends-with? ".csv" filename)
+				    (make-instance 'parser/csv))))
+		      (tests (if parser
+				 (parse-report parser doc)
+				 (error "DOCUMENT not recognized"))))
+		 (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
+		 (progn
+		   (multiple-value-bind (red-or-green processed-results)
+		       (apply-policy policy tests)
+		     (let ((stream (make-string-output-stream)))
+		       (render stream (cdr (assoc :REF json)) processed-results
+			       (title parser)
+			       (commit-url-format policy))
+		       (let ((ref (store-document *storage-driver*
+						  (flexi-streams:string-to-octets
+						   (get-output-stream-string stream)))))
+			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
+			 (format nil "~A: ~A/doc?id=~A~%"
+				 red-or-green
+				 *server-uri*
+				 ref)))))))))))
+    (error (c)
+      (log:error "~A" c)
+      (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
+      (format nil "ERROR: ~A~%" c))))
+
 
 (snooze:defroute upload (:post :application/octet-stream)
   (handler-case (store-document *storage-driver* (hunchentoot:raw-post-data))
