@@ -34,6 +34,7 @@ import (
 )
 
 var (
+	// FIXME: get version from git, as it done in rlgl-server.lisp
 	VERSION = "undefined"
 	red  = color.New(color.FgRed).SprintFunc()
 	cyan = color.New(color.FgCyan).SprintFunc()
@@ -67,7 +68,7 @@ func (c *Config) Write(path string) {
 		}
 	}
 
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		exitErr(fmt.Errorf("failed to open config for writing: %s", err))
 	}
