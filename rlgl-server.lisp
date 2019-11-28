@@ -38,8 +38,6 @@
  	(or (uiop:getenv "RLGL_VERSION") v)
  	v)))
 
-; (defparameter +rlgl-version+ +V+)
-
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
 
