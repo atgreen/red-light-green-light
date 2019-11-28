@@ -129,10 +129,23 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			(str:concat "rlgl-server:parser/" result)))))))
 
 ;; ----------------------------------------------------------------------------
+;; HTML rendering helpers...
+
+(defun emit-bootstrap.min.css ()
+  (list :rel "stylesheet"
+	:href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+	:integrity "sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+	:crossorigin "anonymous"))
+
+(defun emit-bootstrap.min.js ()
+  (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+	:integrity "sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+	:crossorigin "anonymous"))
+
+;; ----------------------------------------------------------------------------
 ;; API routes
 
 (setf snooze:*home-resource* :index)
-
 
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
@@ -145,10 +158,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:link :rel "icon" :href "images/rlgl.svg.png")
 	(:title "Red Light Green Light")
 	(:link :rel "stylesheet" :href "css/rlgl.css")
-	(:link :attrs (list :rel "stylesheet"
-			    :href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-			    :integrity "sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-			    :crossorigin "anonymous"))
+	(:link :attrs (emit-bootstrap.min.css))
 	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
        (:body
 	(:header
@@ -200,9 +210,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
 			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
 			     :crossorigin "anonymous"))
-       (:script :attrs (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-			     :integrity "sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-			     :crossorigin "anonymous"))
+       (:script :attrs (emit-bootstrap.min.js))
        (:script :attrs (list :src "js/index.js")))))
 
 (snooze:defroute start (:get :text/plain)
@@ -322,10 +330,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:link :rel "icon" :href "images/rlgl.svg.png")
 	(:title "Report")
 	(:link :rel "stylesheet" :href "css/rlgl.css")
-	(:link :attrs (list :rel "stylesheet"
-			    :href "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-			    :integrity "sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-			    :crossorigin "anonymous"))
+	(:link :attrs (emit-bootstrap.min.css))
 	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
        (:body
 	(:header
@@ -373,9 +378,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
 			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
 			     :crossorigin "anonymous"))
-       (:script :attrs (list :src "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-			     :integrity "sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-			     :crossorigin "anonymous"))
+       (:script :attrs (emit-bootstrap.min.js))
        (:script :attrs (list :src "js/index.js"))))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
