@@ -68,10 +68,10 @@ based on URL."
       ;; Update the policy
       (let ((output (if (not (fad:directory-exists-p policy-dirname))
 			(progn
-			  (log:info "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone --depth=1 ~A ~A"
+			  (log:info "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
 				    url policy-dirname)
 			  (inferior-shell:run
-			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone --depth=1 ~A ~A"
+			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
 				   url policy-dirname)))
 			(progn
 			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull)\""
