@@ -451,6 +451,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
 
+  ;; We do lots of string conversion with flexi-streams.  In the case
+  ;; where there are character encoding errors, replace the bad
+  ;; character with '?'.
+  (setf flexi-streams:*substitution-char* #\?)
+
   ;; We never git commit, but git will complain even when cloning if
   ;; we run in a container without a known user unless...
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
