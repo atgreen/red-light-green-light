@@ -19,7 +19,10 @@
 (defpackage #:rlgl.util
   (:use #:cl)
   (:shadow #:package)
-  (:export #:random-hex-string #:valid-url? #:read-file-into-string))
+  (:export #:random-hex-string
+	   #:valid-url?
+	   #:read-file-into-string
+	   #:escape-json-string))
 
 (in-package #:rlgl.util)
 
@@ -48,3 +51,7 @@
   "Returns T if STRING is a valid http or https url."
   (and string
        (quri:uri-http-p (quri:uri string))))
+
+(defun escape-json-string (string)
+  "Escape character sequences used for json strings."
+  (str:replace-all "\\" "\\\\" string))
