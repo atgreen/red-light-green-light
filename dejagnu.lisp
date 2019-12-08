@@ -64,7 +64,7 @@
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"id\": \"~A\" }"
 				 host
-				 (escape-json-string
+				 (rlgl.util:escape-json-string
 				  (str:substring 7 nil line))))
 			tests))
 		      (t tests)))))
