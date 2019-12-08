@@ -41,23 +41,29 @@
 		      ((str:starts-with? "Host   is" line)
 		       (setf host (str:substring 10 nil line))
 		       tests)
+#|
 		      ((str:starts-with? "PASS:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 6 nil line)))
+				 host (rlgl.util:escape-json-string
+				       (str:substring 6 nil line))))
 			tests))
+
+|#
 		      ((str:starts-with? "FAIL:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 6 nil line)))
+				 host (rlgl.util:escape-json-string
+				       (str:substring 6 nil line))))
 			tests))
 		      ((str:starts-with? "XFAIL:" line)
 		       (cons
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (str:substring 7 nil line)))
+				 host (rlgl.util:escape-json-string
+				       (str:substring 7 nil line))))
 			tests))
 		      ((str:starts-with? "XPASS:" line)
 		       (cons

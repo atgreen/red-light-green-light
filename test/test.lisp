@@ -70,6 +70,7 @@
   (test-eval "test/mysql-aqua.html")
   (test-eval "test/clair-report.json")
   (test-eval "test/empty-clair-report.json")
+  (test-eval "test/gcc.sum")
 
   (finalize)
 

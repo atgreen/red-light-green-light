@@ -54,4 +54,7 @@
 
 (defun escape-json-string (string)
   "Escape character sequences used for json strings."
-  (str:replace-all "\\" "\\\\" string))
+  (let* ((s1 (str:replace-all "\\" "\\\\\\" string))
+	 (s2 (str:replace-all "\"" "\\\\\"" s1)))
+    (format nil "~A~%" s2)
+    s2))

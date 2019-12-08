@@ -11,7 +11,8 @@ binary:
 		--entry "rlgl-server:start-rlgl-server"
 
 check: clean
-	sbcl --disable-debugger \
+	sbcl --dynamic-space-size 4096 \
+	     --disable-debugger \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
 	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
