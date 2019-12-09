@@ -29,7 +29,8 @@
 
 (defmethod parse-report ((parser parser/dejagnu) doc)
   (let ((tests (list))
-	(host "UNKNOWN"))
+	(host "UNKNOWN")
+	(target "UNKNOWN"))
     (with-input-from-string (in doc)
       (loop for line = (read-line in nil)
 	    while line do
@@ -37,41 +38,44 @@
 		    (cond
 		      ((str:starts-with? "Native configuration is " line)
 		       (setf host (str:substring 24 nil line))
+		       (setf target (str:substring 24 nil line))
 		       tests)
 		      ((str:starts-with? "Host   is" line)
 		       (setf host (str:substring 10 nil line))
+		       tests)
+		      ((str:starts-with? "Target is" line)
+		       (setf target (str:substring 10 nil line))
 		       tests)
 #|
 		      ((str:starts-with? "PASS:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (rlgl.util:escape-json-string
-				       (str:substring 6 nil line))))
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"PASS\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
+				 host target (rlgl.util:escape-json-string
+				              (str:substring 6 nil line))))
 			tests))
 
 |#
 		      ((str:starts-with? "FAIL:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (rlgl.util:escape-json-string
-				       (str:substring 6 nil line))))
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
+				 host target (rlgl.util:escape-json-string
+					      (str:substring 6 nil line))))
 			tests))
 		      ((str:starts-with? "XFAIL:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host (rlgl.util:escape-json-string
-				       (str:substring 7 nil line))))
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
+				 host target (rlgl.util:escape-json-string
+					      (str:substring 7 nil line))))
 			tests))
 		      ((str:starts-with? "XPASS:" line)
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"id\": \"~A\" }"
-				 host
-				 (rlgl.util:escape-json-string
-				  (str:substring 7 nil line))))
+			 (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
+				 host target (rlgl.util:escape-json-string
+					      (str:substring 7 nil line))))
 			tests))
 		      (t tests)))))
     tests))
