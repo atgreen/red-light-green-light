@@ -107,7 +107,7 @@ pipeline.  Here's an example workflow:
 - First, we must log into our Red Light Green Light server with `rlgl`
 cli tool like so:
 ```
-$ rlgl login -u USERNAME -p PASSWORD http://rlgl-server.example.com
+$ rlgl login http://rlgl-server.example.com
 ```
 
 - Each deployable artifact is given a Player ID.  The Player ID is
