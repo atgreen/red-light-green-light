@@ -160,8 +160,8 @@ regexp (starting with \#^), or any other string."
 				  (str:concat (cdr pair) "$"))
 				s))))
 		    (t
-		      (eval `(lambda (s)
-			       (string= s ,(cdr pair))))))))
+		     (eval `(lambda (s)
+			      (string= s ,(cdr pair))))))))
 	  matcher))
 
 (defun extract-expiration-date (line)
