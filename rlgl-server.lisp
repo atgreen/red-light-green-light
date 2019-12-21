@@ -175,7 +175,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   "Red Light Green Light is a git-centric tool designed to accelerate CI/CD pipelines."
 			   (:br)
 			   (:br)
-			   "This hosted version of Red Light Green Light is an experimental service and offers no guarantees.  Use at your own risk.  Note that all documents and reports will age-out after 7 days."
+			   "This hosted version of Red Light Green Light is an experimental service and offers no guarantees.  Use at your own risk.  Note that all documents and reports will age-out after 30 days."
 			   (:br)
 			   (:br)
 			   (:h4 "Downloads")
