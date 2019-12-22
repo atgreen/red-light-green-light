@@ -50,8 +50,5 @@
 			(json:decode-json-from-string
 			 (format nil "{ \"report\": \"oscap-xccdf\", \"result\": \"PASS\", \"id\": \"~A\", \"severity\": \"~A\" }"
 				 id severity))
-			tests-fail)))))))))
+			tests-pass)))))))))
     (append tests-fail tests-pass)))
-
-
-    
