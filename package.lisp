@@ -28,6 +28,7 @@
 	   #:parser/dejagnu
 	   #:parser/junit
 	   #:parser/oscap-oval
+	   #:parser/oscap-xccdf
 	   #:db
 	   #:db/sqlite
 	   #:db/postgresql

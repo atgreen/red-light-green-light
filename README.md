@@ -277,6 +277,7 @@ Currently supported report parsers include:
 * [DejaGnu](https://www.gnu.org/software/dejagnu/) testing framework
 * [JUnit](https://junit.org/junit5/) XML results report
 * [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
+* [OpenSCAP](https://www.open-scap.org/) XCCDF scan reports
 * Comma separated values (CSV) for generic policy enforcement on arbitrary metrics (file size, performance results, etc).
 
 Note that for the CSV parser, the first line of the CSV file defines
