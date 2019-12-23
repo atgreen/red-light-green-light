@@ -279,7 +279,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute doc (:get :text/html &key id)
   (let ((report
-	  (handler-case (read-document *storage-driver* id)
+	  (handler-case (flexi-streams:octets-to-string
+			 (read-document *storage-driver* id)
+			 :external-format :utf-8)
 	    (error (c)
 	      (log:error "~A" c)
 	      (rlgl.util:read-file-into-string "missing-doc.html")))))
