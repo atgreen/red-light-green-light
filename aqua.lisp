@@ -28,7 +28,9 @@
    :title  "Aqua Scan Report"))
 
 (defmethod parse-report ((parser parser/aqua) doc)
-  (let ((pdoc (plump:parse doc))
+  (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
+			    (flexi-streams:make-in-memory-input-stream doc)
+			    :external-format :utf-8)))
 	(tests-fail (list)))
 
     (let* ((vulns (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(1) > a"

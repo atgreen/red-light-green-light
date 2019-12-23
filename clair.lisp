@@ -28,7 +28,9 @@
    :title  "Clair Scan Report"))
 
 (defmethod parse-report ((parser parser/clair) doc)
-  (let* ((report (json:decode-json-from-string doc))
+  (let* ((report (json:decode-json-from-source (flexi-streams:make-flexi-stream
+						(flexi-streams:make-in-memory-input-stream doc)
+						:external-format :utf-8)))
 	 (tests-pass (list))
 	 (tests-fail
 	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))

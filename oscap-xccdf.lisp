@@ -26,12 +26,15 @@
    :title  "OpenSCAP XCCDF Scan Report"))
 
 (defmethod parse-report ((parser parser/oscap-xccdf) doc)
-  (let ((pdoc (plump:parse doc))
+  (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
+			    (flexi-streams:make-in-memory-input-stream doc)
+			    :external-format :utf-8)))
 	(tests-fail (list))
 	(tests-pass (list)))
     (let ((rows (lquery:$ pdoc "#rule-overview > table > tbody > tr")))
       (loop for row across rows do
 	(let ((text (lquery:$ row "td" (text))))
+	  (print text)
 	  (when (eq (length text) 3)
 	    (let ((id (aref text 0))
 		  (severity (aref text 1))

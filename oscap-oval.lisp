@@ -28,7 +28,9 @@
    :title  "OpenSCAP OVAL Scan Report"))
 
 (defmethod parse-report ((parser parser/oscap-oval) doc)
-  (let ((pdoc (plump:parse doc))
+  (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
+			    (flexi-streams:make-in-memory-input-stream doc)
+			    :external-format :utf-8)))
 	(tests-fail (list))
 	(tests-pass (list)))
 ;;; Extract date

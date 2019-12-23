@@ -26,8 +26,8 @@
    :title  "JUnit Test Report"))
 
 (defmethod parse-report ((parser parser/junit) doc)
-  (let ((xmls (cxml:parse-octets (flexi-streams:string-to-octets doc)
-				(cxml-xmls:make-xmls-builder)))
+  (let ((xmls (cxml:parse-octets doc
+				 (cxml-xmls:make-xmls-builder)))
 	(tests-fail (list))
 	(tests-pass (list)))
     (let ((children (cdr (cdr xmls))))

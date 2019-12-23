@@ -58,7 +58,7 @@
 
 (defmethod read-document ((backend storage/local) ref)
   "Return a string containing the document."
-  (rlgl.util:read-file-into-string
+  (rlgl.util:read-file-into-vector
    (format nil "~A/~A" (local-dir backend) ref)))
 
 (defmethod store-document ((backend storage/local) document)

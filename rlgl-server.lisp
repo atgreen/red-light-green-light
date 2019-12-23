@@ -106,8 +106,9 @@ postgresql-port = 5432
   "Try to recognize the report type in the string DOC.  If we
 recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((fname
-	 (cl-fad:with-output-to-temporary-file (stream)
-	   (print doc stream))))
+	  (cl-fad:with-output-to-temporary-file (stream
+						 :element-type '(unsigned-byte 8))
+	    (write-sequence doc stream))))
     (let ((scripts (cl-fad:list-directory
 		    (fad:pathname-as-directory
 		     (make-pathname :name "recog"
