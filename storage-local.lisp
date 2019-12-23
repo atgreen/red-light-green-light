@@ -57,7 +57,7 @@
 	    (setf (slot-value backend 'key) key))))))
 
 (defmethod read-document ((backend storage/local) ref)
-  "Return a string containing the document."
+  "Return an octet vector containing the document."
   (rlgl.util:read-file-into-vector
    (format nil "~A/~A" (local-dir backend) ref)))
 
