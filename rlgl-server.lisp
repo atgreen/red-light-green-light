@@ -108,26 +108,33 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((fname
 	  (cl-fad:with-output-to-temporary-file (stream
 						 :element-type '(unsigned-byte 8))
-	    (write-sequence doc stream))))
-    (let ((scripts (cl-fad:list-directory
-		    (fad:pathname-as-directory
-		     (make-pathname :name "recog"
-				    :type "d"
-				    :defaults (rlgl-root)))))
-	  (result nil))
-      (find-if (lambda (script)
-		 (log:info "Testing '~A'~%" script)
-		 (let ((output (inferior-shell:run/ss
-				(str:concat
-				 (namestring script) " "
-				 (namestring fname)))))
-		   (setf result output)
-		   (> (length output) 0)))
-	       scripts)
-      (delete-file fname)
-      (when (> (length result) 0)
-	(make-instance (read-from-string
-			(str:concat "rlgl-server:parser/" result)))))))
+	    (write-sequence doc stream)))
+	(result nil))
+    (unwind-protect
+	 (progn
+	   (let ((scripts (cl-fad:list-directory
+			   (fad:pathname-as-directory
+			    (make-pathname :name "recog"
+					   :type "d"
+					   :defaults (rlgl-root))))))
+	     ;; This could probably be a loop over scripts, where we
+	     ;; return output instead of setting result.  The
+	     ;; unwind-protect would make sure that the file was
+	     ;; deleted.
+	     (find-if (lambda (script)
+			(log:info "Testing '~A'~%" script)
+			(let ((output (inferior-shell:run/ss
+				       (str:concat
+					(namestring script) " "
+					(namestring fname)))))
+			  (setf result output)
+			  (> (length output) 0)))
+		      scripts)))
+      (when fname
+	(delete-file fname)))
+    (when (> (length result) 0)
+      (make-instance (read-from-string
+		      (str:concat "rlgl-server:parser/" result))))))
 
 ;; ----------------------------------------------------------------------------
 ;; HTML rendering helpers...
