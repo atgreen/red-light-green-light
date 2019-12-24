@@ -122,7 +122,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	     ;; unwind-protect would make sure that the file was
 	     ;; deleted.
 	     (find-if (lambda (script)
-			(log:info "Testing '~A'~%" script)
+			(log:info "Testing '~A'" script)
 			(let ((output (inferior-shell:run/ss
 				       (str:concat
 					(namestring script) " "
@@ -338,7 +338,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:meta :charset "utf-8")
 	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
 	(:link :rel "icon" :href "images/rlgl.svg.png")
-	(:title "Report")
+	(:title "Red Light Green Light Report")
 	(:link :rel "stylesheet" :href "css/rlgl.css")
 	(:link :attrs (emit-bootstrap.min.css))
 	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
