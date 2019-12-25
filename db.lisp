@@ -32,17 +32,17 @@
   (let ((dbc (connect-cached db)))
     (when (fresh db)
       (dbi:do-sql dbc "drop table log;"))
-    (let ((query (dbi:prepare dbc "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)")))
+    (let ((query (dbi:prepare dbc "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer)")))
       (dbi:execute query))))
 
 (defmethod record-log ((db db-backend) player version result report)
   (dbi:do-sql (connect-cached db)
-    (format nil "insert into log(id, version, colour, report) values (\"~A\", \"~A\", \"~A\", \"~A\");"
+    (format nil "insert into log(id, version, colour, report, unixtimestamp) values (\"~A\", \"~A\", \"~A\", \"~A\", strftime('%s','now'));"
 	    player version result report)))
 
 (defmethod report-log ((db db-backend) player)
   (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select timestamp, colour, version, report from log where id = \"~A\";" player)))
+			     (format nil "select unixtimestamp, colour, version, report from log where id = \"~A\";" player)))
 	 (result (dbi:execute query))
 	 (fstr (make-array '(0) :element-type 'base-char
                            :fill-pointer 0 :adjustable t)))
@@ -52,8 +52,7 @@
 	      do (destructuring-bind (j1 time j2 result j3 version j4 report)
 		     row
 		   (local-time:format-timestring
-		    s (local-time:universal-to-timestamp
-		       (cl-date-time-parser:parse-date-time time))
+		    s (local-time:unix-to-timestamp time)
 		    :format local-time:+rfc-1123-format+)
 		   (format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))

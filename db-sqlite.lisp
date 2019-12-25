@@ -24,12 +24,16 @@
   ((sqlite-db-filename
     :initarg :filename
     :reader filename)
+   (sql-table-init
+    :initarg :sql-table-init
+    :reader sql-table-init)
    (fresh
     :initarg :fresh
     :initform nil
     :reader fresh))
   (:default-initargs
-      :filename (error "Must supply a filename.")))
+   :sql-table-init "create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer)"
+   :filename (error "Must supply a filename.")))
 
 (defmethod connect-cached ((db db/sqlite))
   (dbi:connect-cached :sqlite3 :database-name (filename db)))
