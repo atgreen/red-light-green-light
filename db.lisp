@@ -26,7 +26,10 @@
 (in-package #:rlgl.db)
 
 (defclass db-backend ()
-  ((key :initarg :key :reader key)))
+  ((key :initarg :key :reader key)
+   (sql-insert-log-statement
+    :initarg :sql-insert-log-statement
+    :reader sql-insert-log-statement)))
 
 (defmethod initialize-instance :after ((db db-backend) &key)
   (let ((dbc (connect-cached db)))
@@ -36,13 +39,14 @@
       (dbi:execute query))))
 
 (defmethod record-log ((db db-backend) player version result report)
-  (dbi:do-sql (connect-cached db)
-    (format nil "insert into log(id, version, colour, report, unixtimestamp) values (\"~A\", \"~A\", \"~A\", \"~A\", strftime('%s','now'));"
-	    player version result report)))
+  (let ((stmt (format nil (sql-insert-log-statement db)
+		      player version result report)))
+    (log:info stmt)
+    (dbi:do-sql (connect-cached db) stmt)))
 
 (defmethod report-log ((db db-backend) player)
   (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select unixtimestamp, colour, version, report from log where id = \"~A\";" player)))
+			     (format nil "select unixtimestamp, colour, version, report from log where id = '~A';" player)))
 	 (result (dbi:execute query))
 	 (fstr (make-array '(0) :element-type 'base-char
                            :fill-pointer 0 :adjustable t)))

@@ -37,7 +37,8 @@
   (:default-initargs
    :db-name "rlgl"
    :host "localhost"
-   :port 5432))
+   :port 5432
+   :sql-insert-log-statement "insert into log(id, version, colour, report, unixtimestamp) values ('~A', '~A', '~A', '~A', round(extract(epoch from now())));"))
 
 (defmethod connect-cached ((db db/postgresql))
   (log:info "establishing postgresql connection at ~A:~A"
@@ -46,6 +47,6 @@
   (log:info "postgresql host IP: ~A"
 	    (sb-bsd-sockets:get-host-by-name (host db)))
   (dbi:connect-cached :postgres :database-name (db-name db)
-				:host "10.244.1.189" ;; (host db)
+				:host (host db)
 				:port (port db)
 				:username "rlgl" :password "c0p0$g0g0"))
