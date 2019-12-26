@@ -58,6 +58,6 @@
 		   (local-time:format-timestring
 		    s (local-time:unix-to-timestamp time)
 		    :format local-time:+rfc-1123-format+)
-		   (format s ": ~A [~A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
+		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
 
