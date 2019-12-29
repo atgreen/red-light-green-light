@@ -247,10 +247,12 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       "Hello"))))
 
 (snooze:defroute claim-api-key (:get :text/html)
-  (hunchentoot:redirect
-   (format nil "https://github.com/login/oauth/authorize?client_id=~A\&redirect_uri=\"~A/show-api-key\""
-	   (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
-	   *server-uri*)))
+  (let ((redirect-url
+	  (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/show-api-key"
+		  (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
+		  *server-uri*)))
+    (log:info redirect-url)
+    (hunchentoot:redirect redirect-url)))
 
 (snooze:defroute evaluate (:post :application/json)
   (handler-case
