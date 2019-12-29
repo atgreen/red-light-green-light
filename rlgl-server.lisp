@@ -234,17 +234,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute show-api-key (:get :text/html &key code)
-  (let ((stream
-	  (flexi-streams:make-flexi-stream
-	   (drakma:http-request "https://github.com/login/oauth/access_token"
-				:method :post
-				:parameters `(("client_id" . ,*github-oauth-client-id*)
-					      ("client_secret" . ,*github-oauth-client-secret*)
-					      ("code" . ,(string code))))
-	   :external-format :utf-8)))
-    (loop for line = (read-line stream nil)
-	  while line do
-	    (log:info line)))
+  (let ((r (flexi-streams:octets-to-string
+	    (drakma:http-request "https://github.com/login/oauth/access_token"
+				 :method :post
+				 :parameters `(("client_id" . ,*github-oauth-client-id*)
+					       ("client_secret" . ,*github-oauth-client-secret*)
+					       ("code" . ,(string code))))
+	     :external-format :utf-8)))
+    (log:info r))
     
   (with-html-string
       (:doctype)
@@ -258,7 +255,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (:link :attrs (emit-bootstrap.min.css))
       (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
      (:body
-      "Hello"))))
+      "Hello:" r))))
 
 (snooze:defroute claim-api-key (:get :text/html)
   (let ((redirect-url
