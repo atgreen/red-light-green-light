@@ -235,11 +235,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute show-api-key (:get :text/html &key code)
   (let ((stream
-	  (drakma:http-request "https://github.com/login/oauth/access_token"
-			       :method :post
-			       :parameters `(("client_id" . ,*github-oauth-client-id*)
-					     ("client_secret" . ,*github-oauth-client-secret*)
-					     ("code" . ,(string code))))))
+	  (flexi-streams:make-flexi-stream
+	   (drakma:http-request "https://github.com/login/oauth/access_token"
+				:method :post
+				:parameters `(("client_id" . ,*github-oauth-client-id*)
+					      ("client_secret" . ,*github-oauth-client-secret*)
+					      ("code" . ,(string code))))
+	   :external-format :utf-8)))
     (loop for line = (read-line stream nil)
 	  while line do
 	    (log:info line)))
