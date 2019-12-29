@@ -54,6 +54,8 @@ postgresql-port = 5432
 ")
 
 (defvar *server-uri* nil)
+(defvar *github-oauth-client-id* nil)
+(defvar *github-oauth-client-secret* nil)
 
 ;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
@@ -232,6 +234,16 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute show-api-key (:get :text/html &key code)
+  (let ((stream
+	  (drakma:http-request "https://github.com/login/oauth/access_token"
+			       :method :post
+			       :parameters '(("client_id" . *github-oauth-client-id*)
+					     ("client_secret" . *github-oauth-client-secret*)
+					     ("code" . code)))))
+    (loop for line = (read-line stream nil)
+	  while line do
+	    (log:info line)))
+    
   (with-html-string
       (:doctype)
     (:html
@@ -249,7 +261,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute claim-api-key (:get :text/html)
   (let ((redirect-url
 	  (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/show-api-key"
-		  (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
+		  *github-oauth-client-id*
 		  *server-uri*)))
     (log:info redirect-url)
     (hunchentoot:redirect redirect-url)))
@@ -522,6 +534,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (get-config-value "server-uri")))
     (unless (rlgl.util:valid-url? *server-uri*)
       (error "server-uri is not valid URL: ~A" *server-uri*))
+
+    (setf *github-oauth-client-id*
+	  (or (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
+	      (get-config-value "github-oauth-client-id")))
+    (setf *github-oauth-client-secret*
+	  (or (uiop:getenv "GITHUB_OAUTH_CLIENT_SECRET")
+	      (get-config-value "github-oauth-client-secret")))
 
     ;; Set up DB 
     ;;
