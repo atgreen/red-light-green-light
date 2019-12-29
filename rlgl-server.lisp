@@ -231,6 +231,27 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute report-log (:get :text/plain &key id)
   (rlgl.db:report-log *db* id))
 
+(snooze:defroute show-api-key (:get :text/html)
+  (with-html-string
+      (:doctype)
+    (:html
+     (:head
+      (:meta :charset "utf-8")
+      (:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
+      (:link :rel "icon" :href "images/rlgl.svg.png")
+      (:title "Red Light Green Light")
+      (:link :rel "stylesheet" :href "css/rlgl.css")
+      (:link :attrs (emit-bootstrap.min.css))
+      (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+     (:body
+      "Hello"))))
+
+(snooze:defroute claim-api-key (:get :text/html)
+  (hunchentoot:redirect
+   (format nil "https://github.com/login/oauth/authorize?client_id=~A\&redirect_uri=\"~A/show-api-key\""
+	   (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
+	   *server-uri*)))
+
 (snooze:defroute evaluate (:post :application/json)
   (handler-case
       (let ((json-string
