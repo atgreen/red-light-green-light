@@ -42,7 +42,7 @@
 				   :content-type "application/json"
 				   :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
 						    (rlgl.util:random-hex-string 7)
-						    "http://github.com/atgreen/test-policy"
+						    "http://github.com/moxielogic/rlgl-toolchain-policy"
 						    *upload-ref*))))
     )
 
@@ -70,7 +70,7 @@
   (test-eval "test/mysql-aqua.html")
   (test-eval "test/clair-report.json")
   (test-eval "test/empty-clair-report.json")
-  (test-eval "test/gcc.sum")
+  (test-eval "test/gcc2.sum")
 
   (finalize)
 
