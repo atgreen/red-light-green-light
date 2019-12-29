@@ -239,7 +239,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       :method :post
 			       :parameters `(("client_id" . ,*github-oauth-client-id*)
 					     ("client_secret" . ,*github-oauth-client-secret*)
-					     ("code" . ,code)))))
+					     ("code" . ,(string code))))))
     (loop for line = (read-line stream nil)
 	  while line do
 	    (log:info line)))
