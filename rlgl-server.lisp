@@ -237,9 +237,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((stream
 	  (drakma:http-request "https://github.com/login/oauth/access_token"
 			       :method :post
-			       :parameters '(("client_id" . *github-oauth-client-id*)
-					     ("client_secret" . *github-oauth-client-secret*)
-					     ("code" . code)))))
+			       :parameters `(("client_id" . ,*github-oauth-client-id*)
+					     ("client_secret" . ,*github-oauth-client-secret*)
+					     ("code" . ,code)))))
     (loop for line = (read-line stream nil)
 	  while line do
 	    (log:info line)))
