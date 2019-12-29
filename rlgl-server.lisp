@@ -231,7 +231,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute report-log (:get :text/plain &key id)
   (rlgl.db:report-log *db* id))
 
-(snooze:defroute show-api-key (:get :text/html)
+(snooze:defroute show-api-key (:get :text/html &key code)
   (with-html-string
       (:doctype)
     (:html
