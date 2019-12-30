@@ -84,6 +84,7 @@
 	  (let* ((query (dbi:prepare (connect-cached db)
 				     (format nil "select puk from users where github_id = '~A';" github-user-id)))
 		 (puk (getf (dbi:fetch (dbi:execute query)) :puk)))
+	    (log:info "created user puk ~A" puk)
 	    (dbi:do-sql (connect-cached db)
 	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" puk (uuid:make-v4-uuid))))
 	  (find-github-user-by-id github-user-id))

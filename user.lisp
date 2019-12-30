@@ -19,7 +19,7 @@
 (defpackage #:rlgl.user
   (:use #:cl)
   (:shadow #:package)
-  (:export #:find-github-user-by-info))
+  (:export #:make-user #:find-github-user-by-info))
 
 (in-package #:rlgl.user)
 
