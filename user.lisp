@@ -27,9 +27,6 @@
   ((id :reader id)))
 
 (defun find-github-user-by-info (db github-user-info-string)
-  (let* ((user-json (json:decode-json-from-string doc))
+  (let* ((user-json (json:decode-json-from-string github-user-info-string))
 	 (user (rlgl.db:find-github-user-by-id db (cdr (assoc :ID user-json)))))
     (log:info user)))
-    
-
-
