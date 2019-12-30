@@ -16,7 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-;; Matcher routines
+;; Postgres driver
 
 (in-package #:rlgl.db)
 

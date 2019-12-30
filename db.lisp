@@ -72,7 +72,10 @@
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select user_id from users where github_id = '~A';" github-user-id)))
 	 (result (dbi:fetch (dbi:execute query)))
-	 (user (make-user (getf result :puk) (getf result :user_id))))
+	 (user (let ((puk (getf result :puk)))
+		 (log:info "found user puk ~A" puk)
+		 (and puk
+		      make-user puk (getf result :user_id)))))
     (if (null user)
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
