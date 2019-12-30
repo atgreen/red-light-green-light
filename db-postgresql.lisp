@@ -45,7 +45,7 @@
       (mapc (lambda (command)
 	      (dbi:do-sql dbc command))
 	    '("create extension if not exists \"uuid-ossp\";"
-	      "create table if not exists users (puk integer primary key auto_increment, user_id char(36) not null, github_id integer, unique(user_id));"))))
+	      "create table if not exists users (puk serial primary key, user_id char(36) not null, github_id integer, unique(user_id));"))))
 
 (defmethod connect-cached ((db db/postgresql))
   (log:info "establishing postgresql connection at ~A:~A"
