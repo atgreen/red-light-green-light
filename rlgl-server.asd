@@ -46,7 +46,7 @@
                :cxml :cl-dbi :cl-date-time-parser :quri
 	       :local-time :cl-csv :prometheus
 	       :dbd-sqlite3 :zs3 :simple-date-time
-	       :drakma
+	       :drakma :uuid
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
 	       :prometheus.collectors.sbcl

@@ -32,5 +32,11 @@
    :sql-insert-log-statement "insert into log(id, version, colour, report, unixtimestamp) values ('~A', '~A', '~A', '~A', strftime('%s','now'));"
    :filename (error "Must supply a filename.")))
 
+(defmethod initialize-instance :after ((db db/sqlite) &key)
+  (let ((dbc (connect-cached db)))
+      (mapc (lambda (command)
+	      (dbi:do-sql dbc command))
+	    '("create table if not exists users (puk integer primary key autoincrement, user_id char(36) not null, github_id integer, unique(user_id));"))))
+
 (defmethod connect-cached ((db db/sqlite))
   (dbi:connect-cached :sqlite3 :database-name (filename db)))

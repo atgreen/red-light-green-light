@@ -41,11 +41,9 @@
 	      "drop table if exists users;"
 	      "drop table if exists api_keys;")))
     (mapc (lambda (command)
-	    (let ((query (dbi:prepare dbc command)))
-	      (dbi:execute query)))
-	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer)"
-	    "create table if not exists users (user_id integer, github_id integer)"
-	    "create table if not exists api_keys (user_id integer, api_key char(40))"))))
+	    (dbi:do-sql dbc command))
+	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer);"
+	    "create table if not exists api_keys (puk integer, api_key char(36) not null);"))))
 
 (defmethod record-log ((db db-backend) player version result report)
   (let ((stmt (format nil (sql-insert-log-statement db)
@@ -72,11 +70,18 @@
 
 (defmethod find-github-user-by-id ((db db-backend) github-user-id)
   (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select api_key from users where github_id = '~A';" github-user-id)))
+			     (format nil "select user_id from users where github_id = '~A';" github-user-id)))
 	 (result (dbi:fetch (dbi:execute query)))
-	 (fstr (make-array '(0) :element-type 'base-char
-				:fill-pointer 0 :adjustable t)))
-    (unless result
-      (log:info "github user ~A is not registered" github-user-id))
-    (log:info result)))
-
+	 (user (make-user (getf result :puk) (getf result :user_id))))
+    (if (null user)
+	(let ((user-uuid (uuid:make-v4-uuid)))
+	  (log:info "registering new user ~A" user-uuid)
+	  (dbi:do-sql (connect-cached db)
+	    (format nil "insert into users(user_id, github_id) values ('~A', '~A');" user-uuid github-user-id))
+	  (let* ((query (dbi:prepare (connect-cached db)
+				     (format nil "select puk from users where github_id = '~A';" github-user-id)))
+		 (puk (getf (dbi:fetch (dbi:execute query)) :puk)))
+	    (dbi:do-sql (connect-cached db)
+	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" puk (uuid:make-v4-uuid))))
+	  (find-github-user-by-id github-user-id))
+	user)))
