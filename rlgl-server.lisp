@@ -51,6 +51,8 @@ db = \"sqlite\"
 sqlite-db-filename = \"/var/rlgl/rlgl.db\"
 postgresql-host = \"localhost\"
 postgresql-port = 5432
+github-oauth-client-id = \"ignore\"
+github-oauth-client-secret = \"ignore\"
 ")
 
 (defvar *server-uri* nil)
@@ -243,7 +245,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		 :external-format :utf-8))
 	 (info (flexi-streams:octets-to-string
 		(drakma:http-request (format nil "https://api.github.com/user?~A" token)
-				     :method :get))))
+				     :method :get)))
+	 (user (rlgl.user:find-github-user-by-info *db* info)))
     (log:info info)
     
   (with-html-string

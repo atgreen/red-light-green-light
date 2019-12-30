@@ -38,6 +38,7 @@
 	       (:file "dejagnu")
 	       (:file "junit")
 	       (:file "csv")
+	       (:file "user")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :hunchentoot :spinneret
