@@ -16,6 +16,9 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
+;; Make base32-style API keys.
+;; Inspired by https://www.npmjs.com/package/uuid-apikey
+
 (defpackage #:rlgl.api-key
   (:use #:cl)
   (:shadow #:package)
@@ -39,6 +42,7 @@
 			(str:substring start end s) :radix 16)))))
 
 (defun make-api-key ()
+  "Make a base32-style API key."
   (let ((uuid (str:replace-all "-" ""
 			       (print-object (uuid:make-v4-uuid) nil))))
     (str:upcase
