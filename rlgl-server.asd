@@ -22,6 +22,7 @@
   :version "0"
   :serial t
   :components ((:file "util")
+	       (:file "api-key")
 	       (:file "matcher")
 	       (:file "policy")
 	       (:file "package")
@@ -46,7 +47,7 @@
                :cxml :cl-dbi :cl-date-time-parser :quri
 	       :local-time :cl-csv :prometheus
 	       :dbd-sqlite3 :zs3 :simple-date-time
-	       :drakma :uuid
+	       :drakma :uuid :cl-base32
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
 	       :prometheus.collectors.sbcl

@@ -86,6 +86,6 @@
 		 (puk (getf (dbi:fetch (dbi:execute query)) :puk)))
 	    (log:info "created user puk ~A" puk)
 	    (dbi:do-sql (connect-cached db)
-	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" puk (uuid:make-v4-uuid))))
+	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" puk (rlgl.api-key:make-api-key))))
 	  (find-github-user-by-id github-user-id))
 	user)))
