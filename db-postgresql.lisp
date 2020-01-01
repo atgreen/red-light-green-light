@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -45,7 +45,7 @@
       (mapc (lambda (command)
 	      (dbi:do-sql dbc command))
 	    '("create extension if not exists \"uuid-ossp\";"
-	      "create table if not exists users (puk serial primary key, user_id char(36) not null, github_id integer, unique(user_id));"))))
+	      "create table if not exists users (puk serial primary key, user_uuid char(36) not null, github_id integer, unique(user_uuid));"))))
 
 (defmethod connect-cached ((db db/postgresql))
   (log:info "establishing postgresql connection at ~A:~A"
