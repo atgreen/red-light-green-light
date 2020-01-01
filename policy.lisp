@@ -256,6 +256,3 @@ exists after the JSON object, or NIL otherwise."
 			     result))
 			  candidate-result-list)))
       (values red-or-green result))))
-
-
-
