@@ -75,7 +75,7 @@
 	 (user (let ((puk (getf result :|puk|)))
 		 (log:info "found user puk ~A" puk)
 		 (and puk
-		      make-user puk (getf result :|user_id|)))))
+		      (make-user puk (getf result :|user_id|))))))
     (if (null user)
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
@@ -87,5 +87,5 @@
 	    (log:info "created user puk ~A" newpuk)
 	    (dbi:do-sql (connect-cached db)
 	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (rlgl.api-key:make-api-key))))
-	  (find-github-user-by-id github-user-id))
+	  (find-github-user-by-id db github-user-id))
 	user)))

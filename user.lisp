@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,11 @@
 (defclass user ()
   ((id :reader id)))
 
+(defun make-user (id uuid)
+  (cons id uuid))
+
 (defun find-github-user-by-info (db github-user-info-string)
   (let* ((user-json (json:decode-json-from-string github-user-info-string))
 	 (user (rlgl.db:find-github-user-by-id db (cdr (assoc :ID user-json)))))
-    (log:info user)))
+    (log:info user)
+    user))

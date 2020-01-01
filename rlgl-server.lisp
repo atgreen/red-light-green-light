@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -249,19 +249,19 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	 (user (rlgl.user:find-github-user-by-info *db* info)))
     (log:info info)
     
-  (with-html-string
-      (:doctype)
-    (:html
-     (:head
-      (:meta :charset "utf-8")
-      (:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
-      (:link :rel "icon" :href "images/rlgl.svg.png")
-      (:title "Red Light Green Light")
-      (:link :rel "stylesheet" :href "css/rlgl.css")
-      (:link :attrs (emit-bootstrap.min.css))
-      (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
-     (:body
-      "Hello:" info)))))
+    (with-html-string
+	(:doctype)
+      (:html
+       (:head
+	(:meta :charset "utf-8")
+	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
+	(:link :rel "icon" :href "images/rlgl.svg.png")
+	(:title "Red Light Green Light")
+	(:link :rel "stylesheet" :href "css/rlgl.css")
+	(:link :attrs (emit-bootstrap.min.css))
+	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+       (:body
+	"Hello" user)))))
 
 (snooze:defroute claim-api-key (:get :text/html)
   (let ((redirect-url
