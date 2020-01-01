@@ -248,6 +248,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				     :method :get)))
 	 (user (rlgl.user:find-github-user-by-info *db* info)))
     (log:info info)
+    (log:info user)
     
     (with-html-string
 	(:doctype)
