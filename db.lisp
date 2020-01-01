@@ -68,6 +68,9 @@
 		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
 
+(defun make-user (id uuid)
+  (cons id uuid))
+
 (defmethod find-github-user-by-id ((db db-backend) github-user-id)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))
@@ -75,7 +78,7 @@
 	 (user (let ((puk (getf result :|puk|)))
 		 (log:info "found user puk ~A" puk)
 		 (and puk
-		      (rlgl.user:make-user puk (getf result :|user_uuid|))))))
+		      (make-user puk (getf result :|user_uuid|))))))
     (if (null user)
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
