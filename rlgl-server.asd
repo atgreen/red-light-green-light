@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -31,6 +31,7 @@
 	       (:file "db")
 	       (:file "db-sqlite")
 	       (:file "db-postgresql")
+	       (:file "user")
 	       (:file "oscap-oval")
 	       (:file "oscap-xccdf")
 	       (:file "anchore")
@@ -39,7 +40,6 @@
 	       (:file "dejagnu")
 	       (:file "junit")
 	       (:file "csv")
-	       (:file "user")
 	       (:file "rlgl-server"))
   :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :hunchentoot :spinneret
