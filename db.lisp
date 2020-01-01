@@ -75,7 +75,7 @@
 	 (user (let ((puk (getf result :|puk|)))
 		 (log:info "found user puk ~A" puk)
 		 (and puk
-		      (make-user puk (getf result :|user_uuid|))))))
+		      (rlgl.user:make-user puk (getf result :|user_uuid|))))))
     (if (null user)
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
