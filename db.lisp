@@ -81,6 +81,7 @@
 		 (and puk
 		      (let ((query (dbi:prepare (connect-cached db)
 						(format nil "select api_key from api_keys where puk = ~A;" puk)))
+			    (junk (load:info (dbi:fetch (dbi:execute query))))
 			    (api-key (getf (dbi:fetch (dbi:execute query)) :|api_key|)))
 			(log:info "~A" result)
 			(make-user puk (getf result :|user_uuid|) api-key))))))
