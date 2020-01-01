@@ -261,7 +261,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:link :attrs (emit-bootstrap.min.css))
 	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
        (:body
-	"Hello" user)))))
+	"Hello.  You personal API key is " (car (cdr (cdr user))))))))
 
 (snooze:defroute claim-api-key (:get :text/html)
   (let ((redirect-url
