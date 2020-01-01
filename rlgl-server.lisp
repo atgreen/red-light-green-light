@@ -234,70 +234,70 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute report-log (:get :text/plain &key id)
   (rlgl.db:report-log *db* id))
 
-(snooze:defroute show-api-key (:get :text/html &key code)
-  (let* ((token (flexi-streams:octets-to-string
-		 (drakma:http-request "https://github.com/login/oauth/access_token"
-				      :method :post
-				      :parameters `(("client_id" . ,*github-oauth-client-id*)
-						    ("client_secret" . ,*github-oauth-client-secret*)
-						    ("code" . ,(string code))))
-		 :external-format :utf-8))
-	 (info (flexi-streams:octets-to-string
-		(drakma:http-request (format nil "https://api.github.com/user?~A" token)
-				     :method :get)))
-	 (user (rlgl.user:find-github-user-by-info *db* info)))
-    (log:info info)
-    (log:info user)
-    
-    (with-html-string
-	(:doctype)
-      (:html
-       (:head
-	(:meta :charset "utf-8")
-	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
-	(:link :rel "icon" :href "images/rlgl.svg.png")
-	(:title "Red Light Green Light")
-	(:link :rel "stylesheet" :href "css/rlgl.css")
-	(:link :attrs (emit-bootstrap.min.css))
-	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
-       (:body
-	(:header
-	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
-	       (:a :class "navbar-brand"
-		   :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
-	(:main :role "main" :class "container"
-	       (:div :class "row"
-		     (:div :class "col"
-			   (:div :style "width:100px"
-				 (:div :class "rlgl-svg"))
-			   (:h1 :class "mt-5" "Your personal API key")
-			   (:br)
-			   "rlgl login --key " (car (cdr (cdr user))) "https://rl.gl"
-			   (:br)
-			   (:hr)
-			   "Red Light Green Light was written by Anthony Green " 
-			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
-			   " and is available in source form under the terms of the AGPLv3 license from "
-			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
-			   )))
-	(:footer :class "page-footer font-small special-color-dark pt-4"
-		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
-		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
-       (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
-			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-			     :crossorigin "anonymous"))
-       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-			     :crossorigin "anonymous"))
-       (:script :attrs (emit-bootstrap.min.js))))))
-
-(snooze:defroute claim-api-key (:get :text/html)
-  (let ((redirect-url
-	  (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/show-api-key"
-		  *github-oauth-client-id*
-		  *server-uri*)))
-    (log:info redirect-url)
-    (hunchentoot:redirect redirect-url)))
+(snooze:defroute get-api-key (:get :text/html &key code)
+  (if code
+      (let* ((token (flexi-streams:octets-to-string
+		     (drakma:http-request "https://github.com/login/oauth/access_token"
+					  :method :post
+					  :parameters `(("client_id" . ,*github-oauth-client-id*)
+							("client_secret" . ,*github-oauth-client-secret*)
+							("code" . ,(string code))))
+		     :external-format :utf-8))
+	     (info (flexi-streams:octets-to-string
+		    (drakma:http-request (format nil "https://api.github.com/user?~A" token)
+					 :method :get)))
+	     (user (rlgl.user:find-github-user-by-info *db* info)))
+	(log:info info)
+	(log:info user)
+	
+	(with-html-string
+	    (:doctype)
+	  (:html
+	   (:head
+	    (:meta :charset "utf-8")
+	    (:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
+	    (:link :rel "icon" :href "images/rlgl.svg.png")
+	    (:title "Red Light Green Light")
+	    (:link :rel "stylesheet" :href "css/rlgl.css")
+	    (:link :attrs (emit-bootstrap.min.css))
+	    (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+	   (:body
+	    (:header
+	     (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
+		   (:a :class "navbar-brand"
+		       :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
+	    (:main :role "main" :class "container"
+		   (:div :class "row"
+			 (:div :class "col"
+			       (:div :style "width:100px"
+				     (:div :class "rlgl-svg"))
+			       (:h1 :class "mt-5" "Your personal API key")
+			       (:br)
+			       (:pre
+				"rlgl login --key " (car (cdr (cdr user))) "https://rl.gl")
+			       (:br)
+			       (:hr)
+			       "Red Light Green Light was written by Anthony Green " 
+			       (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
+			       " and is available in source form under the terms of the AGPLv3 license from "
+			       (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
+			       )))
+	    (:footer :class "page-footer font-small special-color-dark pt-4"
+		     (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
+			   (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
+	   (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
+				 :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+				 :crossorigin "anonymous"))
+	   (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+				 :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+				 :crossorigin "anonymous"))
+	   (:script :attrs (emit-bootstrap.min.js)))))
+      (let ((redirect-url
+	     (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/get-api-key"
+		     *github-oauth-client-id*
+		     *server-uri*)))
+	(log:info redirect-url)
+	(hunchentoot:redirect redirect-url))))
 
 (snooze:defroute evaluate (:post :application/json)
   (handler-case
