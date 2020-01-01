@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -82,7 +82,8 @@
 	  (dbi:do-sql (connect-cached db)
 	    (format nil "insert into users(user_id, github_id) values ('~A', '~A');" user-uuid github-user-id))
 	  (let* ((query (dbi:prepare (connect-cached db)
-				     (format nil "select puk from users where github_id = '~A';" github-user-id)))
+				     (format nil "select puk from users where github_id = ~A;" github-user-id)))
+		 (junk (log:info (dbi:fetch (dbi:execute query))))
 		 (puk (getf (dbi:fetch (dbi:execute query)) :puk)))
 	    (log:info "created user puk ~A" puk)
 	    (dbi:do-sql (connect-cached db)
