@@ -274,7 +274,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       (:h1 :class "mt-5" "Your personal API key")
 			       (:br)
 			       (:pre
-				(format nil "rlgl login --key ~A https://rl.gl" (car (cdr (cdr user))))
+				(format nil "rlgl login --key ~A https://rl.gl" (car (cdr (cdr user)))))
 			       (:br)
 			       (:hr)
 			       "Red Light Green Light was written by Anthony Green " 
