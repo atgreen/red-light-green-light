@@ -1,4 +1,4 @@
-// rlgl.go - Copyright 2018, 2019  Anthony Green <green@moxielogic.com>
+// rlgl.go - Copyright 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 //
 // This program is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Affero General Public License
@@ -42,6 +42,7 @@ var (
 
 type Config struct {
 	Host string
+	Key string
 }
 
 func NewConfig() *Config {
@@ -123,6 +124,7 @@ func xdgSupport() bool {
 func main() {
 	var policy string
 	var player string
+	var key string
 	var title string
 	var config Config
 
@@ -147,10 +149,31 @@ func main() {
 			Name:    "login",
 			Aliases: []string{"l"},
 			Usage:   "login to Red Light Green Light server",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "key",
+					Value:       "",
+					Usage:       "API key",
+					Destination: &key,
+				},
+			},
+
 			Action: func(c *cli.Context) error {
 
 				if c.NArg() == 0 {
 					exitErr(fmt.Errorf("Missing server URL"))
+				}
+
+				if key == "" {
+					var slash string;
+					if strings.HasSuffix(c.Args().First(), "/") {
+						slash = "";
+					} else {
+						slash = "/";
+					}
+					exitErr(fmt.Errorf("Missing API key.  Generate a new one at %s%sget-api-key",
+						c.Args().First(),
+						slash))
 				}
 
 				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()))
@@ -165,6 +188,7 @@ func main() {
 				}
 				fmt.Println(string(responseData))
 				config.Host = c.Args().First()
+				config.Key = key
 				config.Write(cfgPath)
 				return nil
 			},
