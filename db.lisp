@@ -43,7 +43,7 @@
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
 	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer);"
-	    "create table if not exists api_keys (puk integer, api_key char(36) not null);"))))
+	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
 (defmethod record-log ((db db-backend) player version result report)
   (let ((stmt (format nil (sql-insert-log-statement db)

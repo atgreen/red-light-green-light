@@ -273,11 +273,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				     (:div :class "rlgl-svg"))
 			       (:h1 :class "mt-5" "Your personal API key")
 			       (:br)
-			       "Your personal API key is <b>" (car (cdr (cdr user))) "</b>."
+			       "Your personal API key is "
+			       (:b (car (cdr (cdr user))) "."
+			       (:br)
 			       (:br)
 			       "To login to " *server-uri* ", use the following command:"
 			       (:pre
-				(format nil "rlgl login --key '~A' '~A'"
+				(format nil "rlgl login --key ~A ~A"
 					(car (cdr (cdr user)))
 					*server-uri*))
 			       (:br)
