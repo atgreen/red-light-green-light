@@ -21,10 +21,11 @@
 (defclass user ()
   ((id :reader user-id)
    (uuid :reader user-uuid)
-   (api-key :reader user-api-key)))
+   (api-key :reader user-api-key)
+   (name :reader user-name)))
 
 (defclass github-user (user)
-  ((name :reader user-name)))
+  ())
 
 (defun make-github-user (id uuid api-key login)
   (let ((u (make-instance 'github-user)))
