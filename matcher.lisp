@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -17,13 +17,6 @@
 ;;; <http://www.gnu.org/licenses/>.
 
 ;; Matcher routines
-
-(defpackage #:matcher
-  (:use #:cl)
-  (:shadow #:package)
-  (:export #:make-policy-matcher #:matcher #:githash #:log-entry
-	   #:kind #:expiration-date
-	   #:match-pair-in-alist #:match-candidate-pattern))
 
 (in-package #:matcher)
 

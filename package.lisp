@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -17,6 +17,30 @@
 ;;; <http://www.gnu.org/licenses/>.
 
 ;;;; package.lisp
+
+(defpackage #:matcher
+  (:use #:cl)
+  (:shadow #:package)
+  (:export #:make-policy-matcher #:matcher #:githash #:log-entry
+	   #:kind #:expiration-date
+	   #:match-pair-in-alist #:match-candidate-pattern))
+
+(defpackage #:policy
+  (:use #:cl #:matcher #:cl-fad)
+  (:shadow #:package)
+  (:export #:*policy-dir* #:make-policy #:apply-policy
+	   #:commit-url-format #:version #:compile-scanners))
+
+(defpackage #:rlgl.db
+  (:use #:cl)
+  (:shadow #:package)
+  (:export #:record-log #:report-log #:db/sqlite #:db/postgresql
+	   #:find-github-user-by-id))
+
+(defpackage #:rlgl.user
+  (:use #:cl)
+  (:shadow #:package)
+  (:export #:make-user #:find-github-user-by-info))
 
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
@@ -36,4 +60,4 @@
 	   #:storage/s3
 	   #:*server-uri*))
 
-(in-package #:rlgl-server)
+

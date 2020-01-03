@@ -16,18 +16,14 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(defpackage #:rlgl.user
-  (:use #:cl)
-  (:shadow #:package)
-  (:export #:make-user #:find-github-user-by-info))
-
 (in-package #:rlgl.user)
 
 (defclass user ()
   ((id :reader id)))
 
-(defun make-user (id uuid)
-  (cons id uuid))
+(defun make-user (id uuid api-key)
+  (log:info "make-user ~A/~A/~A" id uuid api-key)
+  (list id uuid api-key))
 
 (defun find-github-user-by-info (db github-user-info-string)
   (let* ((user-json (json:decode-json-from-string github-user-info-string))

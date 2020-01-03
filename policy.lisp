@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -17,12 +17,6 @@
 ;;; <http://www.gnu.org/licenses/>.
 
 ;; Matcher routines
-
-(defpackage #:policy
-  (:use #:cl #:matcher #:cl-fad)
-  (:shadow #:package)
-  (:export #:*policy-dir* #:make-policy #:apply-policy
-	   #:commit-url-format #:version #:compile-scanners))
 
 (in-package #:policy)
 

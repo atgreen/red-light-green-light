@@ -21,11 +21,11 @@
   :author "Anthony Green <green@moxielogic.com>"
   :version "0"
   :serial t
-  :components ((:file "util")
+  :components ((:file "package")
+	       (:file "util")
 	       (:file "api-key")
 	       (:file "matcher")
 	       (:file "policy")
-	       (:file "package")
 	       (:file "storage-local")
 	       (:file "storage-s3")
 	       (:file "db")

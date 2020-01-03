@@ -269,6 +269,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	    (:main :role "main" :class "container"
 		   (:div :class "row"
 			 (:div :class "col"
+			       (:div :class "alert alert-warning alert-dismissible fade show" :role "alert"
+				     "You are logged in as GitHub user " (car (cdr user)) "."
+				     (:button :type "button"
+					      :class "close"
+					      :data-dismiss "alert"
+					      :aria-label "Close"
+					      (:span :aria-hidden "true"
+						     "X")))
 			       (:div :style "width:100px"
 				     (:div :class "rlgl-svg"))
 			       (:h1 :class "mt-5" "Your personal API key")

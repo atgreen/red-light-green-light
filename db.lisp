@@ -16,13 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-;; Matcher routines
-
-(defpackage #:rlgl.db
-  (:use #:cl)
-  (:shadow #:package)
-  (:export #:record-log #:report-log #:db/sqlite #:db/postgresql
-	   #:find-github-user-by-id))
+;; Database routines
 
 (in-package #:rlgl.db)
 
@@ -68,10 +62,6 @@
 		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
 
-(defun make-user (id uuid api-key)
-  (log:info "make-user ~A/~A/~A" id uuid api-key)
-  (list id uuid api-key))
-
 (defmethod find-github-user-by-id ((db db-backend) github-user-id)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))
@@ -84,7 +74,7 @@
 			     (junk (log:info (dbi:fetch (dbi:execute query))))
 			     (api-key (getf (dbi:fetch (dbi:execute query)) :|api_key|)))
 			(log:info "~A" result)
-			(make-user puk (getf result :|user_uuid|) api-key))))))
+			(rlgl.user:make-user puk (getf result :|user_uuid|) api-key))))))
     (if (null user)
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
