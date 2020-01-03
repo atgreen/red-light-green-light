@@ -274,7 +274,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       (:h1 :class "mt-5" "Your personal API key")
 			       (:br)
 			       "Your personal API key is "
-			       (:b (car (cdr (cdr user))) "."
+			       (:b (car (cdr (cdr user)))) "."
 			       (:br)
 			       (:br)
 			       "To login to " *server-uri* ", use the following command:"
