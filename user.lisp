@@ -19,14 +19,24 @@
 (in-package #:rlgl.user)
 
 (defclass user ()
-  ((id :reader id)))
+  ((id :reader user-id)
+   (uuid :reader user-uuid)
+   (api-key :reader user-api-key)))
 
-(defun make-user (id uuid api-key)
-  (log:info "make-user ~A/~A/~A" id uuid api-key)
-  (list id uuid api-key))
+(defclass github-user (user)
+  ((name :reader user-name)))
+
+(defun make-github-user (id uuid api-key login)
+  (let ((u (make-instance 'github-user)))
+    (setf (slot-value u 'id) id)
+    (setf (slot-value u 'uuid) uuid)
+    (setf (slot-value u 'api-key) api-key)
+    (setf (slot-value u 'name) login)
+    u))
 
 (defun find-github-user-by-info (db github-user-info-string)
   (let* ((user-json (json:decode-json-from-string github-user-info-string))
-	 (user (rlgl.db:find-github-user-by-id db (cdr (assoc :ID user-json)))))
-    (log:info user)
+	 (user (rlgl.db:find-github-user-by-id db
+					       (cdr (assoc :ID user-json))
+					       (cdr (assoc :LOGIN user-json)))))
     user))

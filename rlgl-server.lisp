@@ -248,7 +248,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 					 :method :get)))
 	     (user (rlgl.user:find-github-user-by-info *db* info)))
 	(log:info info)
-	(log:info user)
 	
 	(with-html-string
 	    (:doctype)
@@ -270,7 +269,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		   (:div :class "row"
 			 (:div :class "col"
 			       (:div :class "alert alert-warning alert-dismissible fade show" :role "alert"
-				     "You are logged in as GitHub user " (car (cdr user)) "."
+				     "You are logged in as GitHub user " (slot-value user 'name) "."
 				     (:button :type "button"
 					      :class "close"
 					      :data-dismiss "alert"
@@ -282,15 +281,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       (:h1 :class "mt-5" "Your personal API key")
 			       (:br)
 			       "Your personal API key is "
-			       (:b (car (cdr (cdr user)))) "."
+			       (:b (slot-value user 'api-key) ".")
 			       (:br)
 			       (:br)
 			       "To login to " *server-uri* ", use the following command:"
 			       (:pre
 				(format nil "rlgl login --key ~A ~A"
-					(car (cdr (cdr user)))
+					(slot-value user 'api-key)
 					*server-uri*))
-			       (:br)
+  			       (:br)
 			       (:hr)
 			       "Red Light Green Light was written by Anthony Green " 
 			       (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
@@ -308,9 +307,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				 :crossorigin "anonymous"))
 	   (:script :attrs (emit-bootstrap.min.js)))))
       (let ((redirect-url
-	     (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/get-api-key"
-		     *github-oauth-client-id*
-		     *server-uri*)))
+	      (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/get-api-key"
+		      *github-oauth-client-id*
+		      *server-uri*)))
 	(log:info redirect-url)
 	(hunchentoot:redirect redirect-url))))
 
