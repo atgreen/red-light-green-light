@@ -269,7 +269,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		   (:div :class "row"
 			 (:div :class "col"
 			       (:div :class "alert alert-warning alert-dismissible fade show" :role "alert"
-				     "You are logged in as GitHub user " (user-name user) "."
+				     "You are logged in as GitHub user " (rlgl.user:user-name user) "."
 				     (:button :type "button"
 					      :class "close"
 					      :data-dismiss "alert"
@@ -281,13 +281,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       (:h1 :class "mt-5" "Your personal API key")
 			       (:br)
 			       "Your personal API key is "
-			       (:b (user-api-key user) ".")
+			       (:b (rlgl.user:user-api-key user) ".")
 			       (:br)
 			       (:br)
 			       "To login to " *server-uri* ", use the following command:"
 			       (:pre
 				(format nil "rlgl login --key ~A ~A"
-					(user-api-key user)
+					(rlgl.user:user-api-key user)
 					*server-uri*))
   			       (:br)
 			       (:hr)
