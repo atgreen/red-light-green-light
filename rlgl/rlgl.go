@@ -373,7 +373,7 @@ func main() {
 
 	app.Name = "rlgl"
 	app.Version = VERSION
-	app.Copyright = "(c) 2018, 2019 Anthony Green"
+	app.Copyright = "(c) 2018-2020 Anthony Green"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
 		cli.Author{
