@@ -647,8 +647,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (hunchentoot:stop (application-metrics-exposer app) :soft soft))
 
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
-  (multiple-value-bind (username password) (hunchentoot:authorization request)
-    (log:info (format nil "auth: ~A:~A" username password)))
+  (log:info (hunchentoot:header-in :AUTHORIZATION request))
   (if (string= (hunchentoot:request-uri request) "/metrics")
       (tbnl:acceptor-dispatch-request (application-metrics-exposer app) request)
       (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
