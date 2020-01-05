@@ -284,7 +284,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			       (:b (rlgl.user:user-api-key user) ".")
 			       (:br)
 			       (:br)
-			       "To login to " *server-uri* ", use the following command:"
+			       "Use the following command to login to this server:"
 			       (:pre
 				(format nil "rlgl login --key ~A ~A"
 					(rlgl.user:user-api-key user)
