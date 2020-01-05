@@ -668,6 +668,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	       (progn
 		 (log:info "Missing authorization key")
 		 ;; FIXME
-		 (call-next-method))
+		 (call-next-method))))))))
 		       
 
