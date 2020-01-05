@@ -663,10 +663,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		 (if (equalp token-type "Bearer")
 		     (if (rlgl.api-key:authorize-by-api-key token-string)
 			 (call-next-method)
-			 (progn
-			   (log:info "FIXME authorization key not valid")
-			   (call-next-method)))
+			 (error "FIXME authorization key not valid"))
 		     (error "Authorization header not a Bearer token")))
-	       (error "Missing authorization key")))))))
+	       (progn
+		 (log:info "Missing authorization key")
+		 ;; FIXME
+		 (call-next-method))
 		       
 
