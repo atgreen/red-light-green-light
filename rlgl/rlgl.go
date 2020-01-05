@@ -199,21 +199,28 @@ func main() {
 			Usage:   "create a Player ID",
 			Action: func(c *cli.Context) error {
 
-				if config.Host == "" {
+				if (config.Host == "") || (config.Key == "") {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
 
-				response, err := http.Get(fmt.Sprintf("%s/start", config.Host))
+				var bearer = "Bearer " + config.Key;
+				
+				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
+				req.Header.Add("Authorization",	bearer)
 
+				// Send req using http Client
+				client := &http.Client{}
+				resp, err := client.Do(req)
 				if err != nil {
 					exitErr(err)
+				} else {
+					defer resp.Body.Close()
+					responseData, err := ioutil.ReadAll(resp.Body)
+					if err != nil {
+						log.Fatal(err)
+					}
+					fmt.Println(string(responseData))
 				}
-
-				responseData, err := ioutil.ReadAll(response.Body)
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println(string(responseData))
 
 				return nil
 			},

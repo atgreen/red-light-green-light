@@ -226,6 +226,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute start (:get :text/plain)
   ;; Return a random 7 character hash
+  (hunchentoot:authorization)
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
@@ -646,6 +647,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (hunchentoot:stop (application-metrics-exposer app) :soft soft))
 
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
+  (multiple-value-bind (username password) (hunchentoot:authorization request)
+    (log:info (format nil "auth: ~A:~A" username password)))
   (if (string= (hunchentoot:request-uri request) "/metrics")
       (tbnl:acceptor-dispatch-request (application-metrics-exposer app) request)
       (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
