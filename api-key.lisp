@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -22,9 +22,14 @@
 (defpackage #:rlgl.api-key
   (:use #:cl)
   (:shadow #:package)
-  (:export #:make-api-key))
+  (:export #:make-api-key #:authorize-by-api-key))
 
 (in-package #:rlgl.api-key)
+
+(defun authorize-by-api-key (api-key)
+  (if (rlgl.db:find-puk-by-api-key api-key)
+      t
+      nil))
 
 (defun int-to-byte-array (int)
   (let ((a (make-array 4)))

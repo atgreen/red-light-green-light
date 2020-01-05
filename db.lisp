@@ -62,6 +62,12 @@
 		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
 
+(defmethod find-puk-by-api-key ((db db-backend) api-key)
+  (let* ((query (dbi:prepare (connect-cached db)
+			     (format nil "select puk from api_keys where api_key = '~A';" api-key)))
+	 (result (dbi:fetch (dbi:execute query))))
+    (getf result :|puk|)))
+
 (defmethod find-github-user-by-id ((db db-backend) github-user-id github-user-login)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))

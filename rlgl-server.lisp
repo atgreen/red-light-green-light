@@ -647,14 +647,26 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (hunchentoot:stop (application-metrics-exposer app) :soft soft))
 
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
-  (let ((access-token (hunchentoot:header-in :AUTHORIZATION request)))
-    (if (not access-token)
-	(if (not (string= (hunchentoot:request-uri request) "/login"))
-	    (log:info "FIXME: missing auth")
-	    ;; FIXME: check auth
-	    ))
-    (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
+  (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
 		      "rlgl_app")))
     (prom:counter.inc *http-requests-counter* :labels labels)
-    (prom:histogram.time (prom:get-metric *http-request-duration* labels)
-			 (call-next-method))))
+    (prom:histogram.time
+     (prom:get-metric *http-request-duration* labels)
+     (if (string= (hunchentoot:request-uri request) "/login")
+	 (call-next-method)
+	 (let ((access-token (hunchentoot:header-in :AUTHORIZATION request)))
+	   (if access-token
+	       (let* ((token-type-and-value (split-sequence:split-sequence #\space access-token))
+		      (token-type (first token-type-and-value))
+		      (token-string (second token-type-and-value)))
+		 ;; Make sure that it is a bearer token
+		 (if (equalp token-type "Bearer")
+		     (if (rlgl.api-key:authorize-by-api-key token-string)
+			 (call-next-method)
+			 (progn
+			   (log:info "FIXME authorization key not valid")
+			   (call-next-method)))
+		     (error "Authorization header not a Bearer token")))
+	       (error "Missing authorization key")))))))
+		       
+
