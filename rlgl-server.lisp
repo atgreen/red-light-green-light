@@ -661,7 +661,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		      (token-string (second token-type-and-value)))
 		 ;; Make sure that it is a bearer token
 		 (if (equalp token-type "Bearer")
-		     (if (rlgl.api-key:authorize-by-api-key token-string)
+		     (if (rlgl.api-key:authorize-by-api-key *db* token-string)
 			 (call-next-method)
 			 (error "FIXME authorization key not valid"))
 		     (error "Authorization header not a Bearer token")))

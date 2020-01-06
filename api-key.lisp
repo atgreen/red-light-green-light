@@ -26,8 +26,8 @@
 
 (in-package #:rlgl.api-key)
 
-(defun authorize-by-api-key (api-key)
-  (if (rlgl.db:find-puk-by-api-key api-key)
+(defun authorize-by-api-key (db api-key)
+  (if (rlgl.db:find-puk-by-api-key db api-key)
       t
       nil))
 
