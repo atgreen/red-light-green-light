@@ -85,7 +85,9 @@
 	(let ((user-uuid (uuid:make-v4-uuid)))
 	  (log:info "registering new user ~A" user-uuid)
 	  (dbi:do-sql (connect-cached db)
-	    (format nil "insert into users(user_uuid, github_id) values ('~A', '~A');" user-uuid github-user-id))
+	    (format nil "insert into users(user_uuid, github_id, created_at) values ('~A', '~A', ~A);"
+		    user-uuid github-user-id
+		    (local-time:timestamp-to-unix (local-time:now))))
 	  (let* ((query (dbi:prepare (connect-cached db)
 				     (format nil "select puk from users where github_id = ~A;" github-user-id)))
 		 (newpuk (getf (dbi:fetch (dbi:execute query)) :|puk|)))
