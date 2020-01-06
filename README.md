@@ -6,8 +6,8 @@
 [![Build Status](https://travis-ci.org/atgreen/red-light-green-light.svg?branch=master)](https://travis-ci.org/atgreen/red-light-green-light)
 [![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
-Quickest Start
---------------
+Quick Start
+------------
 
 Try out the hosted version at [https://rl.gl](https://rl.gl).  Note
 that documents expire after 7 days.
@@ -18,27 +18,19 @@ policy used to validate unit test reports for
 [travis-ci](https://travis-ci.org/libffi/libffi) builds:
 [https://github.com/libffi/rlgl-policy](https://github.com/libffi/rlgl-policy).
 
-Quick Start
------------
+Download and install one of the cli tools hosted at https://rl.gl.
+Now login to the server like so...
 
-Run the pre-built server container with your favorite container
-runtime (podman!), or docker, like so:
+    $ rlgl login https://rl.gl
 
-    $ docker run --rm -t -i -p 8080:8080 moxielogic/rlgl-server
-    
-If running on a container platform, like OpenShift, tell the server
-about the ingress route by setting the `RLGL_SERVER_URI` environment
-variable within the container.
+You'll get a message back asking you to create a personal API key.
+Follow those instructions, and try again...
 
-Point your browser at http://localhost:8080 and download and install
-one of the cli tools hosted within that image.  Now login to the
-server like so...
-
-    $ rlgl l http://localhost:8080
+    $ rlgl login --key=MY_PERSONAL_KEY https://rl.gl
     
 Generate and inspect a player ID, like so...
 
-    $ ID=$(rlgl s)
+    $ ID=$(rlgl start)
     $ echo $ID
 
 Generate an OpenSCAP report, or grab one from here:
@@ -47,7 +39,7 @@ Generate an OpenSCAP report, or grab one from here:
     
 Evaluate the report against a sample policy:
 
-    $ rlgl e --id=$ID --policy=http://github.com/atgreen/test-policy report.html
+    $ rlgl evaluate --id=$ID --policy=http://github.com/atgreen/test-policy report.html
     
 Click on the resulting URL and explore.  Try forking the test policy
 report and making changes.
