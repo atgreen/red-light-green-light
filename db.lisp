@@ -68,7 +68,7 @@
 	 (result (dbi:fetch (dbi:execute query))))
     (getf result :|puk|)))
 
-(defmethod find-github-user-by-id ((db db-backend) github-user-id github-user-login)
+(defmethod find-user-by-github-id ((db db-backend) github-user-id github-user-login)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))
 	 (result (dbi:fetch (dbi:execute query)))
@@ -94,5 +94,5 @@
 	    (log:info "created user puk ~A" newpuk)
 	    (dbi:do-sql (connect-cached db)
 	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (rlgl.api-key:make-api-key))))
-	  (find-github-user-by-id db github-user-id github-user-login))
+	  (find-user-by-github-id db github-user-id github-user-login))
 	user)))

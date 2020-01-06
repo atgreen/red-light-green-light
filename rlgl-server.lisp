@@ -247,7 +247,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	     (info (flexi-streams:octets-to-string
 		    (drakma:http-request (format nil "https://api.github.com/user?~A" token)
 					 :method :get)))
-	     (user (rlgl.user:find-github-user-by-info *db* info)))
+	     (user (rlgl.user:find-user-by-github-info *db* info)))
 	(log:info info)
 	
 	(with-html-string

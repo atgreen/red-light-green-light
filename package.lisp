@@ -35,12 +35,12 @@
   (:use #:cl)
   (:shadow #:package)
   (:export #:record-log #:report-log #:db/sqlite #:db/postgresql
-	   #:find-puk-by-api-key #:find-github-user-by-id))
+	   #:find-puk-by-api-key #:find-user-by-github-id))
 
 (defpackage #:rlgl.user
   (:use #:cl)
   (:shadow #:package)
-  (:export #:make-github-user #:user-api-key #:user-name #:find-github-user-by-info))
+  (:export #:make-github-user #:user-api-key #:user-name #:find-user-by-github-info))
 
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
