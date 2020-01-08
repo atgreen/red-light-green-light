@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
 ;;;                         
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -34,7 +34,6 @@
     (let ((rows (lquery:$ pdoc "#rule-overview > table > tbody > tr")))
       (loop for row across rows do
 	(let ((text (lquery:$ row "td" (text))))
-	  (print text)
 	  (when (eq (length text) 3)
 	    (let ((id (aref text 0))
 		  (severity (aref text 1))
