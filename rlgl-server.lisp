@@ -457,8 +457,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 							    (:a :href (format nil commit-url-format (githash matcher))
 								:target "_blank"
 								(:pre (str:trim (car log-lines))))
-							    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))
-						      (:br)))
+							    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))))
 						  (:div :id "border"
 							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist))))))))))))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
