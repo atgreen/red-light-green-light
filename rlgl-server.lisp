@@ -155,6 +155,20 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	:crossorigin "anonymous"))
 
 ;; ----------------------------------------------------------------------------
+;; API authentication
+
+(defun authorize ()
+  (let* ((request hunchentoot:*request*)
+	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
+	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
+	 (token-type (first token-type-and-value))
+	 (token-string (second token-type-and-value)))
+      ;; Make sure that it is a bearer token
+    (unless (and (equalp token-type "Bearer")
+		 (rlgl.api-key:authorize-by-api-key *db* token-string))
+      (error "Authorization error"))))
+
+;; ----------------------------------------------------------------------------
 ;; API routes
 
 (setf snooze:*home-resource* :index)
@@ -225,14 +239,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        (:script :attrs (emit-bootstrap.min.js)))))
 
 (snooze:defroute start (:get :text/plain)
+  (authorize)
   ;; Return a random 7 character hash
-  (hunchentoot:authorization)
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
+  (authorize)
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute get-api-key (:get :text/html &key code)
@@ -315,6 +330,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(hunchentoot:redirect redirect-url))))
 
 (snooze:defroute evaluate (:post :application/json)
+  (authorize)
   (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
@@ -362,12 +378,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 
 (snooze:defroute upload (:post :application/octet-stream)
+  (authorize)
   (handler-case (store-document *storage-driver* (hunchentoot:raw-post-data))
     (error (c)
       (log:error "~A" c)
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
+  (authorize)
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
@@ -651,22 +669,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (prom:counter.inc *http-requests-counter* :labels labels)
     (prom:histogram.time
      (prom:get-metric *http-request-duration* labels)
-     (if (string= (hunchentoot:request-uri request) "/login")
-	 (call-next-method)
-	 (let ((access-token (hunchentoot:header-in :AUTHORIZATION request)))
-	   (if access-token
-	       (let* ((token-type-and-value (split-sequence:split-sequence #\space access-token))
-		      (token-type (first token-type-and-value))
-		      (token-string (second token-type-and-value)))
-		 ;; Make sure that it is a bearer token
-		 (if (equalp token-type "Bearer")
-		     (if (rlgl.api-key:authorize-by-api-key *db* token-string)
-			 (call-next-method)
-			 (error "FIXME authorization key not valid"))
-		     (error "Authorization header not a Bearer token")))
-	       (progn
-		 (log:info "Missing authorization key")
-		 ;; FIXME
-		 (call-next-method))))))))
+     (call-next-method))))
 		       
 
