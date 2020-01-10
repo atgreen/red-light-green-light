@@ -163,7 +163,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
 	 (token-type (first token-type-and-value))
 	 (token-string (second token-type-and-value)))
-      ;; Make sure that it is a bearer token
+    ;; Make sure that it is a bearer token
     (unless (and (equalp token-type "Bearer")
 		 (rlgl.api-key:authorize-by-api-key *db* token-string))
       (error "Authorization error"))))
@@ -247,7 +247,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
-  (authorize)
+  ;;  (authorize)
   (rlgl.db:report-log *db* id))
 
 (snooze:defroute get-api-key (:get :text/html &key code)
@@ -330,7 +330,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(hunchentoot:redirect redirect-url))))
 
 (snooze:defroute evaluate (:post :application/json)
-  (authorize)
+  ;; (authorize)
   (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
@@ -378,14 +378,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 
 (snooze:defroute upload (:post :application/octet-stream)
-  (authorize)
+  ;; (authorize)
   (handler-case (store-document *storage-driver* (hunchentoot:raw-post-data))
     (error (c)
       (log:error "~A" c)
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
-  (authorize)
+  ;; (authorize)
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
