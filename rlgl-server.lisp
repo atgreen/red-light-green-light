@@ -642,7 +642,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     ;; Injest it if so...
     (let ((test-api-key (get-config-value "test-api-key")))
       (when test-api-key
-	(rlgl.db:register-test-api-key test-api-key))))
+	(rlgl.db:register-test-api-key *db* test-api-key))))
   
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
