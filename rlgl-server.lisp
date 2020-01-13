@@ -636,17 +636,19 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	    (pathname
 	     (if (str:ends-with? "/" dir)
 		 dir
-		 (str:concat dir "/"))))))
+		 (str:concat dir "/")))))
+
+    ;; There may be a test api key defined in the config file.
+    ;; Injest it if so...
+    (let ((test-api-key (get-config-value "test-api-key")))
+      (when test-api-key
+	(register-test-api-key test-api-key))))
   
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
   (initialize-metrics)
 
-  (let ((test-api-key (get-config-value "test-api-key")))
-    (when test-api-key
-      (register-test-api-key test-api-key)))
-  
   (let ((srvr (start-server)))
     ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
     ;; testsuite.
