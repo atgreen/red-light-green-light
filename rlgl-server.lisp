@@ -643,6 +643,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
   (initialize-metrics)
 
+  (let ((test-api-key (get-config-value "test-api-key")))
+    (when test-api-key
+      (register-test-api-key test-api-key)))
+  
   (let ((srvr (start-server)))
     ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
     ;; testsuite.

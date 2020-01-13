@@ -68,6 +68,10 @@
 	 (result (dbi:fetch (dbi:execute query))))
     (getf result :|puk|)))
 
+(defmethod register-test-api-key ((db db-backend) api-key)
+  (dbi:do-sql (connect-cached db)
+    (format nil "insert into api_keys(puk, api_key) values (-1, '~A');" api-key)))
+
 (defmethod find-user-by-github-id ((db db-backend) github-user-id github-user-login)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))

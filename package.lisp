@@ -35,7 +35,8 @@
   (:use #:cl)
   (:shadow #:package)
   (:export #:record-log #:report-log #:db/sqlite #:db/postgresql
-	   #:find-puk-by-api-key #:find-user-by-github-id))
+	   #:find-puk-by-api-key #:find-user-by-github-id
+	   #:register-test-api-key))
 
 (defpackage #:rlgl.user
   (:use #:cl)
