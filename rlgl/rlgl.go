@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -27,7 +28,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
+	"mime/multipart"
+	
 	"github.com/fatih/color"
 	"github.com/naoina/toml"
 	"github.com/urfave/cli"
@@ -119,6 +121,52 @@ func xdgSupport() bool {
 		}
 	}
 	return false
+}
+
+func SendPostRequest (config *Config, url string, filename string, filetype string) []byte {
+	file, err := os.Open(filename)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	
+	
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(filetype, file.Name())
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	io.Copy(part, file)
+	writer.Close()
+	request, err := http.NewRequest("POST", url, body)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	var bearer = "Bearer " + config.Key;
+	request.Header.Add("Authorization", bearer)
+	
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	client := &http.Client{}
+	response, err := client.Do(request)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer response.Body.Close()
+	
+	content, err := ioutil.ReadAll(response.Body)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	return content
 }
 
 func main() {
@@ -295,7 +343,7 @@ func main() {
 
 			Action: func(c *cli.Context) error {
 
-				if config.Host == "" {
+				if (config.Host == "") || (config.Key == "") {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
 
@@ -314,36 +362,8 @@ func main() {
 				var n string;
 				var name string;
 
-				var location string;
-
-				location = fmt.Sprintf("%s/upload", config.Host);
-				
-				for {
-					{
-						file, err := os.Open(c.Args().Get(0))
-						if err != nil {
-							exitErr(err)
-						}
-						name = file.Name()
-						defer file.Close()
-						res, err := http.Post(location, "application/octet-stream", file)
-						if err != nil {
-							exitErr(err)
-						}
-						location = res.Header.Get("Location");
-						if (res.StatusCode == 200) {
-							message, err := ioutil.ReadAll(res.Body)
-							if err != nil {
-								exitErr(err)
-							}
-							n = string(message)
-							
-							break;
-						}
-						
-						defer res.Body.Close()
-					}
-				} 
+				message := SendPostRequest (&config, fmt.Sprintf("%s/upload", config.Host), c.Args().Get(0), "bin");
+				n = string(message)
 
 				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
@@ -352,18 +372,27 @@ func main() {
 
 				jsonValue, _ := json.Marshal(values)
 
-				response, err := http.Post(fmt.Sprintf("%s/evaluate", config.Host), "application/json", bytes.NewBuffer(jsonValue))
-
+				request, err := http.NewRequest("POST", fmt.Sprintf("%s/evaluate", config.Host), bytes.NewBufferString(string(jsonValue)));
 				if err != nil {
-					exitErr(err)
+					log.Fatal(err)
 				}
-
+				var bearer = "Bearer " + config.Key;
+				request.Header.Add("Authorization", bearer)
+				request.Header.Add("Content-Type", "application/json");
+				client := &http.Client{}
+				response, err := client.Do(request)
+				
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer response.Body.Close()
+				
 				responseData, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
 				fmt.Print(string(responseData))
-
+				
 				if strings.HasPrefix(string(responseData), "GREEN:") {
 					os.Exit(0)
 				} else {

@@ -329,8 +329,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(log:info redirect-url)
 	(hunchentoot:redirect redirect-url))))
 
-(snooze:defroute evaluate (:post :application/json)
-  ; (authorize)
+(defun do-evaluate ()
+  (authorize)
   (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
@@ -376,7 +376,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
       (format nil "ERROR: ~A~%" c))))
 
-(defun upload ()
+(defun do-upload ()
   (authorize)
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
@@ -387,7 +387,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
-  ;; (authorize)
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
@@ -520,7 +519,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     "/cli/" (fad:pathname-as-directory
              (make-pathname :name "cli"
                             :defaults (rlgl-root))))
-   (hunchentoot:create-prefix-dispatcher "/upload" 'upload)
+   (hunchentoot:create-prefix-dispatcher "/upload" 'do-upload)
+   (hunchentoot:create-prefix-dispatcher "/evaluate" 'do-evaluate)
    (snooze:make-hunchentoot-app)))
 
 (defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)
@@ -677,8 +677,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (hunchentoot:stop (application-metrics-exposer app) :soft soft))
 
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
-  (print hunchentoot:*request*)
-  (print (hunchentoot:post-parameters*))
   (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
 		      "rlgl_app")))
     (prom:counter.inc *http-requests-counter* :labels labels)
