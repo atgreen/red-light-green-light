@@ -377,12 +377,16 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (format nil "ERROR: ~A~%" c))))
 
 
-(snooze:defroute upload (:post :application/octet-stream)
+(snooze:defroute upload (:post "application/octet-stream")
   ;; (authorize)
   (handler-case (store-document *storage-driver* (hunchentoot:raw-post-data))
     (error (c)
       (log:error "~A" c)
       (format nil "Error storing document: ~A" c))))
+
+(defun test-upload ()
+  (print "OK!")
+  "OK!")
 
 (snooze:defroute doc (:get :text/html &key id)
   ;; (authorize)
@@ -518,6 +522,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     "/cli/" (fad:pathname-as-directory
              (make-pathname :name "cli"
                             :defaults (rlgl-root))))
+   (hunchentoot:create-prefix-dispatcher "/yupload" (test-upload))
    (snooze:make-hunchentoot-app)))
 
 (defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)
@@ -554,6 +559,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (error ()
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
+
+(hunchentoot:define-easy-handler (say-yo :uri "/yo") (name)
+  (setf (hunchentoot:content-type*) "text/plain")
+  (format nil "Hey~@[ ~A~]!" name))
 
 (defun start-rlgl-server (&optional (sleep-forever? nil))
   "Start the web application and have the main thread sleep forever if
@@ -670,11 +679,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (hunchentoot:stop (application-metrics-exposer app) :soft soft))
 
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
+  (print hunchentoot:*request*)
+  (print (hunchentoot:post-parameters*))
   (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
 		      "rlgl_app")))
     (prom:counter.inc *http-requests-counter* :labels labels)
     (prom:histogram.time
      (prom:get-metric *http-request-duration* labels)
      (call-next-method))))
-		       
-
