@@ -421,7 +421,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	       (setf xfail (cons item xfail)))
 	      ((eq kind :PASS)
 	       (setf pass (cons item pass)))
-	      ((t t)))) ; FIXME: abort
+	      (t t))) ; FIXME: error
 	  (setf unknown (cons (cons *unknown-matcher*
 				    (cdr item))
 			      unknown))))
