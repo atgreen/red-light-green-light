@@ -27,7 +27,17 @@ You'll get a message back asking you to create a personal API key.
 Follow those instructions, and try again...
 
     $ rlgl login --key=MY_PERSONAL_KEY https://rl.gl
-    
+
+If you require the use of a proxy, specify like so:
+
+    $ rlgl login --proxy=https://myproxy.example.com:8080 --key=MY_PERSONAL_KEY https://rl.gl
+
+You can also specify a proxy username and password for basic proxy authentication:
+
+    $ rlgl login --proxy=https://myproxy.example.com:8080 \
+                 --proxy-auth=USERNAME:PASSWORD \
+                 --key=MY_PERSONAL_KEY https://rl.gl
+
 Generate and inspect a player ID, like so...
 
     $ ID=$(rlgl start)
