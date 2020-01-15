@@ -1,17 +1,29 @@
 #!/bin/sh
 
+# Forward ports from the rlgl-server to localhost for development
+# purposes.
+# Port 8080 is the HTTP port for rlgl-server
+# Port 4005 is the slynk port for connecting with the emacs sly client
+
 if [ "$#" -ne 1 ]; then
-    echo "Usage: slynk-port-forward PROJECT"
+    echo "Usage: slynk-port-forward NAMESPACE"
     exit 1
 fi
 
-oc project $1
-if [ $? ] ; then
-  POD=$(oc get pods | grep red-light-green-light | grep Running | awk '{ print $1 }')
-  oc port-forward $POD 4008
-else
-    exit 1
-fi
+NAMESPACE=$1
 
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
 
+function ctrl_c() {
+    kill -9 ${P1}
+    kill -9 ${P2}
+}
 
+PODNAME=$(kubectl get pods -n ${NAMESPACE} --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep rlgl-server)
+kubectl port-forward ${PODNAME} 8080 -n ${NAMESPACE} &
+P1=$?
+kubectl port-forward ${PODNAME} 4005 -n ${NAMESPACE} &
+P2=$?
+
+while true; do sleep 10000; done;
