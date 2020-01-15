@@ -647,13 +647,16 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
     ;; There may be a test api key defined in the config file.
     ;; Injest it if so...
-    (let ((test-api-key (get-config-value "test-api-key")))
-      (when test-api-key
-	(rlgl.db:register-test-api-key *db* test-api-key))))
-  
+    (handler-case
+	(let ((test-api-key (get-config-value "test-api-key")))
+	  (when test-api-key
+	    (rlgl.db:register-test-api-key *db* test-api-key)))
+      (error ()
+	nil)))
+    
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
-
+  
   (initialize-metrics)
 
   (let ((srvr (start-server)))
