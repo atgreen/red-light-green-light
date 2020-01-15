@@ -18,12 +18,14 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -45,6 +47,8 @@ var (
 type Config struct {
 	Host string
 	Key string
+	Proxy string
+	ProxyAuth string
 }
 
 func NewConfig() *Config {
@@ -123,6 +127,34 @@ func xdgSupport() bool {
 	return false
 }
 
+func setProxy (proxy string, auth string) {
+
+	var transport *http.Transport;
+	
+	if proxy != "" {
+		proxyUrl, err := url.Parse(proxy)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if auth != "" {
+			basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+			hdr := http.Header{}
+			hdr.Add("Proxy-Authorization", basicAuth)
+			transport = &http.Transport{
+				Proxy: http.ProxyURL(proxyUrl),
+				ProxyConnectHeader: hdr,
+			}
+		} else {
+			transport = &http.Transport{
+				Proxy: http.ProxyURL(proxyUrl),
+			}
+		}
+		
+		http.DefaultTransport = transport;
+	}
+}
+
+
 func SendPostRequest (config *Config, url string, filename string, filetype string) []byte {
 	file, err := os.Open(filename)
 	
@@ -173,6 +205,8 @@ func main() {
 	var policy string
 	var player string
 	var key string
+	var proxy string
+	var proxyauth string
 	var title string
 	var config Config
 
@@ -204,6 +238,18 @@ func main() {
 					Usage:       "API key",
 					Destination: &key,
 				},
+				cli.StringFlag{
+					Name:        "proxy",
+					Value:       "",
+					Usage:       "proxy URL (eg. http://HOST:PORT)",
+					Destination: &proxy,
+				},
+				cli.StringFlag{
+					Name:        "proxy-auth",
+					Value:       "",
+					Usage:       "proxy basic authentication (eg. USERNAME:PASSWORD)",
+					Destination: &proxyauth,
+				},
 			},
 
 			Action: func(c *cli.Context) error {
@@ -224,6 +270,8 @@ func main() {
 						slash))
 				}
 
+				setProxy(proxy, proxyauth);
+				
 				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()))
 
 				if err != nil {
@@ -237,6 +285,8 @@ func main() {
 				fmt.Println(string(responseData))
 				config.Host = c.Args().First()
 				config.Key = key
+				config.Proxy = proxy
+				config.ProxyAuth = proxyauth
 				config.Write(cfgPath)
 				return nil
 			},
@@ -250,6 +300,8 @@ func main() {
 				if (config.Host == "") || (config.Key == "") {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
 
 				var bearer = "Bearer " + config.Key;
 				
@@ -300,6 +352,8 @@ func main() {
 				if c.NArg() != 0 {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
 
 				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player))
 
@@ -358,6 +412,8 @@ func main() {
 				if c.NArg() == 0 {
 					exitErr(fmt.Errorf("Missing report"))
 				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
 
 				var n string;
 				var name string;
