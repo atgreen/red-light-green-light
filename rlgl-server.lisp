@@ -158,9 +158,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; API authentication
 
 (defun authorize ()
-  t)
-#|
-(let* ((request hunchentoot:*request*)
+  (let* ((request hunchentoot:*request*)
 	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
 	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
 	 (token-type (first token-type-and-value))
@@ -169,11 +167,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (unless (and (equalp token-type "Bearer")
 		 (rlgl.api-key:authorize-by-api-key *db* token-string))
       (error "Authorization error"))))
-|#
 
 (defun authorize-policy-bound-api-key (policy-name)
-  t)
-#|
   (let* ((request hunchentoot:*request*)
 	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
 	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
@@ -183,7 +178,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (unless (and (equalp token-type "Bearer")
 		 (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
       (error "Authorization error"))))
-|#
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
