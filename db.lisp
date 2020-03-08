@@ -71,9 +71,9 @@
 
 (defmethod find-policy-bound-api-key ((db db-backend) api-key)
   (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select policy_name from policy_bound_api_keys where api_key = '~A';" api-key)))
+			     (format nil "select policy from policy_bound_api_keys where api_key = '~A';" api-key)))
 	 (result (dbi:fetch (dbi:execute query))))
-    (getf result :|policy_name|)))
+    (getf result :|policy|)))
 
 (defmethod register-test-api-key ((db db-backend) api-key)
   (dbi:do-sql (connect-cached db)
