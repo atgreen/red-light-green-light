@@ -158,7 +158,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; API authentication
 
 (defun authorize ()
-  (let* ((request hunchentoot:*request*)
+  t)
+#|
+(let* ((request hunchentoot:*request*)
 	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
 	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
 	 (token-type (first token-type-and-value))
@@ -167,6 +169,21 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (unless (and (equalp token-type "Bearer")
 		 (rlgl.api-key:authorize-by-api-key *db* token-string))
       (error "Authorization error"))))
+|#
+
+(defun authorize-policy-bound-api-key (policy-name)
+  t)
+#|
+  (let* ((request hunchentoot:*request*)
+	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
+	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
+	 (token-type (first token-type-and-value))
+	 (token-string (second token-type-and-value)))
+    ;; Make sure that it is a bearer token
+    (unless (and (equalp token-type "Bearer")
+		 (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
+      (error "Authorization error"))))
+|#
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
@@ -346,31 +363,32 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	      ((null player)
 	       (error "ID missing"))
 	      (t
-	       (let* ((policy (make-policy policy-name))
-		      (doc (read-document *storage-driver* (cdr (assoc :REF json))))
-		      (filename (cdr (assoc :NAME json)))
-		      (parser (or (recognize-report doc)
-				  (when (str:ends-with? ".csv" filename)
-				    (make-instance 'parser/csv))))
-		      (tests (if parser
-				 (parse-report parser doc)
-				 (error "DOCUMENT not recognized"))))
-		 (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
-		 (progn
-		   (multiple-value-bind (red-or-green processed-results)
-		       (apply-policy policy tests)
-		     (let ((stream (make-string-output-stream)))
-		       (render stream (cdr (assoc :REF json)) processed-results
-			       (title parser)
-			       (commit-url-format policy))
-		       (let ((ref (store-document *storage-driver*
-						  (flexi-streams:string-to-octets
-						   (get-output-stream-string stream)))))
-			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
-			 (format nil "~A: ~A/doc?id=~A~%"
-				 red-or-green
-				 *server-uri*
-				 ref)))))))))))
+	       (when (authorize-policy-bound-api-key policy-name)
+		 (let* ((policy (make-policy policy-name))
+			(doc (read-document *storage-driver* (cdr (assoc :REF json))))
+			(filename (cdr (assoc :NAME json)))
+			(parser (or (recognize-report doc)
+				    (when (str:ends-with? ".csv" filename)
+				      (make-instance 'parser/csv))))
+			(tests (if parser
+				   (parse-report parser doc)
+				   (error "DOCUMENT not recognized"))))
+		   (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
+		   (progn
+		     (multiple-value-bind (red-or-green processed-results)
+			 (apply-policy policy tests)
+		       (let ((stream (make-string-output-stream)))
+			 (render stream (cdr (assoc :REF json)) processed-results
+				 (title parser)
+				 (commit-url-format policy))
+			 (let ((ref (store-document *storage-driver*
+						    (flexi-streams:string-to-octets
+						     (get-output-stream-string stream)))))
+			   (rlgl.db:record-log *db* player (version policy) red-or-green ref)
+			   (format nil "~A: ~A/doc?id=~A~%"
+				   red-or-green
+				   *server-uri*
+				   ref))))))))))))
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)

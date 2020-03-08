@@ -37,6 +37,7 @@
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
 	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer);"
+	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
 	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
 (defmethod record-log ((db db-backend) player version result report)
@@ -67,6 +68,12 @@
 			     (format nil "select puk from api_keys where api_key = '~A';" api-key)))
 	 (result (dbi:fetch (dbi:execute query))))
     (getf result :|puk|)))
+
+(defmethod find-policy-bound-api-key ((db db-backend) api-key)
+  (let* ((query (dbi:prepare (connect-cached db)
+			     (format nil "select policy_name from policy_bound_api_keys where api_key = '~A';" api-key)))
+	 (result (dbi:fetch (dbi:execute query))))
+    (getf result :|policy_name|)))
 
 (defmethod register-test-api-key ((db db-backend) api-key)
   (dbi:do-sql (connect-cached db)
