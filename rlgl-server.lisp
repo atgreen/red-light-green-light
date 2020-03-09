@@ -383,7 +383,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				     red-or-green
 				     *server-uri*
 				     ref))))))
-		   (log:error "Error authorizing for policy bound key: ~A" policy)))))))
+		   (log:error "Error authorizing for policy bound key: ~A" policy-name)))))))
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
