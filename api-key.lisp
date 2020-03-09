@@ -34,7 +34,6 @@
 (defun authorize-by-policy-bound-api-key (db api-key policy-name)
   "Return nil if API-KEY is bound to a policy that is not POLICY-NAME, and t otherwise."
   (let ((bound-policy (rlgl.db:find-policy-bound-api-key db api-key)))
-    (log:info "bound-policy is '~A'. policy-name is '~A'" bound-policy policy-name)
     (if bound-policy
 	(string= policy-name bound-policy)
 	t)))
