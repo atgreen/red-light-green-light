@@ -184,6 +184,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (setf snooze:*home-resource* :index)
 
+;; Readiness probe
+(snooze:defroute healthz (:get :text/*)
+  "ready")
+
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
     (with-html-string
