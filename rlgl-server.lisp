@@ -272,7 +272,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (rlgl.db:report-log *db* id))
 
 
-(snooze:defroute get-api-key2 (:get :text/html &key code)
+(snooze:defroute get-api-key2 (:get :text/html &key code session_state)
   (if code
       (let* ((token (flexi-streams:octets-to-string
 		     (drakma:http-request (str:concat *keycloak-oidc-realm-uri* "/protocol/openid-connect/token")
