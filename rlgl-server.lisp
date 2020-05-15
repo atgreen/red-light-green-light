@@ -718,6 +718,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (setf *github-oauth-client-secret*
 	  (or (uiop:getenv "GITHUB_OAUTH_CLIENT_SECRET")
 	      (get-config-value "github-oauth-client-secret")))
+    (setf *keycloak-oidc-client-id*
+	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
+	      (get-config-value "keycloak-oidc-client-id")))
+    (setf *keycloak-oidc-client-secret*
+	  (or (uiop:getenv "KEYLOAK_OIDC_CLIENT_SECRET")
+	      (get-config-value "keycloak-oidc-client-secret")))
+    (setf *keycloak-oidc-realm-uri*
+	  (or (uiop:getenv "KEYLOAK_OIDC_REALM_URI")
+	      (get-config-value "keycloak-oidc-realm-uri")))
 
     ;; Set up DB 
     ;;
