@@ -277,8 +277,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (let* ((token (flexi-streams:octets-to-string
 		     (drakma:http-request (str:concat *keycloak-oidc-realm-uri* "/protocol/openid-connect/token")
 					  :method :post
-					  :parameters `(("client_id" . *keycloak-oidc-client-id*)
-							("client_secret" . *keycloak-oidc-client-secret*)
+					  :parameters `(("client_id" . ,*keycloak-oidc-client-id*)
+							("client_secret" . ,*keycloak-oidc-client-secret*)
 							("grant_type" . "client_credentials")
 							("code" . ,(string code))))
 		     :external-format :utf-8))
