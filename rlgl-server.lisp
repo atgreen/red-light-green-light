@@ -347,7 +347,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 				 :crossorigin "anonymous"))
 	   (:script :attrs (emit-bootstrap.min.js)))))
       (let ((redirect-url
-	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2"
+	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2&response_type=code"
 		      *keycloak-oidc-realm-uri*
 		      *keycloak-oidc-client-id*
 		      *server-uri*)))
