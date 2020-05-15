@@ -280,14 +280,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 					  :parameters `(("client_id" . ,*keycloak-oidc-client-id*)
 							("client_secret" . ,*keycloak-oidc-client-secret*)
 							("grant_type" . "client_credentials")
+							("scope" . "openid")
 							("code" . ,(string code))))
 		     :external-format :utf-8))
 ;;;	     (info (flexi-streams:octets-to-string
-;;;		    (drakma:http-request (format nil "https://api.github.com/user?~A" token)
+;;;		    (drakma:http-request (str:concat *keycloak-oidc-realm-uri* "/protocol/openid-connect/userinfo" token)
 ;;;					 :method :get)))
+	     (ignore (log:info token))
 	     (info "foo")
 	     (user (rlgl.user:find-user-by-github-info *db* info)))
-	(log:info info)
 	
 	(with-html-string
 	    (:doctype)
