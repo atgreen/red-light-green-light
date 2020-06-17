@@ -79,6 +79,7 @@ tools introduces problems:
  - no centralized, auditable policy management
  - policies are locked within proprietary tools
 
+
 Policy Driven Quality Gates
 ------------------------------
 
