@@ -236,7 +236,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-linux-amd64.tgz" "rlgl command-line tool for 64-bit x86 Linux"))
 			    (:li (:a :href "cli/rlgl-linux-arm.tgz" "rlgl command-line tool for 64-bit ARM Linux"))
 			    (:li (:a :href "cli/rlgl-linux-ppc64le.tgz" "rlgl command-line tool for 64-bit Little-Endian Power Linux"))
-			    (:li (:a :href "cli/rlgl-linux-s390x.tgz" "rlgl command-line tool for s390x Linux"))
+<			    (:li (:a :href "cli/rlgl-linux-s390x.tgz" "rlgl command-line tool for s390x Linux"))
 			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)
@@ -760,6 +760,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			      :host (get-config-value "postgresql-host")
 			      :port (get-config-value "postgresql-port"))))))
   
+    (log:info "About to initialize storage")
+
     ;; Define the storage backend.
     ;;
     (setf *storage-driver*
@@ -768,6 +770,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	    (str:concat "rlgl-server:storage/"
 			(get-config-value "storage-driver")))))
     
+    (log:info "About to initialize policy-dir")
+
     ;; This is the directory where we check out policies.  Make sure it
     ;; ends with a trailing '/'.
     ;;
@@ -790,7 +794,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
   
+  (log:info "About to initialize metrics")
+
   (initialize-metrics)
+
+  (log:info "About to start server")
 
   (let ((srvr (start-server)))
     ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
