@@ -277,7 +277,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   ;;  (authorize)
   (rlgl.db:report-log *db* id))
 
-
 (snooze:defroute get-api-key2 (:get :text/html &key code session_state)
   (if code
       (let* ((token (flexi-streams:octets-to-string
@@ -663,6 +662,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      (setf hunchentoot:*dispatch-table* +rlgl-dispatch-table+)
      (setf prom:*default-registry* *rlgl-registry*)
      (let ((exposer (make-instance 'exposer-acceptor :registry *rlgl-registry* :port 9101)))
+       (log:info "About to start hunchentoot")
        (setf ,handler (hunchentoot:start (make-instance 'application
 							:document-root #p"./"
 							:port ,port
@@ -803,6 +803,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((srvr (start-server)))
     ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
     ;; testsuite.
+    (log:info "About to enter sleep loop")
     (when sleep-forever?
       (loop
 	 (sleep 3000)))
