@@ -339,7 +339,7 @@ token claims and token header"
 	  ;; FIXME - deal with bad logins
 	  (multiple-value-bind (headers claims)
 	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
-	    (let ((user (rlgl.user:find-user-by-oidc-info *db* claims)))
+	    (let ((user (rlgl.user:find-user-by-oidc-id *db* claims)))
 	      (with-html-string
 		(:doctype)
 		(:html
