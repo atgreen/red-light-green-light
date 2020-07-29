@@ -36,9 +36,9 @@
     u))
 
 (defun find-user-by-oidc-id (db id-json)
-  (let (user (rlgl.db:find-user-by-github-id db
-					     (cdr (assoc :SUB id-json))
-					     (cdr (assoc :NAME id-json))))
+  (let ((user (rlgl.db:find-user-by-github-id db
+					      (cdr (assoc :SUB id-json))
+					      (cdr (assoc :NAME id-json)))))
     user))
 
 (defun find-user-by-github-info (db github-user-info-string)
