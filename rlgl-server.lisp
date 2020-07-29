@@ -54,6 +54,7 @@ postgresql-port = 5432
 github-oauth-client-id = \"ignore\"
 github-oauth-client-secret = \"ignore\"
 keycloak-oidc-realm-uri = \"ignore\"
+keycloak-oidc-realm-redirect-uri = \"ignore\"
 keycloak-oidc-client-id = \"ignore\"
 keycloak-oidc-client-secret = \"ignore\"
 ")
@@ -336,6 +337,8 @@ token claims and token header"
 							  ("code" . ,(string-downcase code))))
 		       :external-format :utf-8))
 	       (json (json:decode-json-from-string token)))
+	  (log:info "token json string = ~A" token)
+	  (log:info "token json = ~A" json)
 	  ;; FIXME - deal with bad logins
 	  (multiple-value-bind (headers claims)
 	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
@@ -396,14 +399,14 @@ token claims and token header"
 		 (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
 				       :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
 				       :crossorigin "anonymous"))
-		 (:script :attrs (emit-bootstrap.min.js))))))
-	  (let ((redirect-url
-		  (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2&response_type=code&scope=openid%20profile%20email"
-			  *keycloak-oidc-realm-redirect-uri*
-			  *keycloak-oidc-client-id*
-			  *server-uri*)))
-	    (log:info redirect-url)
-	    (hunchentoot:redirect redirect-url))))))
+		 (:script :attrs (emit-bootstrap.min.js))))))))
+      (let ((redirect-url
+	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2&response_type=code&scope=openid%20profile%20email"
+		      *keycloak-oidc-realm-redirect-uri*
+		      *keycloak-oidc-client-id*
+		      *server-uri*)))
+	(log:info redirect-url)
+	(hunchentoot:redirect redirect-url))))
 
 (snooze:defroute get-api-key (:get :text/html &key code)
   (if code

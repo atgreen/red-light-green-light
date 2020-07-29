@@ -5,6 +5,7 @@ binary:
 		--asdf-tree `pwd`/.. \
 		--asdf-tree `pwd`/3rd-party/cl-dbi \
 		--asdf-tree `pwd`/3rd-party/cl-json-util \
+		--asdf-tree `pwd`/3rd-party/snooze-20190710-git \
 		--asdf-tree ~/quicklisp/dists/quicklisp/software \
 		--load-system rlgl-server \
 		--compress-core \
