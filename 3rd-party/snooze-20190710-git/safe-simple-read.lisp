@@ -21,7 +21,7 @@
 		   (values retval nread)))
 	      (t
 	       (values retval nread))))
-    (error
+    (error (e)
       (values nil nil))))
 
 (defun read-string (stream &optional (terminator #\") )
