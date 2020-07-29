@@ -48,6 +48,7 @@
 	       :local-time :cl-csv :prometheus
 	       :dbd-sqlite3 :zs3 :simple-date-time
 	       :drakma :uuid :cl-base32
+	       :split-sequence
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
 	       :prometheus.collectors.sbcl

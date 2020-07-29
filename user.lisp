@@ -35,6 +35,12 @@
     (setf (slot-value u 'name) login)
     u))
 
+(defun find-user-by-oidc-id (db id-json)
+  (let (user (rlgl.db:find-user-by-github-id db
+					     (cdr (assoc :SUB id-json))
+					     (cdr (assoc :NAME id-json))))
+    user))
+
 (defun find-user-by-github-info (db github-user-info-string)
   (let* ((user-json (json:decode-json-from-string github-user-info-string))
 	 (user (rlgl.db:find-user-by-github-id db

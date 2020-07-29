@@ -41,7 +41,7 @@
 (defpackage #:rlgl.user
   (:use #:cl)
   (:shadow #:package)
-  (:export #:make-github-user #:user-api-key #:user-name #:find-user-by-github-info))
+  (:export #:make-github-user #:user-api-key #:user-name #:find-user-by-oidc-id #:find-user-by-github-info))
 
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
