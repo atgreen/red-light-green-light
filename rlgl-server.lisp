@@ -318,7 +318,7 @@ token claims and token header"
 					    :parameters `(("client_id" . ,*keycloak-oidc-client-id*)
 							  ("client_secret" . ,*keycloak-oidc-client-secret*)
 							  ("grant_type" . "authorization_code")
-							  ("redirect_uri" . ,(format nil "~A/get-api-key2" *server-uri*))
+							  ("redirect_uri" . ,(format nil "~A/get-api-key" *server-uri*))
 							  ("scope" . "openid")
 							  ("code" . ,(string-downcase code))))
 		       :external-format :utf-8))
@@ -387,7 +387,7 @@ token claims and token header"
 				       :crossorigin "anonymous"))
 		 (:script :attrs (emit-bootstrap.min.js))))))))
       (let ((redirect-url
-	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2&response_type=code&scope=openid%20profile%20email"
+	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
 		      *server-uri*)))
