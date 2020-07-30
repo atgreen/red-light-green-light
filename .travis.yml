@@ -20,7 +20,7 @@ before_install:
   - (cd rlgl && make depend && make build)
   - mv rlgl/build/* cli
   - docker build -f Dockerfile --build-arg RLGL_VERSION="$(git describe --tags --dirty=+)" -t $REPO:latest .
-
+  - (cd keycloak-server-docker; docker build -f Dockerfile -t $REPO-keycloak:latest .)
 #  - make coveralls
 
 after_success:
@@ -29,5 +29,8 @@ after_success:
       docker tag $REPO:latest $REPO:$(git describe --tags --dirty=+);
       docker push $REPO:latest;
       docker push $REPO:$(git describe --tags --dirty=+);
+      docker tag $REPO-keycloak:latest $REPO:$(git describe --tags --dirty=+);
+      docker push $REPO-keycloak:latest;
+      docker push $REPO-keycloak:$(git describe --tags --dirty=+);
     fi
   - echo All done.
