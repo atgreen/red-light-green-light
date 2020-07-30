@@ -328,7 +328,7 @@ token claims and token header"
 	  (multiple-value-bind (headers claims)
 	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
 	    (log:info "id-token claims: ~A" claims)
-	    (let ((user (rlgl.user:find-user-by-oidc-id *db* claims)))
+	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
 	      (with-html-string
 		(:doctype)
 		(:html
@@ -349,7 +349,7 @@ token claims and token header"
 			 (:div :class "row"
 			       (:div :class "col"
 				     (:div :class "alert alert-warning alert-dismissible fade show" :role "alert"
-					   "You are logged in as KeyCloak user " (rlgl.user:user-name user) "."
+					   "You are logged in as user " (rlgl.user:user-name user) "."
 					   (:button :type "button"
 						    :class "close"
 						    :data-dismiss "alert"
