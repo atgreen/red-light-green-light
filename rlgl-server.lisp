@@ -51,8 +51,6 @@ db = \"sqlite\"
 sqlite-db-filename = \"/var/rlgl/rlgl.db\"
 postgresql-host = \"localhost\"
 postgresql-port = 5432
-github-oauth-client-id = \"ignore\"
-github-oauth-client-secret = \"ignore\"
 keycloak-oidc-realm-uri = \"ignore\"
 keycloak-oidc-realm-redirect-uri = \"ignore\"
 keycloak-oidc-client-id = \"ignore\"
@@ -60,8 +58,6 @@ keycloak-oidc-client-secret = \"ignore\"
 ")
 
 (defvar *server-uri* nil)
-(defvar *github-oauth-client-id* nil)
-(defvar *github-oauth-client-secret* nil)
 (defvar *keycloak-oidc-realm-redirect-uri* nil)
 (defvar *keycloak-oidc-realm-uri* nil)
 (defvar *keycloak-oidc-client-id* nil)
@@ -312,17 +308,7 @@ token claims and token header"
       (setf *c* claims)
       (values headers claims))))
 
-(snooze:defroute callback (:get :text/html &key code session_state)
-  (let ((redirect-url
-	  (format nil "~A/protocol/openid-connect/token?client_id=~A&redirect_uri=~A/get-api-key2&code=~A"
-		  *keycloak-oidc-realm-redirect-uri*
-		  *keycloak-oidc-client-id*
-		  *server-uri*
-		  (string code))))
-    (log:info redirect-url)
-    (hunchentoot:redirect redirect-url)))
-
-(snooze:defroute get-api-key2 (:get :text/html &key code session_state)
+(snooze:defroute get-api-key (:get :text/html &key code session_state)
   (if code
       (progn
 	(log:info "Got a code: ~A" (string-downcase code))
@@ -337,11 +323,11 @@ token claims and token header"
 							  ("code" . ,(string-downcase code))))
 		       :external-format :utf-8))
 	       (json (json:decode-json-from-string token)))
-	  (log:info "token json string = ~A" token)
 	  (log:info "token json = ~A" json)
 	  ;; FIXME - deal with bad logins
 	  (multiple-value-bind (headers claims)
 	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
+	    (log:info "id-token claims: ~A" claims)
 	    (let ((user (rlgl.user:find-user-by-oidc-id *db* claims)))
 	      (with-html-string
 		(:doctype)
@@ -404,90 +390,6 @@ token claims and token header"
 	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key2&response_type=code&scope=openid%20profile%20email"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
-		      *server-uri*)))
-	(log:info redirect-url)
-	(hunchentoot:redirect redirect-url))))
-
-(snooze:defroute get-api-key (:get :text/html &key code)
-  (if code
-      (let* ((token (flexi-streams:octets-to-string
-		     (drakma:http-request "https://github.com/login/oauth/access_token"
-					  :method :post
-					  :parameters `(("client_id" . ,*github-oauth-client-id*)
-							("client_secret" . ,*github-oauth-client-secret*)
-							("code" . ,(string code))))
-		     :external-format :utf-8))
-	     (info (flexi-streams:octets-to-string
-		    (drakma:http-request (format nil "https://api.github.com/user?~A" token)
-					 :method :get)))
-	     (user (rlgl.user:find-user-by-github-info *db* info)))
-	(log:info info)
-	(with-html-string
-	    (:doctype)
-	  (:html
-	   (:head
-	    (:meta :charset "utf-8")
-	    (:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
-	    (:link :rel "apple-touch-icon" :sizes "180x180" :href "images/apple-touch-icon.png")
-	    (:link :rel "icon" :type "image/png" :sizes "32x32" :href "images/favicon-32x32.png")
-	    (:link :rel "icon" :type "image/png" :sizes "16x16" :href "images/favicon-16x16.png")
-	    (:link :rel "manifest" :href "images/site.webmanifest")
-	    (:link :rel "mask-icon" :href "images/safari-pinned-tab.svg" :color "#5bbad5")
-	    (:meta :name "msapplication-TileColor" :content "#da532c")
-	    (:meta :name "theme-color" :content "#ffffff")
-	    (:title "Red Light Green Light")
-	    (:link :rel "stylesheet" :href "css/rlgl.css")
-	    (:link :attrs (emit-bootstrap.min.css))
-	    (:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
-	   (:body
-	    (:header
-	     (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
-		   (:a :class "navbar-brand"
-		       :href "https://github.com/atgreen/red-light-green-light" "Red Light Green Light")))
-	    (:main :role "main" :class "container"
-		   (:div :class "row"
-			 (:div :class "col"
-			       (:div :class "alert alert-warning alert-dismissible fade show" :role "alert"
-				     "You are logged in as GitHub user " (rlgl.user:user-name user) "."
-				     (:button :type "button"
-					      :class "close"
-					      :data-dismiss "alert"
-					      :aria-label "Close"
-					      (:span :aria-hidden "true"
-						     "X")))
-			       (:div :style "width:100px"
-				     (:div :class "rlgl-svg"))
-			       (:h1 :class "mt-5" "Your personal API key")
-			       (:br)
-			       "Your personal API key is "
-			       (:b (rlgl.user:user-api-key user) ".")
-			       (:br)
-			       (:br)
-			       "Use the following command to login to this server:"
-			       (:pre
-				(format nil "rlgl login --key ~A ~A"
-					(rlgl.user:user-api-key user)
-					*server-uri*))
-  			       (:br)
-			       (:hr)
-			       "Red Light Green Light was written by Anthony Green " 
-			       (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
-			       " and is available in source form under the terms of the AGPLv3 license from "
-			       (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
-			       )))
-	    (:footer :class "page-footer font-small special-color-dark pt-4"
-		     (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
-			   (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
-	   (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
-				 :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-				 :crossorigin "anonymous"))
-	   (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-				 :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-				 :crossorigin "anonymous"))
-	   (:script :attrs (emit-bootstrap.min.js)))))
-      (let ((redirect-url
-	      (format nil "https://github.com/login/oauth/authorize?client_id=~A&redirect_uri=~A/get-api-key"
-		      *github-oauth-client-id*
 		      *server-uri*)))
 	(log:info redirect-url)
 	(hunchentoot:redirect redirect-url))))
@@ -778,12 +680,6 @@ token claims and token header"
     (unless (rlgl.util:valid-url? *server-uri*)
       (error "server-uri is not valid URL: ~A" *server-uri*))
 
-    (setf *github-oauth-client-id*
-	  (or (uiop:getenv "GITHUB_OAUTH_CLIENT_ID")
-	      (get-config-value "github-oauth-client-id")))
-    (setf *github-oauth-client-secret*
-	  (or (uiop:getenv "GITHUB_OAUTH_CLIENT_SECRET")
-	      (get-config-value "github-oauth-client-secret")))
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
 	      (get-config-value "keycloak-oidc-client-id")))

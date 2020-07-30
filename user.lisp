@@ -24,26 +24,16 @@
    (api-key :reader user-api-key)
    (name :reader user-name)))
 
-(defclass github-user (user)
-  ())
-
-(defun make-github-user (id uuid api-key login)
-  (let ((u (make-instance 'github-user)))
+(defun make-user (id uuid api-key login)
+  (let ((u (make-instance 'user)))
     (setf (slot-value u 'id) id)
     (setf (slot-value u 'uuid) uuid)
     (setf (slot-value u 'api-key) api-key)
     (setf (slot-value u 'name) login)
     u))
 
-(defun find-user-by-oidc-id (db id-json)
-  (let ((user (rlgl.db:find-user-by-github-id db
-					      (cdr (assoc :SUB id-json))
-					      (cdr (assoc :NAME id-json)))))
-    user))
-
-(defun find-user-by-github-info (db github-user-info-string)
-  (let* ((user-json (json:decode-json-from-string github-user-info-string))
-	 (user (rlgl.db:find-user-by-github-id db
-					       (cdr (assoc :ID user-json))
-					       (cdr (assoc :LOGIN user-json)))))
+(defun find-user-by-keycloak-id-token (db id-json)
+  (let ((user (rlgl.db:find-user-by-keycloak-id db
+						(cdr (assoc :SUB id-json))
+						(cdr (assoc :NAME id-json)))))
     user))

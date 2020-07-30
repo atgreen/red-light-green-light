@@ -79,9 +79,9 @@
   (dbi:do-sql (connect-cached db)
     (format nil "insert into api_keys(puk, api_key) values (-1, '~A');" api-key)))
 
-(defmethod find-user-by-github-id ((db db-backend) github-user-id github-user-login)
+(defmethod find-user-by-keycloak-id ((db db-backend) user-uuid preferred-username)
   (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select puk, user_uuid from users where github_id = '~A';" github-user-id)))
+			     (format nil "select puk from users where user_uuid = '~A';" user-uuid)))
 	 (result (dbi:fetch (dbi:execute query)))
 	 (user (let ((puk (getf result :|puk|)))
 		 (log:info "found user puk ~A" puk)
@@ -91,19 +91,18 @@
 			     (junk (log:info (dbi:fetch (dbi:execute query))))
 			     (api-key (getf (dbi:fetch (dbi:execute query)) :|api_key|)))
 			(log:info "~A" result)
-			(rlgl.user:make-github-user puk (getf result :|user_uuid|) api-key github-user-login))))))
+			(rlgl.user:make-user puk user-uuid api-key preferred-username))))))
     (if (null user)
-	(let ((user-uuid (uuid:make-v4-uuid)))
+	(progn
 	  (log:info "registering new user ~A" user-uuid)
 	  (dbi:do-sql (connect-cached db)
-	    (format nil "insert into users(user_uuid, github_id, created_at) values ('~A', '~A', ~A);"
-		    user-uuid github-user-id
-		    (local-time:timestamp-to-unix (local-time:now))))
+	    (format nil "insert into users(user_uuid, created_at) values ('~A', ~A);"
+		    user-uuid (local-time:timestamp-to-unix (local-time:now))))
 	  (let* ((query (dbi:prepare (connect-cached db)
-				     (format nil "select puk from users where github_id = ~A;" github-user-id)))
+				     (format nil "select puk from users where user_uuid = '~A';" user-uuid)))
 		 (newpuk (getf (dbi:fetch (dbi:execute query)) :|puk|)))
 	    (log:info "created user puk ~A" newpuk)
 	    (dbi:do-sql (connect-cached db)
 	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (rlgl.api-key:make-api-key))))
-	  (find-user-by-github-id db github-user-id github-user-login))
+	  (find-user-by-keycloak-id db user-uuid preferred-username))
 	user)))

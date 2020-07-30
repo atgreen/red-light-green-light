@@ -36,7 +36,7 @@
   (let ((dbc (connect-cached db)))
       (mapc (lambda (command)
 	      (dbi:do-sql dbc command))
-	    '("create table if not exists users (puk integer primary key autoincrement, user_id char(36) not null, github_id integer, created_at integer, unique(user_id));"))))
+	    '("create table if not exists users (puk integer primary key autoincrement, user_uuid char(36) not null, created_at integer, unique(user_uuid));"))))
 
 (defmethod connect-cached ((db db/sqlite))
   (dbi:connect-cached :sqlite3 :database-name (filename db)))
