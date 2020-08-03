@@ -56,7 +56,8 @@
 	    (port db))
   (log:info "postgresql host IP: ~A"
 	    (sb-bsd-sockets:get-host-by-name (host db)))
-  (log:info "postgresql password: ~A" (password db))
+  (log:info "postgresql password: '~A'" (password db))
+  (log:info "postgresql password: '~S'" (password db))
   (dbi:connect-cached :postgres :database-name (db-name db)
 				:host (host db)
 				:port (port db)
