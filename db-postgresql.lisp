@@ -30,6 +30,9 @@
    (port
     :initarg :port
     :reader port)
+   (password
+    :initarg :password
+    :reader password)
    (fresh
     :initarg :fresh
     :initform nil
@@ -56,4 +59,4 @@
   (dbi:connect-cached :postgres :database-name (db-name db)
 				:host (host db)
 				:port (port db)
-				:username "rlgl" :password "c0p0$g0g0"))
+				:username "rlgl" :password (password db)))

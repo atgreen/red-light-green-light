@@ -703,6 +703,8 @@ token claims and token header"
 			      :filename (get-config-value "sqlite-db-filename")))
 	      ("postgresql"
 	       (make-instance 'rlgl.db:db/postgresql
+			      :password (or (uiop:getenv "POSTGRESQL_PASSWORD")
+					    (get-config-value "postgresql-password"))
 			      :host (get-config-value "postgresql-host")
 			      :port (get-config-value "postgresql-port"))))))
   
