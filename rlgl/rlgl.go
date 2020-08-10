@@ -372,16 +372,13 @@ func main() {
 		},
 		{
 			Name:  "baseline",
+			Aliases: []string{"b"},
 			Usage: "generate baseline XFAIL regression policy",
 
 			Action: func(c *cli.Context) error {
 
 				if config.Host == "" {
 					exitErr(fmt.Errorf("Login to server first"))
-				}
-
-				if player == "" {
-					exitErr(fmt.Errorf("Missing player ID"))
 				}
 
 				if c.NArg() == 0 {
