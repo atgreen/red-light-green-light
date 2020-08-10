@@ -371,6 +371,43 @@ func main() {
 			},
 		},
 		{
+			Name:  "baseline",
+			Usage: "generate baseline XFAIL regression policy",
+
+			Action: func(c *cli.Context) error {
+
+				if config.Host == "" {
+					exitErr(fmt.Errorf("Login to server first"))
+				}
+
+				if player == "" {
+					exitErr(fmt.Errorf("Missing player ID"))
+				}
+
+				if c.NArg() == 0 {
+				   exitErr(fmt.Errorf("Missing report argument"))
+				} else if c.NArg() > 1 {
+				   exitErr(fmt.Errorf("Too may arguments"))
+				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
+
+				response, err := http.Get(fmt.Sprintf("%s/get-regression-policy?id=\"%s\"", config.Host, c.Args().First()));
+
+				if err != nil {
+					exitErr(err)
+				}
+
+				responseData, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Print(string(responseData))
+
+				return nil
+			},
+		},
+		{
 			Name:    "evaluate",
 			Aliases: []string{"e"},
 			Usage:   "evaluate test results",
