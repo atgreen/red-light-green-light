@@ -275,9 +275,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   ;;  (authorize)
   (rlgl.db:report-log *db* id))
 
-(defvar *h* nil)
-(defvar *c* nil)
-
 (defun base64-decode (base-64-string)
   "Takes a base64-uri string and return an array of octets"
   (cl-base64:base64-string-to-usb8-array
@@ -304,9 +301,31 @@ token claims and token header"
 		     (base64-decode
 		      claims-string)
 		     :external-format :utf-8))))
-      (setf *h* headers)
-      (setf *c* claims)
       (values headers claims))))
+
+(snooze:defroute get-regression-policy (:get :text &key id)
+  (authorize)
+  (let* ((doc
+	   (handler-case
+	       (flexi-streams:octets-to-string
+		(read-document *storage-driver* id)
+		:external-format :utf-8)
+	     (error (c)
+	       (log:error "~A" c)
+	       (rlgl.util:read-file-into-string "missing-doc.html"))))
+	 (stream (make-string-output-stream)))
+    (loop with index = 0
+	  for pos = (search "<td>FAIL" doc :start2 index)
+	  when pos do (setf index (+ 1 pos))
+	  when pos do (let ((start (+ 1(search "{" doc :start2 pos)))
+			    (end (search "}</pre>" doc :start2 pos)))
+			(format stream "{ ~A }~%"
+				(string-trim " "
+					     (cl-ppcre:regex-replace-all
+					      "    "
+					      (substitute #\SPACE #\NEWLINE (subseq doc start end)) ""))))
+	  while pos)
+    (get-output-stream-string stream)))
 
 (snooze:defroute get-api-key (:get :text/html &key code session_state)
   (if code
