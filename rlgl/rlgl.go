@@ -409,7 +409,7 @@ func main() {
 					log.Fatal(err)
 				}
 
-				fmt.Print(string(response))
+				fmt.Print(string(responseData))
 
 				return nil
 			},
