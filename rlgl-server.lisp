@@ -305,6 +305,9 @@ token claims and token header"
 
 (snooze:defroute get-baseline-xfail-policy (:get :text &key id)
   (authorize)
+  ;; Accept full URLs, in which case we extract the document id from the end.
+  (when (str:starts-with? *server-uri* id)
+    (setf id (str:substr (- (length id) 13) nil id)))
   (handler-case
       (let ((doc
 	      (flexi-streams:octets-to-string
