@@ -305,30 +305,31 @@ token claims and token header"
 
 (snooze:defroute get-baseline-xfail-policy (:get :text &key id)
   (authorize)
-  ;; Accept full URLs, in which case we extract the document id from the end.
-  (when (str:starts-with? *server-uri* id)
-    (setf id (str:substring (- (length id) 13) nil id)))
-  (handler-case
-      (let ((doc
-	      (flexi-streams:octets-to-string
-	       (read-document *storage-driver* id)
-	       :external-format :utf-8))
-	    (stream (make-string-output-stream)))
-	(loop with index = 0
-	      for pos = (search "<td>FAIL" doc :start2 index)
-	      when pos do (setf index (+ 1 pos))
-	      when pos do (let ((start (+ 1 (search "{" doc :start2 pos)))
-				(end (search "}</pre>" doc :start2 pos)))
-			    (format stream "{ ~A }~%"
-				    (string-trim " "
-						 (cl-ppcre:regex-replace-all
-						  "    "
-						  (substitute #\SPACE #\NEWLINE (subseq doc start end)) ""))))
-	      while pos)
-	(get-output-stream-string stream))
-    (error (c)
-      (log:error "~A" c)
-      (format nil "# Could not generate baseline regression policy for ~A~%" id))))
+  (let ((id (string id)))
+    ;; Accept full URLs, in which case we extract the document id from the end.
+    (when (str:starts-with? *server-uri* id)
+      (setf id (str:substring (- (length id) 13) nil id)))
+    (handler-case
+	(let ((doc
+		(flexi-streams:octets-to-string
+		 (read-document *storage-driver* id)
+		 :external-format :utf-8))
+	      (stream (make-string-output-stream)))
+	  (loop with index = 0
+		for pos = (search "<td>FAIL" doc :start2 index)
+		when pos do (setf index (+ 1 pos))
+		when pos do (let ((start (+ 1 (search "{" doc :start2 pos)))
+				  (end (search "}</pre>" doc :start2 pos)))
+			      (format stream "{ ~A }~%"
+				      (string-trim " "
+						   (cl-ppcre:regex-replace-all
+						    "    "
+						    (substitute #\SPACE #\NEWLINE (subseq doc start end)) ""))))
+		while pos)
+	  (get-output-stream-string stream))
+      (error (c)
+	(log:error "~A" c)
+	(format nil "# Could not generate baseline regression policy for ~A~%" id)))))
 
 (snooze:defroute get-api-key (:get :text/html &key code session_state)
   (if code
