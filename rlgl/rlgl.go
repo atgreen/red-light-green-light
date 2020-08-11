@@ -389,13 +389,16 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth);
 
-				response, err := http.Get(fmt.Sprintf("%s/get-regression-policy?id=\"%s\"", config.Host, c.Args().First()));
-
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-regression-policy?id=%s", config.Host, c.Args().First()));
 				if err != nil {
-					exitErr(err)
+					log.Fatal(err)
 				}
+				var bearer = "Bearer " + config.Key;
+				request.Header.Add("Authorization", bearer)
+				request.Header.Add("Content-Type", "text");
+				client := &http.Client{}
+				response, err := client.Do(request)
 
-				responseData, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
