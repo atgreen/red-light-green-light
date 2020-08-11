@@ -389,7 +389,7 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth);
 
-				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-regression-policy?id=%s", config.Host, c.Args().First()));
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-regression-policy?id=%s", config.Host, c.Args().First()), nil);
 				if err != nil {
 					log.Fatal(err)
 				}
