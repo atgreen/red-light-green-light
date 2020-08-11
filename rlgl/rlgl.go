@@ -402,7 +402,14 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				fmt.Print(string(responseData))
+				defer response.Body.Close()
+				
+				responseData, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Print(string(response))
 
 				return nil
 			},
