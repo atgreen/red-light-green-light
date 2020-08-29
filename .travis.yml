@@ -7,7 +7,7 @@ services:
   - docker
 
 env:
-  GO111MODULES=on
+  GO111MODULE=on
   LISP=sbcl
   REPO=moxielogic/rlgl-server
 
