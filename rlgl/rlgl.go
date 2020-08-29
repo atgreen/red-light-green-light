@@ -226,25 +226,25 @@ func main() {
 
 	app := cli.NewApp()
 
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		{
 			Name:    "login",
 			Aliases: []string{"l"},
 			Usage:   "login to Red Light Green Light server",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "key",
 					Value:       "",
 					Usage:       "API key",
 					Destination: &key,
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "proxy",
 					Value:       "",
 					Usage:       "proxy URL (eg. http://HOST:PORT)",
 					Destination: &proxy,
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "proxy-auth",
 					Value:       "",
 					Usage:       "proxy basic authentication (eg. USERNAME:PASSWORD)",
@@ -329,7 +329,7 @@ func main() {
 			Name:  "log",
 			Usage: "log evaluations",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "id",
 					Value:       "",
 					Usage:       "player ID",
@@ -389,6 +389,10 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth);
 
+				if !strings.HasPrefix(c.Args().First(), "RLGL-") {
+				   exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()));
+				}
+
 				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-baseline-xfail-policy?id=%s", config.Host, c.Args().First()), nil);
 				if err != nil {
 					log.Fatal(err)
@@ -419,19 +423,19 @@ func main() {
 			Aliases: []string{"e"},
 			Usage:   "evaluate test results",
 			Flags: []cli.Flag{
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "policy",
 					Value:       "",
 					Usage:       "evaluation policy",
 					Destination: &policy,
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "id",
 					Value:       "",
 					Usage:       "player ID",
 					Destination: &player,
 				},
-				cli.StringFlag{
+				&cli.StringFlag{
 					Name:        "title",
 					Value:       "",
 					Usage:       "report title",
@@ -511,8 +515,8 @@ func main() {
 	app.Version = VERSION
 	app.Copyright = "(c) 2018-2020 Anthony Green"
 	app.Compiled = time.Now()
-	app.Authors = []cli.Author{
-		cli.Author{
+	app.Authors = []*cli.Author{
+		&cli.Author{
 			Name:  "Anthony Green",
 			Email: "green@moxielogic.com",
 		},
