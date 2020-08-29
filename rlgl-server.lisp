@@ -204,7 +204,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(:link :rel "icon" :type "image/png" :sizes "32x32" :href "images/favicon-32x32.png")
 	(:link :rel "icon" :type "image/png" :sizes "16x16" :href "images/favicon-16x16.png")
 	(:link :rel "manifest" :href "images/site.webmanifest")
-	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg" :color "#5bbad5")
+	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg")
 	(:meta :name "msapplication-TileColor" :content "#da532c")
 	(:meta :name "theme-color" :content "#ffffff")
         (:title "Red Light Green Light")
@@ -469,7 +469,8 @@ token claims and token header"
   (authorize)
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
-	     (doc (rlgl.util:read-file-into-vector fpath)))
+	     (doc (alexandria:read-file-into-byte-vector
+		   (rlgl.util:make-absolute-pathname fpath))))
 	(store-document *storage-driver* doc))
     (error (c)
       (log:error "~A" c)
@@ -482,7 +483,8 @@ token claims and token header"
 			 :external-format :utf-8)
 	    (error (c)
 	      (log:error "~A" c)
-	      (rlgl.util:read-file-into-string "missing-doc.html")))))
+	      (alexandria:read-file-into-string
+	       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
     (if (str:starts-with? "<" report)
 	report
 	(format nil "<html><pre>~A</pre></html>" report))))
@@ -532,7 +534,7 @@ token claims and token header"
 	(:link :rel "icon" :type "image/png" :sizes "32x32" :href "images/favicon-32x32.png")
 	(:link :rel "icon" :type "image/png" :sizes "16x16" :href "images/favicon-16x16.png")
 	(:link :rel "manifest" :href "images/site.webmanifest")
-	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg" :color "#5bbad5")
+	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg")
 	(:meta :name "msapplication-TileColor" :content "#da532c")
 	(:meta :name "theme-color" :content "#ffffff")
 	(:title "Red Light Green Light Report")
@@ -684,7 +686,8 @@ token claims and token header"
   (setf *config*
 	(if (fad:file-exists-p "/etc/rlgl/config.ini")
 	    (cl-toml:parse
-	     (rlgl.util:read-file-into-string "/etc/rlgl/config.ini"))
+	     (alexandria:read-file-into-string "/etc/rlgl/config.ini"
+					       :external-format :latin-1))
 	    (make-hash-table)))
 
   (flet ((get-config-value (key)

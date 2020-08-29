@@ -47,7 +47,8 @@
   (log:info "Initializing storage/local")
   (let ((filename (format nil "~A/.key" (local-dir backend))))
     (if (probe-file filename)
-	(setf (slot-value backend 'key) (rlgl.util:read-file-into-string filename))
+	(setf (slot-value backend 'key)
+	      (alexandria:read-file-into-string filename :external-format :latin-1))
 	(let ((key (generate-random-string)))
 	  (with-open-file (stream filename
 				  :direction :output
@@ -58,8 +59,7 @@
 
 (defmethod read-document ((backend storage/local) ref)
   "Return an octet vector containing the document."
-  (rlgl.util:read-file-into-vector
-   (format nil "~A/~A" (local-dir backend) ref)))
+  (alexandria:read-file-into-byte-vector (format nil "~A/~A" (local-dir backend) ref)))
 
 (defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."

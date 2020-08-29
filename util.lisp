@@ -21,8 +21,7 @@
   (:shadow #:package)
   (:export #:random-hex-string
 	   #:valid-url?
-	   #:read-file-into-string
-	   #:read-file-into-vector
+	   #:make-absolute-pathname
 	   #:escape-json-string))
 
 (in-package #:rlgl.util)
@@ -36,34 +35,12 @@
 
 (defparameter +root-path+ (asdf:component-pathname (asdf:find-system "rlgl-server")))
 
-(defun read-file-into-string (filename)
-  "Read FILENAME into a string and return that.
-   If filename is not an absolute path, find it relative to the
-   rlgl-server system (provided by asdf)."
-  (let ((absolute-filename (if (cl-fad:pathname-absolute-p filename)
-			       filename
-			       (merge-pathnames +root-path+ filename))))
-    (with-open-file (stream absolute-filename :external-format :latin-1)
-      (let ((contents (make-string (file-length stream))))
-	(read-sequence contents stream)
-	contents))))
-
-(defun read-file-into-vector (filename)
-  "Read FILENAME into a octet vector and return that.
-   If filename is not an absolute path, find it relative to the
-   rlgl-server system (provided by asdf)."
-  (let ((absolute-filename (if (cl-fad:pathname-absolute-p filename)
-			       filename
-			       (merge-pathnames +root-path+ filename))))
-    (let ((stream (open absolute-filename :element-type '(unsigned-byte 8))))
-      (unwind-protect
-	   (progn
-	     (let ((contents (make-array (file-length stream)
-					 :element-type '(unsigned-byte 8))))
-	       (read-sequence contents stream)
-	       contents))
-	(when stream
-	  (close stream))))))
+(defun make-absolute-pathname (pathname)
+  "Return an absolute pathname.  If PATHNAME is relative, make it
+   relative to the rlgl-server system (provided by asdf)."
+  (if (cl-fad:pathname-absolute-p pathname)
+      pathname
+      (merge-pathnames +root-path+ pathname)))
 
 (defun valid-url? (string)
   "Returns T if STRING is a valid http or https url."
