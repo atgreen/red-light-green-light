@@ -18,7 +18,7 @@ go:
 before_install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
     |  bash
-  - (cd rlgl && make depend && make build)
+  - (cd rlgl && make build)
   - mv rlgl/build/* cli
   - docker build -f Dockerfile --build-arg RLGL_VERSION="$(git describe --tags --dirty=+)" -t $REPO:latest .
   - (cd keycloak-server-docker; docker build -f Dockerfile -t $REPO-keycloak:latest .)
