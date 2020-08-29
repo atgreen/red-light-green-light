@@ -13,7 +13,7 @@ env:
 
 language: go
 go:
-- 1.11
+- 1.14
 
 before_install:
   - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
