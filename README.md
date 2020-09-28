@@ -46,11 +46,11 @@ Generate and inspect a player ID, like so...
 Generate an OpenSCAP report, or grab one from here:
 
     $ curl https://raw.githubusercontent.com/atgreen/red-light-green-light/master/test/report.html > report.html
-    
+
 Evaluate the report against a sample policy:
 
     $ rlgl evaluate --id=$ID --policy=http://github.com/atgreen/test-policy report.html
-    
+
 Click on the resulting URL and explore.  Try forking the test policy
 report and making changes.
 
@@ -64,8 +64,8 @@ Problem Statement
 
 Modern DevOps pipelines require Quality Gating mechanisms in order to
 fully automate the promotion of software artifacts from dev all the
-way through to prod.  These Quality Gates are responsible for deciding
-whether or not a deployable artifact (config files, software builds,
+way through to prod. These Quality Gates are responsible for deciding
+whether a deployable artifact (config files, software builds,
 container images, VM images, etc) should proceed to the next stage of
 a CI/CD pipeline.
 
@@ -139,7 +139,7 @@ GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F
 $ rlgl evaluate --policy https://git.example.com/policy/prod.git --id $ID oval-scan.xml
 RED: http://rlgl-server.example.com/RLGL-1CF5B3A
 ```
-   
+
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/rel.git --id $ID gcc.log
 GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2
@@ -149,7 +149,7 @@ Standard exit codes make it easy to integrate `rlgl` into your CI/CD
 pipeline scripts.  `GREEN` lights have an exit code of 0.  `RED`
 lights have an exit code of 1.  Any other exit code is an error.
 
-That's it!   The client side is very easy.   
+That's it!   The client side is very easy.
 
 The server side, where policy is evaluated, is where the magic is.
 
