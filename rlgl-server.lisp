@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -62,6 +62,9 @@ keycloak-oidc-client-secret = \"ignore\"
 (defvar *keycloak-oidc-realm-uri* nil)
 (defvar *keycloak-oidc-client-id* nil)
 (defvar *keycloak-oidc-client-secret* nil)
+
+(defvar *matomo-uri* nil)
+(defvar *matomo-idsite* nil)
 
 ;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
@@ -194,7 +197,16 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
-    (with-html-string
+  (when *matomo-uri*
+    (let* ((request hunchentoot:*request*))
+      (drakma:http-request *matomo-uri*
+                           :method :post
+                           :parameters `(("idsite" . ,*matomo-idsite*)
+                                         ("ua" . ,(hunchentoot:user-agent request))
+                                         ("rec" . "1")
+                                         ("apiv" . "1"))
+                           :external-format :utf-8)))
+  (with-html-string
       (:doctype)
       (:html
        (:head
@@ -247,7 +259,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:br)
 			   (:br)
 			   (:hr)
-			   "Red Light Green Light was written by Anthony Green " 
+			   "Red Light Green Light was written by Anthony Green "
 			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
 			   " and is available in source form under the terms of the AGPLv3 license from "
 			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
@@ -394,7 +406,7 @@ token claims and token header"
 					      *server-uri*))
 				     (:br)
 				     (:hr)
-				     "Red Light Green Light was written by Anthony Green " 
+				     "Red Light Green Light was written by Anthony Green "
 				     (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
 				     " and is available in source form under the terms of the AGPLv3 license from "
 				     (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
@@ -675,9 +687,9 @@ token claims and token header"
   ;; we run in a container without a known user unless...
   (sb-posix:setenv "GIT_COMMITTER_NAME" "rlgl" 1)
   (sb-posix:setenv "GIT_COMMITTER_EMAIML" "rlgl@example.com" 1)
-  
+
   (log:info "Starting rlgl-server version ~A" +rlgl-version+)
-  
+
   ;; Read the built-in configuration settings.
   (setf *default-config* (cl-toml:parse +default-config-text+))
   (log:info +default-config-text+)
@@ -700,12 +712,18 @@ token claims and token header"
 	     (if (subtypep (type-of value) 'vector)
 		 (coerce value 'simple-string)
 		 value))))
-  
+
     (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 			   (get-config-value "server-uri")))
     (unless (rlgl.util:valid-url? *server-uri*)
       (error "server-uri is not valid URL: ~A" *server-uri*))
 
+    (setf *matomo-uri*
+          (or (uiop:getenv "MATOMO_URI")
+              (get-config-value "matomo-uri")))
+    (setf *matomo-idsite*
+          (or (uiop:getenv "MATOMO_IDSITE")
+              (get-config-value "matomo-idsite")))
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
 	      (get-config-value "keycloak-oidc-client-id")))
@@ -719,13 +737,13 @@ token claims and token header"
 	  (or (uiop:getenv "KEYLOAK_OIDC_REALM_URI")
 	      (get-config-value "keycloak-oidc-realm-uri")))
 
-    ;; Set up DB 
+    ;; Set up DB
     ;;
     (setf *db*
 	  (let ((db (get-config-value "db")))
 	    (alexandria:eswitch (db :test #'equal)
 	      ("sqlite"
-	       (make-instance 'rlgl.db:db/sqlite 
+	       (make-instance 'rlgl.db:db/sqlite
 			      :filename (get-config-value "sqlite-db-filename")))
 	      ("postgresql"
 	       (make-instance 'rlgl.db:db/postgresql
@@ -733,7 +751,7 @@ token claims and token header"
 					    (get-config-value "postgresql-password"))
 			      :host (get-config-value "postgresql-host")
 			      :port (get-config-value "postgresql-port"))))))
-  
+
     (log:info "About to initialize storage")
 
     ;; Define the storage backend.
@@ -743,7 +761,7 @@ token claims and token header"
 	   (read-from-string
 	    (str:concat "rlgl-server:storage/"
 			(get-config-value "storage-driver")))))
-    
+
     (log:info "About to initialize policy-dir")
 
     ;; This is the directory where we check out policies.  Make sure it
@@ -764,10 +782,10 @@ token claims and token header"
 	    (rlgl.db:register-test-api-key *db* test-api-key)))
       (error ()
 	nil)))
-    
+
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
-  
+
   (log:info "About to initialize metrics")
 
   (initialize-metrics)
