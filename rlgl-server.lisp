@@ -728,7 +728,7 @@ token claims and token header"
     (setf *matomo-idsite*
           (or (uiop:getenv "MATOMO_IDSITE")
               (get-config-value "matomo-idsite")))
-    (setf *matomo-idsite*
+    (setf *matomo-token-auth*
           (or (uiop:getenv "MATOMO_TOKEN_AUTH")
               (get-config-value "matomo-token-auth")))
     (setf *keycloak-oidc-client-id*
