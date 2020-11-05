@@ -744,6 +744,7 @@ token claims and token header"
 	  (or (uiop:getenv "KEYLOAK_OIDC_REALM_URI")
 	      (get-config-value "keycloak-oidc-realm-uri")))
 
+
     ;; Set up DB
     ;;
     (setf *db*
