@@ -65,6 +65,7 @@ keycloak-oidc-client-secret = \"ignore\"
 
 (defvar *matomo-uri* nil)
 (defvar *matomo-idsite* nil)
+(defvar *matomo-token-auth* nil)
 
 ;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
@@ -202,7 +203,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       (drakma:http-request *matomo-uri*
                            :method :post
                            :parameters `(("idsite" . ,*matomo-idsite*)
+                                         ("token_auth" . ,*matomo-token-auth*)
                                          ("ua" . ,(hunchentoot:user-agent request))
+                                         ("action_name" . "home")
+                                         ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                         ("cip" . ,(hunchentoot:real-remote-addr request))
                                          ("rec" . "1")
                                          ("apiv" . "1")))))
   (with-html-string
@@ -723,6 +728,9 @@ token claims and token header"
     (setf *matomo-idsite*
           (or (uiop:getenv "MATOMO_IDSITE")
               (get-config-value "matomo-idsite")))
+    (setf *matomo-idsite*
+          (or (uiop:getenv "MATOMO_TOKEN_AUTH")
+              (get-config-value "matomo-token-auth")))
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
 	      (get-config-value "keycloak-oidc-client-id")))
