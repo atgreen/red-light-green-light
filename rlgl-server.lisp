@@ -204,11 +204,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                            :parameters `(("idsite" . ,*matomo-idsite*)
                                          ("ua" . ,(hunchentoot:user-agent request))
                                          ("rec" . "1")
-                                         ("apiv" . "1"))
-                           :external-format :utf-8)))
+                                         ("apiv" . "1")))))
   (with-html-string
       (:doctype)
-      (:html
+    (:html
        (:head
 	(:meta :charset "utf-8")
 	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
