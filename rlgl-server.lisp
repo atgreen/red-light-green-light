@@ -757,15 +757,18 @@ token claims and token header"
     (unless (rlgl.util:valid-url? *server-uri*)
       (error "server-uri is not valid URL: ~A" *server-uri*))
 
-    (setf *matomo-uri*
-          (or (uiop:getenv "MATOMO_URI")
-              (get-config-value "matomo-uri")))
-    (setf *matomo-idsite*
-          (or (uiop:getenv "MATOMO_IDSITE")
-              (get-config-value "matomo-idsite")))
-    (setf *matomo-token-auth*
-          (or (uiop:getenv "MATOMO_TOKEN_AUTH")
-              (get-config-value "matomo-token-auth")))
+    ;; Only read the matomo config values if the matomo URI is set.
+    (when (or (uiop:getenv "MATOMO_URI") (gethash "matomo-uri" *config*))
+      (setf *matomo-uri*
+            (or (uiop:getenv "MATOMO_URI")
+                (get-config-value "matomo-uri")))
+      (setf *matomo-idsite*
+            (or (uiop:getenv "MATOMO_IDSITE")
+                (get-config-value "matomo-idsite")))
+      (setf *matomo-token-auth*
+            (or (uiop:getenv "MATOMO_TOKEN_AUTH")
+                (get-config-value "matomo-token-auth"))))
+
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
 	      (get-config-value "keycloak-oidc-client-id")))
