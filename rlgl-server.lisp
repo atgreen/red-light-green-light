@@ -309,7 +309,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                             ("rec" . "1")
                                             ("apiv" . "1")))))))
   ;; Return a random 7 character hash
-  (rlgl.util:rlgl.util:random-hex-string 7))
+  (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
   (when *matomo-uri*
