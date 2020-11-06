@@ -68,6 +68,11 @@ keycloak-oidc-client-secret = \"ignore\"
 (defvar *matomo-token-auth* nil)
 
 ;; ----------------------------------------------------------------------------
+;; Define a thread pool for asynchronous tasks
+
+(defvar *thread-pool* (thread-pool:make-thread-pool 10))
+
+;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
 (defparameter *http-requests-counter* nil)
 (defparameter *http-request-duration* nil)
@@ -199,19 +204,24 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
   (when *matomo-uri*
-    (let* ((request hunchentoot:*request*))
-      (drakma:http-request *matomo-uri*
-                           :method :post
-                           :parameters `(("idsite" . ,*matomo-idsite*)
-                                         ("token_auth" . ,*matomo-token-auth*)
-                                         ("ua" . ,(hunchentoot:user-agent request))
-                                         ("action_name" . "home")
-                                         ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
-                                         ("cip" . ,(hunchentoot:real-remote-addr request))
-                                         ("rec" . "1")
-                                         ("apiv" . "1")))))
+    (let ((request hunchentoot:*request*))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters `(("idsite" . ,*matomo-idsite*)
+                                            ("token_auth" . ,*matomo-token-auth*)
+                                            ("rand" . ,(random-hex-string))
+                                            ("url" . ,*server-uri*)
+                                            ("ua" . ,(hunchentoot:user-agent request))
+                                            ("action_name" . "home")
+                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                            ("cip" . ,(hunchentoot:real-remote-addr request))
+                                            ("rec" . "1")
+                                            ("apiv" . "1")))))))
   (with-html-string
-      (:doctype)
+    (:doctype)
     (:html
        (:head
 	(:meta :charset "utf-8")
@@ -281,14 +291,65 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute start (:get :text/plain)
   (authorize)
+  (when *matomo-uri*
+    (let ((request hunchentoot:*request*))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters `(("idsite" . ,*matomo-idsite*)
+                                            ("token_auth" . ,*matomo-token-auth*)
+                                            ("rand" . ,(random-hex-string))
+                                            ("url" . ,(str:concat *server-uri* "/start"))
+                                            ("ua" . ,(hunchentoot:user-agent request))
+                                            ("action_name" . "start")
+                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                            ("cip" . ,(hunchentoot:real-remote-addr request))
+                                            ("rec" . "1")
+                                            ("apiv" . "1")))))))
   ;; Return a random 7 character hash
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
+  (when *matomo-uri*
+    (let ((request hunchentoot:*request*))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters `(("idsite" . ,*matomo-idsite*)
+                                            ("token_auth" . ,*matomo-token-auth*)
+                                            ("rand" . ,(random-hex-string))
+                                            ("url" . ,(str:concat *server-uri* "/login"))
+                                            ("ua" . ,(hunchentoot:user-agent request))
+                                            ("action_name" . "login")
+                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                            ("cip" . ,(hunchentoot:real-remote-addr request))
+                                            ("rec" . "1")
+                                            ("apiv" . "1")))))))
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
   ;;  (authorize)
+  (when *matomo-uri*
+    (let ((request hunchentoot:*request*))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters `(("idsite" . ,*matomo-idsite*)
+                                            ("token_auth" . ,*matomo-token-auth*)
+                                            ("rand" . ,(random-hex-string))
+                                            ("url" . ,(str:concat *server-uri* "/log"))
+                                            ("ua" . ,(hunchentoot:user-agent request))
+                                            ("action_name" . "log")
+                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                            ("cip" . ,(hunchentoot:real-remote-addr request))
+                                            ("rec" . "1")
+                                            ("apiv" . "1")))))))
   (rlgl.db:report-log *db* id))
 
 (defun base64-decode (base-64-string)
@@ -350,6 +411,23 @@ token claims and token header"
 (snooze:defroute get-api-key (:get :text/html &key code session_state)
   (if code
       (progn
+        (when *matomo-uri*
+          (let ((request hunchentoot:*request*))
+            (thread-pool:add-to-pool
+             *thread-pool*
+             (lambda ()
+               (drakma:http-request *matomo-uri*
+                                    :method :post
+                                    :parameters `(("idsite" . ,*matomo-idsite*)
+                                                  ("token_auth" . ,*matomo-token-auth*)
+                                                  ("rand" . ,(random-hex-string))
+                                                  ("url" . ,(str:concat *server-uri* "/get-api-key"))
+                                                  ("ua" . ,(hunchentoot:user-agent request))
+                                                  ("action_name" . "get-api-key")
+                                                  ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                                  ("cip" . ,(hunchentoot:real-remote-addr request))
+                                                  ("rec" . "1")
+                                                  ("apiv" . "1")))))))
 	(log:info "Got a code: ~A" (string-downcase code))
 	(let* ((token (flexi-streams:octets-to-string
 		       (drakma:http-request (str:concat *keycloak-oidc-realm-uri* "/protocol/openid-connect/token")
@@ -493,6 +571,23 @@ token claims and token header"
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
+  (when *matomo-uri*
+    (let ((request hunchentoot:*request*))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters `(("idsite" . ,*matomo-idsite*)
+                                            ("token_auth" . ,*matomo-token-auth*)
+                                            ("rand" . ,(random-hex-string))
+                                            ("url" . ,(str:concat *server-uri* "/doc"))
+                                            ("ua" . ,(hunchentoot:user-agent request))
+                                            ("action_name" . "doc")
+                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                                            ("cip" . ,(hunchentoot:real-remote-addr request))
+                                            ("rec" . "1")
+                                            ("apiv" . "1")))))))
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
@@ -800,6 +895,8 @@ token claims and token header"
 
   (log:info "About to start server")
 
+  (thread-pool:start-pool *thread-pool*)
+
   (let ((srvr (start-server)))
     ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
     ;; testsuite.
@@ -811,6 +908,7 @@ token claims and token header"
 
 (defun stop-rlgl-server ()
   "Stop the web application."
+  (thread-pool:stop-pool *thread-pool*)
   (stop-server))
 
 (defmethod hunchentoot:start ((app application))
