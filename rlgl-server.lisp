@@ -212,7 +212,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                               :method :post
                               :parameters `(("idsite" . ,*matomo-idsite*)
                                             ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(random-hex-string))
+                                            ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,*server-uri*)
                                             ("ua" . ,(hunchentoot:user-agent request))
                                             ("action_name" . "home")
@@ -300,7 +300,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                               :method :post
                               :parameters `(("idsite" . ,*matomo-idsite*)
                                             ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(random-hex-string))
+                                            ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,(str:concat *server-uri* "/start"))
                                             ("ua" . ,(hunchentoot:user-agent request))
                                             ("action_name" . "start")
@@ -309,7 +309,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                             ("rec" . "1")
                                             ("apiv" . "1")))))))
   ;; Return a random 7 character hash
-  (rlgl.util:random-hex-string 7))
+  (rlgl.util:rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
   (when *matomo-uri*
@@ -321,7 +321,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                               :method :post
                               :parameters `(("idsite" . ,*matomo-idsite*)
                                             ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(random-hex-string))
+                                            ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,(str:concat *server-uri* "/login"))
                                             ("ua" . ,(hunchentoot:user-agent request))
                                             ("action_name" . "login")
@@ -342,7 +342,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                               :method :post
                               :parameters `(("idsite" . ,*matomo-idsite*)
                                             ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(random-hex-string))
+                                            ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,(str:concat *server-uri* "/log"))
                                             ("ua" . ,(hunchentoot:user-agent request))
                                             ("action_name" . "log")
@@ -420,7 +420,7 @@ token claims and token header"
                                     :method :post
                                     :parameters `(("idsite" . ,*matomo-idsite*)
                                                   ("token_auth" . ,*matomo-token-auth*)
-                                                  ("rand" . ,(random-hex-string))
+                                                  ("rand" . ,(rlgl.util:random-hex-string))
                                                   ("url" . ,(str:concat *server-uri* "/get-api-key"))
                                                   ("ua" . ,(hunchentoot:user-agent request))
                                                   ("action_name" . "get-api-key")
@@ -580,7 +580,7 @@ token claims and token header"
                               :method :post
                               :parameters `(("idsite" . ,*matomo-idsite*)
                                             ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(random-hex-string))
+                                            ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,(str:concat *server-uri* "/doc"))
                                             ("ua" . ,(hunchentoot:user-agent request))
                                             ("action_name" . "doc")
