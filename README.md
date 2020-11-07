@@ -325,7 +325,6 @@ either environment variables or a [TOML](https://toml.io) formatted
 configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
-|------------------------------------+------------------------------------+----------------------------------------------|
 | Environment Variable               | Config File Setting                | Description                                  |
 |------------------------------------+------------------------------------+----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
@@ -344,7 +343,6 @@ override settings found in the config file.
 | `KEYCLOAK_OIDC_REALM_REDIRECT_URI` | `keycloak-oidc-realm-redirect-uri` | Keycloak realm redirect URI (optional)       |
 | `KEYCLOAK_OIDC_REALM_URI`          | `keycloak-oidc-realm-uri`          | Keycloak realm URI (optional)                |
 |                                    | `test-api-key`                     | Used for testing                             |
-|------------------------------------+------------------------------------+----------------------------------------------|
 
 Author and License
 -------------------
