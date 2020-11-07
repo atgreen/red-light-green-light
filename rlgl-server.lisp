@@ -206,7 +206,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                             ("rand" . ,(rlgl.util:random-hex-string))
                                             ("url" . ,(str:concat *server-uri* url))
                                             ("ua" . ,(hunchentoot:user-agent request))
-                                            ("action_name" . action)
+                                            ("action_name" . ,action)
                                             ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
                                             ("cip" . ,(hunchentoot:real-remote-addr request))
                                             ("rec" . "1")
