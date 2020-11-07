@@ -469,6 +469,7 @@ token claims and token header"
 
 (defun do-evaluate ()
   (authorize)
+  (track-action "evaluate" "/evaluate")
   (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
@@ -517,6 +518,7 @@ token claims and token header"
 
 (defun do-upload ()
   (authorize)
+  (track-action "upload" "/upload")
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
 	     (doc (alexandria:read-file-into-byte-vector
