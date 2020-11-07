@@ -93,6 +93,8 @@ themselves, in a way that is:
  - customizeable
  - protected with authentication/authorization mechanisms
 
+![alt text](images/rlgl-workflow.png "Red Light Green Light workflow")
+
 The goal of all of this is to enable auditors to easily answer the
 following questions as they relate to any artifact promoted through a
 CI/CD pipeline:
