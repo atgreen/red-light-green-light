@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -78,7 +78,7 @@ based on URL."
 
       (let ((policy-pathname
 	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
-	
+
 	(let ((xfail-file (merge-pathnames-as-file policy-pathname #p"XFAIL"))
 	      (pass-file (merge-pathnames-as-file policy-pathname #p"PASS"))
 	      (fail-file (merge-pathnames-as-file policy-pathname #p"FAIL")))
@@ -120,7 +120,7 @@ based on URL."
 
 (defun parse-numeric-range (value)
   "Extract the numeric values for a double-dotted range."
-  (multiple-value-bind (x y start-array end-array) 
+  (multiple-value-bind (x y start-array end-array)
       (cl-ppcre:scan +numeric-range+ value)
     (values
      (read-from-string
@@ -215,7 +215,7 @@ exists after the JSON object, or NIL otherwise."
   encoded values produced by the report parsers.  This function
   returns two values: :GREEN or :RED, as well as a list of pairs made
   by consing the matcher object with the test result alist."
-  
+
   (let ((red-or-green :GREEN)
 	(now (get-universal-time)))
     (let ((result (mapcar (lambda (result)
@@ -237,7 +237,7 @@ exists after the JSON object, or NIL otherwise."
 				(when red-match
 				  (setf red-or-green :RED))
 				red-match)
-			      ;; No check for passes
+			      ;; Now check for passes
 			      (find-if (lambda (matcher)
 					 (and (< now (expiration-date matcher))
 					      (match-candidate-pattern
