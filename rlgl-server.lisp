@@ -527,7 +527,7 @@ token claims and token header"
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
-  (track-action "doc" "/doc")
+  (track-action "doc" (format nil "/doc?id=~A" id))
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
