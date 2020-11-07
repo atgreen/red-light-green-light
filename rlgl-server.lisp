@@ -223,23 +223,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
-  (when *matomo-uri*
-    (let ((request hunchentoot:*request*))
-      (thread-pool:add-to-pool
-       *thread-pool*
-       (lambda ()
-         (drakma:http-request *matomo-uri*
-                              :method :post
-                              :parameters `(("idsite" . ,*matomo-idsite*)
-                                            ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(rlgl.util:random-hex-string))
-                                            ("url" . ,*server-uri*)
-                                            ("ua" . ,(hunchentoot:user-agent request))
-                                            ("action_name" . "home")
-                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
-                                            ("cip" . ,(hunchentoot:real-remote-addr request))
-                                            ("rec" . "1")
-                                            ("apiv" . "1")))))))
+  (track-action "home" "/")
   (with-html-string
     (:doctype)
     (:html
