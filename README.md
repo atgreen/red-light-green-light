@@ -320,7 +320,7 @@ Configuration
 -------------
 
 The Red Light Green Light server is customized through a number of
-configuration item. Every configuration item is settable through
+configuration settings.  Every configuration item is settable through
 either environment variables or a [TOML](https://toml.io) formatted
 configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
