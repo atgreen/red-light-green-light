@@ -312,6 +312,39 @@ Monitoring & Observability
 
 The Red Light Green Light server exports Prometheus metrics on port 9101.
 
+Red Light Green Light can optionally transmit usage info to a
+[Mamoto](https://mamoto.org) instance.
+
+
+Configuration
+-------------
+
+The Red Light Green Light server is customized through a number of
+configuration item. Every configuration item is settable through
+either environment variables or a [TOML](https://toml.io) formatted
+configuration file, `/etc/rlgl/config.ini`. Environment variables
+override settings found in the config file.
+
++------------------------------------+------------------------------------+----------------------------------------------+
+| Environment Variable               | Config File Setting                | Description                                  |
++------------------------------------+------------------------------------+----------------------------------------------+
+| `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
+|                                    | `db`                               | Either `sqlite` or `postgresql`              |
+|                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
+| `POSTGRESQL_PASSWORD`              | `postgresql-password`              | Database password                            |
+|                                    | `postgresql-host`                  | Host for postgresql server                   |
+|                                    | `postgresql-port`                  | Port for postgresql server                   |
+|                                    | `storage-driver`                   | Either `local` or `s3`                       |
+|                                    | `policy-dir`                       | Local directory for storing policy git repos |
+| `MATOMO_URI`                       | `matomo-uri`                       | URI for a Matomo sever (optional)            |
+| `MATOMO_IDSITE`                    | `matomo-idsite`                    | Site ID for Matomo tracking (optional)       |
+| `MATOMO_TOKEN_AUTH`                | `matomo-token-auth`                | Auth token for Matomo tracking (optional)    |
+| `KEYCLOAK_OIDC_CLIENT_ID`          | `keycloak-oidc-client-id`          | Keycloak client ID (optional)                |
+| `KEYCLOAK_OIDC_CLIENT_SECRET`      | `keycloak-oidc-client-secret`      | Keycloak client secret (optional)            |
+| `KEYCLOAK_OIDC_REALM_REDIRECT_URI` | `keycloak-oidc-realm-redirect-uri` | Keycloak realm redirect URI (optional)       |
+| `KEYCLOAK_OIDC_REALM_URI`          | `keycloak-oidc-realm-uri`          | Keycloak realm URI (optional)                |
+|                                    | `test-api-key`                     | Used for testing                             |
++------------------------------------+------------------------------------+----------------------------------------------+
 
 Author and License
 -------------------
