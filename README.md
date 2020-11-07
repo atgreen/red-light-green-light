@@ -326,7 +326,7 @@ configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
 | Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------|------------------------------------|----------------------------------------------|
+|------------------------------------+------------------------------------+----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
 |                                    | `db`                               | Either `sqlite` or `postgresql`              |
 |                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
@@ -343,6 +343,8 @@ override settings found in the config file.
 | `KEYCLOAK_OIDC_REALM_REDIRECT_URI` | `keycloak-oidc-realm-redirect-uri` | Keycloak realm redirect URI (optional)       |
 | `KEYCLOAK_OIDC_REALM_URI`          | `keycloak-oidc-realm-uri`          | Keycloak realm URI (optional)                |
 |                                    | `test-api-key`                     | Used for testing                             |
+| `AWS_ACCESS_KEY`                   |                                    | Required when using s3 storage               |
+| `AWS_SECRET_KEY`                   |                                    | Required when using s3 storage               |
 
 Author and License
 -------------------
