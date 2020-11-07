@@ -326,7 +326,7 @@ configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
 | Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------+------------------------------------+----------------------------------------------|
+|------------------------------------|------------------------------------|----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
 |                                    | `db`                               | Either `sqlite` or `postgresql`              |
 |                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
