@@ -313,7 +313,7 @@ Monitoring & Observability
 The Red Light Green Light server exports Prometheus metrics on port 9101.
 
 Red Light Green Light can optionally transmit usage info to a
-[Mamoto](https://mamoto.org) instance.
+[Matomo](https://matomo.org) instance.
 
 
 Configuration
