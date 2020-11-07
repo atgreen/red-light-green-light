@@ -210,6 +210,18 @@ The format of this log is:
 
 `TIMESTAMP` `RED-OR-GREEN`: `GIT-POLICY-HASH` `REPORT-URL`
 
+Red Light Green Light also has the ability to generate baseline XFAIL
+policy in cases where you want to track regressions from an already
+imperfect test run.
+
+```shell
+$ rlgl baseline RLGL-01234567
+```
+
+This command will generate XFAIL policy output to the console for
+every FAIL in the report RLGL-01234567 (the "RLGL-" prefix is
+optional).
+
 
 Policy in Detail
 ---------------
