@@ -167,7 +167,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defvar *thread-pool* (thread-pool:make-thread-pool 10))
 
-(defun track-action (action :key url api-key)
+(defun track-action (action &key url api-key)
   (when *matomo-uri*
     (let* ((request hunchentoot:*request*)
            (parameters (list ("idsite" . *matomo-idsite*)
