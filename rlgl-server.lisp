@@ -159,6 +159,40 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	:crossorigin "anonymous"))
 
 ;; ----------------------------------------------------------------------------
+;; Track actions via matomo
+
+(defvar *matomo-uri* nil)
+(defvar *matomo-idsite* nil)
+(defvar *matomo-token-auth* nil)
+
+(defvar *thread-pool* (thread-pool:make-thread-pool 10))
+
+(defun track-action (action :key url api-key)
+  (when *matomo-uri*
+    (let* ((request hunchentoot:*request*)
+           (parameters (list ("idsite" . *matomo-idsite*)
+                             ("token_auth" . *matomo-token-auth*)
+                             ("rand" . (rlgl.util:random-hex-string))
+                             ("ua" . (hunchentoot:user-agent request))
+                             ("action_name" . action)
+                             ("ref" . (hunchentoot:header-in :HTTP_REFERER request))
+                             ("cip" . (hunchentoot:real-remote-addr request))
+                             ("rec" . "1")
+                             ("apiv" . "1"))))
+      (when api-key
+        (setf parameters (cons (cons "dimension2" api-key)
+                               parameters)))
+      (when url
+        (setf parameters (cons (cons "url" (str:concat *server-uri* url))
+                               parameters)))
+      (thread-pool:add-to-pool
+       *thread-pool*
+       (lambda ()
+         (drakma:http-request *matomo-uri*
+                              :method :post
+                              :parameters parameters))))))
+
+;; ----------------------------------------------------------------------------
 ;; API authentication
 
 (defun authorize ()
@@ -168,8 +202,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	 (token-type (first token-type-and-value))
 	 (token-string (second token-type-and-value)))
     ;; Make sure that it is a bearer token
-    (unless (and (equalp token-type "Bearer")
-		 (rlgl.api-key:authorize-by-api-key *db* token-string))
+    (if (and (equalp token-type "Bearer")
+             (rlgl.api-key:authorize-by-api-key *db* token-string))
+        (track-action "authorize" :api-key token-string)
       (error "Authorization error"))))
 
 (defun authorize-policy-bound-api-key (policy-name)
@@ -183,35 +218,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 		 (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
       (error "Authorization error"))))
 
-
-;; ----------------------------------------------------------------------------
-;; Track actions via matomo
-
-(defvar *matomo-uri* nil)
-(defvar *matomo-idsite* nil)
-(defvar *matomo-token-auth* nil)
-
-(defvar *thread-pool* (thread-pool:make-thread-pool 10))
-
-(defun track-action (action url)
-  (when *matomo-uri*
-    (let ((request hunchentoot:*request*))
-      (thread-pool:add-to-pool
-       *thread-pool*
-       (lambda ()
-         (drakma:http-request *matomo-uri*
-                              :method :post
-                              :parameters `(("idsite" . ,*matomo-idsite*)
-                                            ("token_auth" . ,*matomo-token-auth*)
-                                            ("rand" . ,(rlgl.util:random-hex-string))
-                                            ("url" . ,(str:concat *server-uri* url))
-                                            ("ua" . ,(hunchentoot:user-agent request))
-                                            ("action_name" . ,action)
-                                            ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
-                                            ("cip" . ,(hunchentoot:real-remote-addr request))
-                                            ("rec" . "1")
-                                            ("apiv" . "1"))))))))
-
 ;; ----------------------------------------------------------------------------
 ;; API routes
 
@@ -223,7 +229,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
-  (track-action "home" "/")
+  (track-action "home" :url "/")
   (with-html-string
     (:doctype)
     (:html
@@ -295,17 +301,16 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute start (:get :text/plain)
   (authorize)
-  (track-action "start" "/start")
   ;; Return a random 7 character hash
   (rlgl.util:random-hex-string 7))
 
 (snooze:defroute login (:get :text/plain)
-  (track-action "login" "/login")
+  (track-action "login" :url "/login")
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
   ;;  (authorize)
-  (track-action "log" "/log")
+  (track-action "log")
   (rlgl.db:report-log *db* id))
 
 (defun base64-decode (base-64-string)
@@ -367,7 +372,7 @@ token claims and token header"
 (snooze:defroute get-api-key (:get :text/html &key code session_state)
   (if code
       (progn
-        (track-action "get-api-key" "/get-api-key")
+        (track-action "get-api-key" :url "/get-api-key")
 	(log:info "Got a code: ~A" (string-downcase code))
 	(let* ((token (flexi-streams:octets-to-string
 		       (drakma:http-request (str:concat *keycloak-oidc-realm-uri* "/protocol/openid-connect/token")
@@ -453,7 +458,6 @@ token claims and token header"
 
 (defun do-evaluate ()
   (authorize)
-  (track-action "evaluate" "/evaluate")
   (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
@@ -491,6 +495,7 @@ token claims and token header"
 						  (flexi-streams:string-to-octets
 						   (get-output-stream-string stream)))))
 			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
+                         (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
 			 (format nil "~A: ~A/doc?id=~A~%"
 				 red-or-green
 				 *server-uri*
@@ -502,7 +507,7 @@ token claims and token header"
 
 (defun do-upload ()
   (authorize)
-  (track-action "upload" "/upload")
+  (track-action "upload")
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
 	     (doc (alexandria:read-file-into-byte-vector
@@ -513,7 +518,7 @@ token claims and token header"
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
-  (track-action "doc" (format nil "/doc?id=~A" id))
+  (track-action "doc" :url (format nil "/doc?id=~A" id))
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
 			 (read-document *storage-driver* id)
