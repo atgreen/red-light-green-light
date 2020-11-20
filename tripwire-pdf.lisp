@@ -18,14 +18,14 @@
 
 (in-package :rlgl-server)
 
-;;; MVP Twistlock Results report parser
+;;; MVP Tripwire Results report parser
 
 ;; ----------------------------------------------------------------------------
 
-(defclass parser/twistlock-pdf (report-parser)
+(defclass parser/tripwire-pdf (report-parser)
   ()
   (:default-initargs
-   :title  "Twistlock Scan Report"))
+   :title  "Tripwire Scan Report"))
 
 (defparameter +newline+ (format nil "~A" #\newline))
 
@@ -49,7 +49,7 @@
   (multiple-value-bind (test-name pos)
       (find-next pos "Test Name: " doc)))
 
-(defun parse-twistlock-text (text)
+(defun parse-tripwire-text (text)
   (let ((tests nil)
         (position 0))
     (multiple-value-bind (policy-name ppos)
@@ -60,7 +60,7 @@
           while test-name
           do (multiple-value-bind (rule-name rpos)
                  (find-prev tpos "Rule Name: " text)
-               (setf tests (cons (format nil "{ \"report\": \"twistlock-pdf\", \"status\": ~S, \"policy\": \"~A\", \"rule\": \"~A\", \"test\": \"~A\" }"
+               (setf tests (cons (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": \"~A\", \"rule\": \"~A\", \"test\": \"~A\" }"
                                          (find-next tpos "Status: " text)
                                          policy-name rule-name test-name)
                                  tests))
@@ -70,10 +70,10 @@
                  (setf tpos next-tpos))))))
     tests))
 
-;;(parse-twistlock-text
+;;(parse-tripwire-text
 ;; (alexandria:read-file-into-string "/tmp/r.txt" :external-format :latin-1))
 
-(defmethod parse-report ((parser parser/twistlock-pdf) doc)
+(defmethod parse-report ((parser parser/tripwire-pdf) doc)
   (let ((base-filename (format nil "/tmp/temp-~A"
                                (generate-random-string)))
         (pdf-filename (concatenate 'string base-filename ".pdf"))
@@ -88,7 +88,7 @@
              (write-sequence doc stream))
            (inferior-shell:run
             (format nil "pdftotext ~A ~A" pdf-filename txt-filename))
-           (parse-twistlock-text (alexandria:read-file-into-string
+           (parse-tripwire-text (alexandria:read-file-into-string
                                   txt-filename :external-format :latin-1)))
       (uiop:delete-file-if-exists pdf-filename)
       (uiop:delete-file-if-exists txt-filename))))
