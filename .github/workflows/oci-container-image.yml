@@ -1,0 +1,32 @@
+name: OCI container image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+
+    - name: Build rlgl cli
+      run: |
+        (cd rlgl; make build)
+        mv rlgl/build/* cli
+
+    - name: Build the rlgl-server image
+      run: |
+        echo $(git describe --tags --dirty=+)
+        env
+        docker build . --file Dockerfile --build-arg RLGL_VERSION="$(git describe --tags --dirty=+)" --tag moxielogic/rlgl-server:$(git describe --tags --dirty=+)
