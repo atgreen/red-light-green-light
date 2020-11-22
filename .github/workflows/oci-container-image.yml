@@ -15,6 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - run: |
+        git fetch --tags
+        git branch --create-reflog master origin/master
+
     - name: Set up Go 1.14
       uses: actions/setup-go@v2
       with:
