@@ -17,7 +17,6 @@ jobs:
 
     - run: |
         git fetch --tags
-        git branch --create-reflog master origin/master
 
     - name: Set up Go 1.14
       uses: actions/setup-go@v2
