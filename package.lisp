@@ -54,11 +54,10 @@
 	   #:parser/junit
 	   #:parser/oscap-oval
 	   #:parser/oscap-xccdf
+           #:parser/tripwire-pdf
 	   #:db
 	   #:db/sqlite
 	   #:db/postgresql
 	   #:storage/local
 	   #:storage/s3
 	   #:*server-uri*))
-
-
