@@ -27,9 +27,7 @@
 
 (defmethod parse-report ((parser parser/junit) doc)
   (let ((xmls (cxml:parse-octets doc
-				 (cxml-xmls:make-xmls-builder)))
-	(tests-fail (list))
-	(tests-pass (list)))
+				 (cxml-xmls:make-xmls-builder))))
     (let ((children (cdr (cdr xmls))))
       (remove nil
 	      (mapcar
