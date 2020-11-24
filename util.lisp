@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -49,7 +49,7 @@
 
 (defun escape-json-string (string)
   "Escape character sequences used for json strings."
-  (let* ((s1 (str:replace-all "\\" "\\\\\\" string))
-	 (s2 (str:replace-all "\"" "\\\\\"" s1)))
+  (let* ((s1 (str:replace-all "\\" "\\\\\\\\" string))
+	 (s2 (str:replace-all "\"" "\\\\\\\"" s1)))
     (format nil "~A~%" s2)
     s2))
