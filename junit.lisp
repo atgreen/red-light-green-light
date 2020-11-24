@@ -23,7 +23,8 @@
 (defclass parser/junit (report-parser)
   ()
   (:default-initargs
-   :title  "JUnit Test Report"))
+   :title  "JUnit Test Report"
+   :doctype "text"))
 
 (defmethod parse-report ((parser parser/junit) doc)
   (let ((xmls (cxml:parse-octets doc

@@ -25,7 +25,8 @@
 (defclass parser/tripwire-pdf (report-parser)
   ()
   (:default-initargs
-   :title  "Tripwire Scan Report"))
+   :title  "Tripwire Scan Report"
+   :doctype "pdf"))
 
 (defparameter +newline+ (format nil "~A" #\newline))
 
@@ -50,7 +51,7 @@
       (find-next pos "Test Name: " doc)))
 
 (defun parse-tripwire-text (text)
-  (let ((tests nil)
+  (let ((tests (list))
         (position 0))
     (multiple-value-bind (policy-name ppos)
         (find-next position "Policy Name: " text)
@@ -60,9 +61,12 @@
           while test-name
           do (multiple-value-bind (rule-name rpos)
                  (find-prev tpos "Rule Name: " text)
-               (setf tests (cons (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": \"~A\", \"rule\": \"~A\", \"test\": \"~A\" }"
-                                         (find-next tpos "Status: " text)
-                                         policy-name rule-name test-name)
+               (setf tests (cons (json:decode-json-from-string
+                                  (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": ~S, \"rule\": ~S, \"id\": ~S }"
+                                          (find-next tpos "Status: " text)
+                                          (rlgl.util:escape-json-string policy-name)
+                                          (rlgl.util:escape-json-string rule-name)
+                                          (rlgl.util:escape-json-string test-name)))
                                  tests))
                (multiple-value-bind (next-test-name next-tpos)
                    (find-next (+ 1 tpos) "Test Name: " text)
@@ -70,17 +74,14 @@
                  (setf tpos next-tpos))))))
     tests))
 
-;;(parse-tripwire-text
-;; (alexandria:read-file-into-string "/tmp/r.txt" :external-format :latin-1))
-
 (defmethod parse-report ((parser parser/tripwire-pdf) doc)
-  (let ((base-filename (format nil "/tmp/temp-~A"
-                               (generate-random-string)))
-        (pdf-filename (concatenate 'string base-filename ".pdf"))
-        (txt-filename (concatenate 'string base-filename ".txt")))
+  (let* ((base-filename (format nil "/tmp/temp-~A"
+                                (generate-random-string)))
+         (pdf-filename (concatenate 'string base-filename ".pdf"))
+         (txt-filename (concatenate 'string base-filename ".txt")))
     (unwind-protect
          (progn
-           (with-open-file (stream filename
+           (with-open-file (stream pdf-filename
                                    :direction :output
                                    :if-exists :supersede
                                    :if-does-not-exist :create

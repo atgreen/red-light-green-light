@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -23,7 +23,8 @@
 (defclass parser/oscap-xccdf (report-parser)
   ()
   (:default-initargs
-   :title  "OpenSCAP XCCDF Scan Report"))
+   :title  "OpenSCAP XCCDF Scan Report"
+   :doctype "html"))
 
 (defmethod parse-report ((parser parser/oscap-xccdf) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream

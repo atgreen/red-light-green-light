@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -25,7 +25,8 @@
 (defclass parser/aqua (report-parser)
   ()
   (:default-initargs
-   :title  "Aqua Scan Report"))
+   :title  "Aqua Scan Report"
+   :doctype "html"))
 
 (defmethod parse-report ((parser parser/aqua) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
@@ -39,7 +40,7 @@
 			       (text)))
 	   (score (lquery:$ pdoc "#cves > tbody > tr > tr > td:nth-child(4) > span"
 			    (text))))
-      
+
       (loop for i from 0 to (- (length vulns) 1)
 	 do
 	   (progn
@@ -55,5 +56,3 @@
 		    tests-fail)))))
 
     tests-fail))
-
-  

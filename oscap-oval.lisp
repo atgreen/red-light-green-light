@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -25,7 +25,8 @@
 (defclass parser/oscap-oval (report-parser)
   ()
   (:default-initargs
-   :title  "OpenSCAP OVAL Scan Report"))
+   :title  "OpenSCAP OVAL Scan Report"
+   :doctype "html"))
 
 (defmethod parse-report ((parser parser/oscap-oval) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
@@ -36,7 +37,7 @@
 ;;; Extract date
 ;;;    (lquery:$ pdoc "body > table.noborder.nomargin > tbody > tr > td:nth-child(2) > table > tbody > tr:nth-child(3) > td:nth-child(4)"
 ;;;	      text
-    (lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a" 
+    (lquery:$ pdoc "tr.resultbadA > td:nth-child(4) > a"
 	      (combine (attr :href) (text))
 	      (map-apply #'(lambda (url text)
 			     (setf tests-fail
@@ -45,7 +46,7 @@
 				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
 					     text url))
 				    tests-fail)))))
-    (lquery:$ pdoc "tr.resultgoodA > td:nth-child(4) > a" 
+    (lquery:$ pdoc "tr.resultgoodA > td:nth-child(4) > a"
 	      (combine (attr :href) (text))
 	      (map-apply #'(lambda (url text)
 			     (setf tests-pass

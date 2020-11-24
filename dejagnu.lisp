@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -25,7 +25,8 @@
 (defclass parser/dejagnu (report-parser)
   ()
   (:default-initargs
-   :title  "DejaGnu Summary Report"))
+   :title  "DejaGnu Summary Report"
+   :doctype "text"))
 
 (defmethod parse-report ((parser parser/dejagnu) doc)
   (let ((tests (list))

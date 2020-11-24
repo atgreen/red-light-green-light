@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -25,7 +25,8 @@
 (defclass parser/csv (report-parser)
   ()
   (:default-initargs
-   :title  "CSV Report"))
+   :title  "CSV Report"
+   :doctype "text"))
 
 (defmethod parse-report ((parser parser/csv) doc)
   "Parse CSV content where the first row specifies the field names."
@@ -40,4 +41,3 @@
        collect (json:decode-json-from-string
 		  (let ((l (loop for i from 0 for e in row collect (list (aref fields i) e))))
 		    (format nil "{ ~{\"~A\": \"~A\"~^, ~} }" (alexandria:flatten l)))))))
-
