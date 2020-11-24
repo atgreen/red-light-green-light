@@ -106,7 +106,8 @@ keycloak-oidc-client-secret = \"ignore\"
 
 (defclass report-parser ()
   ((name :initarg :name :reader name)
-   (title :initarg :title :reader title)))
+   (title :initarg :title :reader title)
+   (doctype :initarg :doctype :reader doctype)))
 
 ;; Run all of the scripts in recog.d until we find
 ;; a match.
@@ -487,8 +488,11 @@ token claims and token header"
 		 (progn
 		   (multiple-value-bind (red-or-green processed-results)
 		       (apply-policy policy tests)
+                     (log:info "Policy applied")
 		     (let ((stream (make-string-output-stream)))
-		       (render stream (cdr (assoc :REF json)) processed-results
+		       (render stream
+                               (doctype parser)
+                               (cdr (assoc :REF json)) processed-results
 			       (title parser)
 			       (commit-url-format policy))
 		       (let ((ref (store-document *storage-driver*
@@ -518,6 +522,7 @@ token claims and token header"
       (format nil "Error storing document: ~A" c))))
 
 (snooze:defroute doc (:get :text/html &key id)
+  "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
   (let ((report
 	  (handler-case (flexi-streams:octets-to-string
@@ -531,6 +536,30 @@ token claims and token header"
 	report
 	(format nil "<html><pre>~A</pre></html>" report))))
 
+(snooze:defroute doc-html (:get :text/html &key id)
+  (track-action "doc-html" :url (format nil "/doc-html?id=~A" id))
+  (handler-case (flexi-streams:octets-to-string
+                 (read-document *storage-driver* id)
+                 :external-format :utf-8)
+    (error (c)
+      (log:error "~A" c)
+      (alexandria:read-file-into-string
+       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
+
+(snooze:defroute doc-text (:get :text/plain &key id)
+  (track-action "doc-text" :url (format nil "/doc-text?id=~A" id))
+  (handler-case (flexi-streams:octets-to-string
+                 (read-document *storage-driver* id)
+                 :external-format :utf-8)
+    (error (c)
+      (log:error "~A" c)
+      (alexandria:read-file-into-string
+       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
+
+(snooze:defroute doc-pdf (:get :application/pdf &key id)
+  (track-action "doc-pdf" :url (format nil "/doc-pdf?id=~A" id))
+  (read-document *storage-driver* id))
+
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
 
 ;;; Render processed results to HTML
@@ -538,7 +567,7 @@ token claims and token header"
 (defparameter *unknown-matcher*
   (make-policy-matcher :kind :unknown))
 
-(defun render (stream report-ref results title commit-url-format)
+(defun render (stream doctype report-ref results title commit-url-format)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
@@ -594,7 +623,10 @@ token claims and token header"
 			   (:div :style "width:100px"
 				 (:div :class "rlgl-svg"))
 			   (:h1 :class "mt-5" title)
-			   (:a :href (format nil "~A/doc?id=~A" *server-uri* report-ref)
+			   (:a :href (format nil "~A/doc-~A?id=~A"
+                                             *server-uri*
+                                             doctype
+                                             report-ref)
 			       :target "_blank" "Original Report")
 			   (:table :class "fold-table" :id "results"
 				   (:tr (:th "RESULT") (:th "ID"))
