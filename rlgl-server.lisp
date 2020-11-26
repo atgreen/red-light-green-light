@@ -316,20 +316,28 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defun base64-decode (base-64-string)
   "Takes a base64-uri string and return an array of octets"
-  (cl-base64:base64-string-to-usb8-array
-   ;; Re-pad the string, or CL-BASE64 will get confused
-   (concatenate 'string
-                base-64-string
-                (make-array (rem (length base-64-string) 4)
-                            :element-type 'character
-                            :initial-element #\.))
-   :uri t))
+  (flet ((round-up-by-4 (n)
+           (let ((r (rem n 4)))
+             (if (> r 0)
+                 (- 4 r)
+                 0))))
+     ;; Re-pad the string, or CL-BASE64 will get confused
+    (let ((s (concatenate 'string
+                          base-64-string
+                          (make-array (round-up-by-4 (length base-64-string))
+                                      :element-type 'character
+                                      :initial-element #\.))))
+      (cl-base64:base64-string-to-usb8-array s :uri t))))
 
 (defun decode-jwt (jwt-string)
   "Decodes a JSON Web Token. Returns two alists,
 token claims and token header"
+  (log:info "decoding jwt-string ~A" jwt-string)
   (destructuring-bind (header-string claims-string digest-string)
       (split-sequence:split-sequence #\. jwt-string)
+    (log:info "header-string = ~A" header-string)
+    (log:info "claims-string = ~A" claims-string)
+    (log:info "digest-string = ~A" digest-string)
     (let* ((headers (json:decode-json-from-string
 		     (flexi-streams:octets-to-string
 		      (base64-decode
@@ -340,6 +348,8 @@ token claims and token header"
 		     (base64-decode
 		      claims-string)
 		     :external-format :utf-8))))
+      (log:info "headers = ~A" headers)
+      (log:info "claims = ~A" claims)
       (values headers claims))))
 
 (snooze:defroute get-baseline-xfail-policy (:get :text &key id)
@@ -558,6 +568,7 @@ token claims and token header"
 
 (snooze:defroute doc-pdf (:get :application/pdf &key id)
   (track-action "doc-pdf" :url (format nil "/doc-pdf?id=~A" id))
+  (setf (hunchentoot:content-type*) "application/pdf")
   (read-document *storage-driver* id))
 
 ;;; END ROUTE DEFINITIONS -----------------------------------------------------
