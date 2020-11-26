@@ -332,12 +332,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (defun decode-jwt (jwt-string)
   "Decodes a JSON Web Token. Returns two alists,
 token claims and token header"
-  (log:info "decoding jwt-string ~A" jwt-string)
   (destructuring-bind (header-string claims-string digest-string)
       (split-sequence:split-sequence #\. jwt-string)
-    (log:info "header-string = ~A" header-string)
-    (log:info "claims-string = ~A" claims-string)
-    (log:info "digest-string = ~A" digest-string)
     (let* ((headers (json:decode-json-from-string
 		     (flexi-streams:octets-to-string
 		      (base64-decode
@@ -348,8 +344,6 @@ token claims and token header"
 		     (base64-decode
 		      claims-string)
 		     :external-format :utf-8))))
-      (log:info "headers = ~A" headers)
-      (log:info "claims = ~A" claims)
       (values headers claims))))
 
 (snooze:defroute get-baseline-xfail-policy (:get :text &key id)

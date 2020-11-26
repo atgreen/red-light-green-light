@@ -37,3 +37,10 @@ jobs:
         docker push moxielogic/rlgl-server:$(git describe --tags --dirty=+);
         # docker tag moxielogic/rlgl-server:latest moxielogic/rlgl-server:$(git describe --tags --dirty=+);
         # docker push moxielogic/rlgl-server:latest;
+
+    - name: Save DigitalOcean kubeconfig
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      run: |
+        doctl kubernetes cluster kubeconfig show k8s-rlgl-prod > $HOME/.kubeconfig
