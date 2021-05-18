@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -390,11 +390,9 @@ token claims and token header"
 							  ("code" . ,(string-downcase code))))
 		       :external-format :utf-8))
 	       (json (json:decode-json-from-string token)))
-	  (log:info "token json = ~A" json)
 	  ;; FIXME - deal with bad logins
 	  (multiple-value-bind (headers claims)
 	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
-	    (log:info "id-token claims: ~A" claims)
 	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
 	      (with-html-string
 		(:doctype)
