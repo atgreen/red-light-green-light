@@ -9,20 +9,21 @@
             (simple-condition-format-arguments c))))
 
 (defun parse-integer-then-float (string)
-  (handler-case
-      (let (retval nread)
-	(multiple-value-setq (retval nread)
-	  (parse-integer string :junk-allowed t))
-	(cond ((/= nread (length string))
-	       (multiple-value-setq (retval nread)
-		 (parse-float:parse-float string :junk-allowed t))
-	       (if (/= nread (length string))
-		   (values nil nread)
-		   (values retval nread)))
-	      (t
-	       (values retval nread))))
-    (error (e)
-      (values nil nil))))
+  (let (retval nread)
+    (multiple-value-setq (retval nread)
+      (parse-integer string :junk-allowed t))
+    (cond ((/= nread (length string))
+           (multiple-value-setq (retval nread)
+             (ignore-errors
+              ;; github#24: Sometimes SBCL will error here even with
+              ;; :JUNK-ALLOWED.  Swallow it.
+              (parse-float:parse-float string :junk-allowed t)))
+           (if (and retval
+                    (/= nread (length string)))
+               (values nil nread)
+               (values retval nread)))
+          (t
+           (values retval nread)))))
 
 (defun read-string (stream &optional (terminator #\") )
   (unless (eql (read-char stream) terminator)

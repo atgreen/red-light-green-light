@@ -338,7 +338,7 @@ As a second value, return what RFC2388:PARSE-HEADER"
       (error (e)
         (error 'incompatible-lambda-list
                :actual-args args
-               :lambda-list lambda-list
+               :lambda-list (cddr lambda-list)
                :format-control "Too many, too few, or unsupported ~
                                 query arguments for REST resource ~a"
                :format-arguments
@@ -534,11 +534,10 @@ As a second value, return what RFC2388:PARSE-HEADER"
     (with-output-to-string (s)
       (cond (verbose-p
              (format s "~a" condition)
-             (format s "~&~%Here's a little bit more information: ~%")
              (explain-failsafe condition s)
-             (format s "~&~%Here's the full backtrace that bit me ~%~%")
-             (uiop/image:print-condition-backtrace condition :stream s)
-             )
+             (loop for (condition backtrace) in *useful-backtraces*
+                   do (format s "~&~%Here's a backtrace for condition ~s~
+                   ~&~a" condition backtrace)))
             (t
              (format s "~a ~a"
                      status-code
@@ -568,11 +567,7 @@ As a second value, return what RFC2388:PARSE-HEADER"
 (define-condition resignalled-condition ()
   ((original-condition :initarg :original-condition
                        :initform (error "Must supply an original condition")
-                       :reader original-condition)
-   (original-condition-backtrace :initform (and (eq :verbose *catch-errors*)
-                                                (with-output-to-string (s)
-                                                  (uiop/image:print-backtrace :stream s)))
-                                 :reader original-condition-backtrace)))
+                       :reader original-condition)))
 
 (define-condition unconvertible-argument
     (invalid-resource-arguments resignalled-condition)
@@ -626,38 +621,43 @@ As a second value, return what RFC2388:PARSE-HEADER"
     (princ (original-condition c) s)))
 
 (defmethod explain-failsafe ((c condition) s)
-  (format s "~&~%No more interesting information on ~a, sorry~%" c))
+  ;; (format s "~&~%No more interesting information on ~a, sorry~%" c)
+  )
 
 (defmethod explain-failsafe ((c error-when-explaining) s)
-  (format s "~&SNOOZE:EXPLAIN-CONDITION was trying to explain to the user the condition ~a."
+  (format s "~&  SNOOZE:EXPLAIN-CONDITION is missing a method to politely explain:~
+             ~&    ~a~
+             ~&  to the client."
           (original-condition c)))
 
 (defmethod explain-failsafe ((c unconvertible-argument) s)
-  (format s "~&SNOOZE:URI-TO-ARGUMENTS was trying to make sense of the ~
-key-value-pair \"~a\" and \"~a\" when it caught ~a"
+  (format s "~&  SNOOZE:URI-TO-ARGUMENTS caught a ~a when converting:~
+             ~&    ~a=~a~
+             ~&  into Lisp objects to give to your route."
+          (type-of (original-condition c))
           (unconvertible-argument-key c)
-          (unconvertible-argument-value c)
-          (original-condition c)))
+          (unconvertible-argument-value c)))
 
 (defmethod explain-failsafe ((c invalid-uri-structure) s)
-  (format s "~&SNOOZE:URI-TO-ARGUMENTS was trying to decode the URI~
-:~%~%  ~a" (invalid-uri c)))
+  (format s "~&  SNOOZE:URI-TO-ARGUMENTS can't grok this URI:~
+             ~&    ~a" (invalid-uri c)))
 
 (defmethod explain-failsafe ((c incompatible-lambda-list) s)
-  (format s "~&Trying to fit~%  ~a~%to the lambda list~%  ~a"
-          (actual-args c) (lambda-list c)))
+  (format s "~&  Snooze failed to fit:~
+             ~&    ~s~
+             ~&  to the lambda list:~
+             ~&    ~a~
+             ~&  which produced a ~a which your Lisp describes as:~
+             ~&    ~a"
+          (actual-args c) (lambda-list c)
+          (type-of (original-condition c))
+          (original-condition c)))
 
 (defmethod explain-failsafe :before ((c resignalled-condition) s)
-  (format s "~&~%You got a ~a because:~% " c))
+  (format s "~&~%You got a ~a because:~% " (type-of c)))
 
 (defmethod explain-failsafe :after ((c resignalled-condition) s)
-  (explain-failsafe (original-condition c) s)
-  (if (original-condition-backtrace c)
-      (format s "~&~%Here's the backtrace at the time of the ~a:~%~%~a"
-              (original-condition c)
-              (original-condition-backtrace c))
-      (format s "~&~%I don't have a backtrace for the ~a:~%~%"
-              (original-condition c))))
+  (explain-failsafe (original-condition c) s))
 
 
 ;;; More internal stuff
@@ -690,8 +690,24 @@ out with NO-SUCH-ROUTE."
                               501 ; unimplemented
                               ))))
 
+(defvar *useful-backtraces* nil "Useful backtraces.")
+
+(defmacro saving-useful-backtrace (args &body body)
+  (declare (ignore args))
+  `(handler-bind
+       ((t
+          (lambda (e)
+            (when *catch-errors*
+              (pushnew (list e
+                             (with-output-to-string (s)
+                               (uiop/image:print-condition-backtrace
+                                e :stream s)))
+                       *useful-backtraces*
+                       :test (lambda (a b) (eq (first a) (first b))))))))
+     ,@body))
+
 (defun call-brutally-explaining-conditions (fn)
-  (let (code condition original-condition)
+  (let (code condition original-condition *useful-backtraces*)
     (flet ((explain (verbose-p)
              (throw 'response
                (values code
@@ -730,10 +746,10 @@ out with NO-SUCH-ROUTE."
                    (setq code (status-code c) condition c)
                    (cond ((eq *catch-http-conditions* :verbose)
                           (invoke-restart 'explain-verbosely))))))
-            (funcall fn))
+            (saving-useful-backtrace () (funcall fn)))
         (explain-verbosely () :report
           (lambda (s)
-            (format s "Explain ~a condition with full backtrace" code))
+            (format s "Explain ~a condition more verbosely" code))
           (explain t))
         (failsafe-explain () :report
           (lambda (s) (format s "Explain ~a condition very succintly" code))
@@ -780,7 +796,7 @@ out with NO-SUCH-ROUTE."
                                         (not (eq *catch-errors* :verbose)))
                                (check-politely-explain)
                                (invoke-restart 'politely-explain)))))
-            (funcall fn))
+            (saving-useful-backtrace () (funcall fn)))
         (politely-explain ()
           :report (lambda (s)
                     (format s "Politely explain to client in ~a"
@@ -916,16 +932,18 @@ EXPLAIN-CONDITION.")
 ;;;
 (defun default-resource-name (uri)
   "Default value for *RESOURCE-NAME-FUNCTION*, which see."
-  (let* ((first-slash-or-qmark (position-if #'(lambda (char)
-                                                (member char '(#\/ #\?)))
-                                            uri
-                                            :start 1)))
-    (values (cond (first-slash-or-qmark
-                   (subseq uri 1 first-slash-or-qmark))
-                  (t
-                   (subseq uri 1)))
-            (if first-slash-or-qmark
-                (subseq uri first-slash-or-qmark)))))
+  (if (string= "" uri)
+    ""
+    (let* ((first-slash-or-qmark (position-if #'(lambda (char)
+                                                  (member char '(#\/ #\?)))
+                                              uri
+                                              :start 1)))
+      (values (cond (first-slash-or-qmark
+                     (subseq uri 1 first-slash-or-qmark))
+                    (t
+                     (subseq uri 1)))
+              (if first-slash-or-qmark
+                  (subseq uri first-slash-or-qmark))))))
 
 (defun search-for-extension-content-type (uri-path)
   "Default value for *URI-CONTENT-TYPES-FUNCTION*, which see."
@@ -1053,11 +1071,3 @@ EXPLAIN-CONDITION.")
              (not (symbol-package object)))
         (princ-to-string (string-downcase (symbol-name object)))
         (write-to-string object))))
-
-
-
-
-
-
-
-
