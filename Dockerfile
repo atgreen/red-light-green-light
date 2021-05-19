@@ -1,4 +1,4 @@
-FROM containerlisp/lisp-10-ubi8
+FROM quay.io/containerlisp/lisp-10-ubi8
 
 COPY . /tmp/src
 ARG RLGL_VERSION=RLGL_VERSION
