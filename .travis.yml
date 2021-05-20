@@ -9,14 +9,14 @@ services:
 env:
   GO111MODULE=on
   LISP=sbcl
-  REPO=moxielogic/rlgl-server
+  REPO=quay.io/moxielogic/rlgl-server
 
 language: go
 go:
 - 1.14
 
 before_install:
-  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh 
+  - curl https://raw.githubusercontent.com/luismbo/cl-travis/master/install.sh
     |  bash
   - (cd rlgl && make build)
   - mv rlgl/build/* cli
