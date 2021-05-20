@@ -35,7 +35,7 @@ jobs:
 
     - name: Get version number
       id: version
-      version: echo "::set-output name=run::$(git describe --tags --dirty=+)"
+      run: echo "::set-output name=run::$(git describe --tags --dirty=+)"
 
     - name: Buildah Action
       id: build-image
