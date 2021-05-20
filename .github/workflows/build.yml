@@ -1,0 +1,62 @@
+name: CI
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+
+    - name: Build rlgl cli
+      run: |
+        (cd rlgl; make build)
+        mv rlgl/build/* cli
+
+    - name: Get short git commit hash
+      id: hash
+      run: echo "::set-output name=hash::${GITHUB_SHA::7}"
+
+    - name: Get version number
+      id: version
+      version: echo "::set-output name=run::$(git describe --tags --dirty=+)"
+
+    - name: Buildah Action
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        context: "1.0"
+        image: rlgl-server
+        tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
+        dockerfiles: |
+          Dockerfile
+        build-args: |
+
+    - name: Push To quay.io
+      id: push-to-quay
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: quay.io/moxielogic
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+
+    - name: Print image url
+      run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
