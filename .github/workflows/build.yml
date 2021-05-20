@@ -41,7 +41,6 @@ jobs:
       id: build-image
       uses: redhat-actions/buildah-build@v2
       with:
-        context: "1.0"
         image: rlgl-server
         tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
         dockerfiles: |
