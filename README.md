@@ -3,7 +3,7 @@
 # Red Light Green Light
 > A git-centric policy management and enforcement tool designed to accelerate your CI/CD pipelines
 
-[![Build Status](https://travis-ci.org/atgreen/red-light-green-light.svg?branch=master)](https://travis-ci.org/atgreen/red-light-green-light)
+[![Build Status](https://github.com/atgreen/red-light-green-light/actions/workflows/build.yml/badge.svg)](https://github.com/atgreen/red-light-green-light/actions)
 [![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
 Quick Start
