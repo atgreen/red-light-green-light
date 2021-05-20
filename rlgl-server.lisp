@@ -228,8 +228,81 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute healthz (:get :text/*)
   "ready")
 
+(snooze:defroute home (:get :text/*)
+  (log:info "ROOT")
+  (track-action "home" :url "/")
+  (with-html-string
+    (:doctype)
+    (:html
+       (:head
+	(:meta :charset "utf-8")
+	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
+	(:link :rel "apple-touch-icon" :sizes "180x180" :href "images/apple-touch-icon.png")
+	(:link :rel "icon" :type "image/png" :sizes "32x32" :href "images/favicon-32x32.png")
+	(:link :rel "icon" :type "image/png" :sizes "16x16" :href "images/favicon-16x16.png")
+	(:link :rel "manifest" :href "images/site.webmanifest")
+	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg")
+	(:meta :name "msapplication-TileColor" :content "#da532c")
+	(:meta :name "theme-color" :content "#ffffff")
+        (:title "Red Light Green Light")
+	(:link :rel "stylesheet" :href "css/rlgl.css")
+	(:link :attrs (emit-bootstrap.min.css))
+	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
+       (:body
+	(:header
+	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
+	       (:a :class "navbar-brand"
+		   :href *server-uri* "Red Light Green Light")))
+	(:main :role "main" :class "container"
+	       (:div :class "row"
+		     (:div :class "col"
+			   (:div :style "width:100px"
+				 (:div :class "rlgl-svg"))
+			   (:h1 :class "mt-5" "Welcome!")
+			   (:br)
+			   "Red Light Green Light is a git-centric tool designed to accelerate CI/CD pipelines."
+			   (:br)
+			   (:br)
+			   "This hosted version of Red Light Green Light is an experimental service and offers no guarantees.  Use at your own risk.  Note that all documents and reports will age-out after 30 days."
+			   (:br)
+			   (:br)
+			   (:h4 "Downloads")
+			   (:ul
+			    (:li (:a :href "cli/rlgl-linux-amd64.tgz" "rlgl command-line tool for 64-bit x86 Linux"))
+			    (:li (:a :href "cli/rlgl-linux-arm.tgz" "rlgl command-line tool for 64-bit ARM Linux"))
+			    (:li (:a :href "cli/rlgl-linux-ppc64le.tgz" "rlgl command-line tool for 64-bit Little-Endian Power Linux"))
+			    (:li (:a :href "cli/rlgl-linux-s390x.tgz" "rlgl command-line tool for s390x Linux"))
+			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
+			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
+			   (:br)
+			   (:h4 "Documentation")
+			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
+			   (:br)
+			   (:br)
+			   (:h4 "Reporting Issues")
+			   "Please feel free to ask questions and report issues here: "(:a :href "https://github.com/atgreen/red-light-green-light/issues" "https://github.com/atgreen/red-light-green-light/issues") "."
+			   (:br)
+			   (:br)
+			   (:hr)
+			   "Red Light Green Light was written by Anthony Green "
+			   (:a :href "mailto:green@moxielogic.com" "<green@moxielogic.com>")
+			   " and is available in source form under the terms of the AGPLv3 license from "
+			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
+			   )))
+	(:footer :class "page-footer font-small special-color-dark pt-4"
+		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
+		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
+       (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+			     :crossorigin "anonymous"))
+       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+			     :crossorigin "anonymous"))
+       (:script :attrs (emit-bootstrap.min.js)))))
+
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
+  (log:info "ROOT")
   (track-action "home" :url "/")
   (with-html-string
     (:doctype)
@@ -656,7 +729,7 @@ token claims and token header"
 	(:footer :class "page-footer font-small special-color-dark pt-4"
 		 (:div :class "footer-copyright text-center py-3" "Generated on "
 		       (simple-date-time:http-date (simple-date-time:now)) " by version" +rlgl-version+
-		       "   //   (C) 2018-2020" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
+		       "   //   (C) 2018-2021" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 			     :crossorigin "anonymous"))
@@ -740,6 +813,7 @@ token claims and token header"
 (defun start-rlgl-server (&optional (sleep-forever? nil))
   "Start the web application and have the main thread sleep forever if
   SLEEP-FOREVER? is not NIL."
+  (setf hunchentoot:*catch-errors-p* t)
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)
 
@@ -891,7 +965,9 @@ token claims and token header"
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
   (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
 		      "rlgl_app")))
+    (log:info "START OF REQUEST DISPATCHER")
     (prom:counter.inc *http-requests-counter* :labels labels)
     (prom:histogram.time
      (prom:get-metric *http-request-duration* labels)
+     (log:info "IN REQUEST DISPATCHER")
      (call-next-method))))
