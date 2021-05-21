@@ -571,15 +571,16 @@ token claims and token header"
                                (cdr (assoc :REF json)) processed-results
 			       (title parser)
 			       (commit-url-format policy))
-		       (let ((ref (store-document *storage-driver*
-						  (flexi-streams:string-to-octets
-						   (get-output-stream-string stream)))))
+		       (let* ((doc-oc (flexi-stream:string-to-octets (get-output-stream-string stream)))
+                              (ref (store-document *storage-driver* doc-oc))
+                              (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha256 doc-oc))))
 			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
                          (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-			 (format nil "~A: ~A/doc?id=~A~%"
+			 (format nil "~A: ~A/doc?id=~A (sha256: ~A)~%"
 				 red-or-green
 				 *server-uri*
-				 ref)))))))))))
+				 ref
+                                 doc-digest)))))))))))
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
