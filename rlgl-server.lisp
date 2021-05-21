@@ -571,7 +571,7 @@ token claims and token header"
                                (cdr (assoc :REF json)) processed-results
 			       (title parser)
 			       (commit-url-format policy))
-		       (let* ((doc-oc (flexi-stream:string-to-octets (get-output-stream-string stream)))
+		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                               (ref (store-document *storage-driver* doc-oc))
                               (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha256 doc-oc))))
 			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
