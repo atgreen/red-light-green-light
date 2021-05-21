@@ -798,6 +798,11 @@ token claims and token header"
 
 ;;; END SERVER CONTROL --------------------------------------------------------
 
+(defun initialize-signer ()
+  "Initialize the signer"
+  (when (uiop:getenv "RLGL_SIGNER_PRIVATE_KEY")
+    (inferior-shell:run "echo $RLGL_SIGNER_PRIVATE_KEY | gpg --import -")))
+
 (defun initialize-policy-dir (dir)
   "Initialize the policy directory."
   (handler-case
@@ -928,6 +933,8 @@ token claims and token header"
 	    (rlgl.db:register-test-api-key *db* test-api-key)))
       (error ()
 	nil)))
+
+  (initialize-signer)
 
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
