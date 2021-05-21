@@ -926,9 +926,6 @@ token claims and token header"
       (error ()
 	nil)))
 
-  (when (uiop:getenv "RLGL_SIGNER_PRIVATE_KEY")
-    (inferior-shell:run "echo $RLGL_SIGNER_PRIVATE_KEY | base64 -d | gpg --import -")))
-
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
