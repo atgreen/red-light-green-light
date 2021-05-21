@@ -290,7 +290,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
 			   )))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
-		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
+		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2021"
 		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -363,7 +363,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
 			   )))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
-		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
+		 (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2021"
 		       (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -515,7 +515,7 @@ token claims and token header"
 				     (:a :href "https://github.com/atgreen/red-light-green-light" "https://github.com/atgreen/red-light-green-light") "."
 				     )))
 		  (:footer :class "page-footer font-small special-color-dark pt-4"
-			   (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2020"
+			   (:div :class "footer-copyright text-center py-3" "Version" +rlgl-version+ "   //   (C) 2018-2021"
 				 (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
 		 (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 				       :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
