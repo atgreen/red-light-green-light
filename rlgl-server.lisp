@@ -567,6 +567,7 @@ token claims and token header"
 		     (let ((stream (make-string-output-stream)))
 		       (render stream
                                (doctype parser)
+                               (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha256 doc))
                                (cdr (assoc :REF json)) processed-results
 			       (title parser)
 			       (commit-url-format policy))
@@ -643,7 +644,7 @@ token claims and token header"
 (defparameter *unknown-matcher*
   (make-policy-matcher :kind :unknown))
 
-(defun render (stream doctype report-ref results title commit-url-format)
+(defun render (stream doctype digest report-ref results title commit-url-format)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
@@ -703,7 +704,7 @@ token claims and token header"
                                              *server-uri*
                                              doctype
                                              report-ref)
-			       :target "_blank" "Original Report")
+			       :target "_blank" (format nil "Original Report (sha256: ~A)" digest))
 			   (:table :class "fold-table" :id "results"
 				   (:tr (:th "RESULT") (:th "ID"))
 				   (dolist (item results)
@@ -798,11 +799,6 @@ token claims and token header"
 
 ;;; END SERVER CONTROL --------------------------------------------------------
 
-(defun initialize-signer ()
-  "Initialize the signer"
-  (when (uiop:getenv "RLGL_SIGNER_PRIVATE_KEY")
-    (inferior-shell:run "echo $RLGL_SIGNER_PRIVATE_KEY | gpg --import -")))
-
 (defun initialize-policy-dir (dir)
   "Initialize the policy directory."
   (handler-case
@@ -810,10 +806,6 @@ token claims and token header"
     (error ()
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
-
-(hunchentoot:define-easy-handler (say-yo :uri "/yo") (name)
-  (setf (hunchentoot:content-type*) "text/plain")
-  (format nil "Hey~@[ ~A~]!" name))
 
 (defun start-rlgl-server (&optional (sleep-forever? nil))
   "Start the web application and have the main thread sleep forever if
@@ -934,7 +926,8 @@ token claims and token header"
       (error ()
 	nil)))
 
-  (initialize-signer)
+  (when (uiop:getenv "RLGL_SIGNER_PRIVATE_KEY")
+    (inferior-shell:run "echo $RLGL_SIGNER_PRIVATE_KEY | base64 -d | gpg --import -")))
 
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
