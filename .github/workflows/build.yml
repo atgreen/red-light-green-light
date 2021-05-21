@@ -31,13 +31,6 @@ jobs:
         (cd rlgl; make build)
         mv rlgl/build/* cli
 
-    - name: Build the rekor cli
-      run: |
-        go get -u -t -v github.com/sigstore/rekor/cmd/cli
-        (cd $GOPATH/src/github.com/sigstore/rekor/cmd/cli;
-         go build -v -o rekor;
-         cp rekor ~)
-
     - name: Get short git commit hash
       id: hash
       run: echo "::set-output name=hash::${GITHUB_SHA::7}"
