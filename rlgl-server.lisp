@@ -567,16 +567,16 @@ token claims and token header"
 		     (let ((stream (make-string-output-stream)))
 		       (render stream
                                (doctype parser)
-                               (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha256 doc))
+                               (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
                                (cdr (assoc :REF json)) processed-results
 			       (title parser)
 			       (commit-url-format policy))
 		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                               (ref (store-document *storage-driver* doc-oc))
-                              (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha256 doc-oc))))
+                              (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
 			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
                          (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-			 (format nil "~A: ~A/doc?id=~A (sha256: ~A)~%"
+			 (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
 				 red-or-green
 				 *server-uri*
 				 ref
@@ -705,7 +705,7 @@ token claims and token header"
                                              *server-uri*
                                              doctype
                                              report-ref)
-			       :target "_blank" (format nil "Original Report (sha256: ~A)" digest))
+			       :target "_blank" (format nil "Original Report (sha3/256: ~A)" digest))
 			   (:table :class "fold-table" :id "results"
 				   (:tr (:th "RESULT") (:th "ID"))
 				   (dolist (item results)
