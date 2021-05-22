@@ -10,7 +10,7 @@ Quick Start
 ------------
 
 Try out the hosted version at [https://rl.gl](https://rl.gl).  Note
-that documents expire after 7 days.
+that documents expire after 30 days.
 
 For an example of real-world rlgl policy in action, check out the
 policy used to validate unit test reports for
