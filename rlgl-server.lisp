@@ -639,7 +639,7 @@ token claims and token header"
   (track-action "doc" :url (format nil "/doc?id=~A" id))
   (let ((want-sig? (let ((id-string (string id)))
                      (if (str:ends-with? ".SIG" id-string)
-                       (setf id (str:trim 0 (- (length id-string) 4) id-string))
+                       (setf id (str:substring 0 (- (length id-string) 4) id-string))
                        nil))))
     (let ((report
   	  (handler-case (flexi-streams:octets-to-string
