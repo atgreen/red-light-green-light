@@ -134,22 +134,32 @@ $ ID=$(rlgl start)
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/dev.git --id $ID my-test-report.html
-GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F
+GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F (sha3/256: 35da0de414ec6eaaa5c758e1b6b364ab7cad20b39bdfce5b15b44570e0f62ef8)
 ```
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/prod.git --id $ID oval-scan.xml
-RED: http://rlgl-server.example.com/RLGL-1CF5B3A
+RED: http://rlgl-server.example.com/RLGL-1CF5B3A (sha3/256: eb7cad20b64ec6f8758ea4a62e15b439bdfce5b35da0de41aa5c4570e0f1b6b3)
 ```
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/rel.git --id $ID gcc.log
-GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2
+GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2 (sha3/256: f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4)
 ```
 
 Standard exit codes make it easy to integrate `rlgl` into your CI/CD
-pipeline scripts.  `GREEN` lights have an exit code of 0.  `RED`
-lights have an exit code of 1.  Any other exit code is an error.
+pipeline scripts. `GREEN` lights have an exit code of 0. `RED` lights
+have an exit code of 1. Any other exit code is an error. The output
+also includes the sha3/256 checksum of the report for future
+reference.   You can validate the report with openssl like so...
+
+```shell
+$ curl -s http://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256
+(stdin)= f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4
+```
+
+The report also includes a link to the original document, which is
+archived, along with its sha3/256 checksum.
 
 That's it!   The client side is very easy.
 
