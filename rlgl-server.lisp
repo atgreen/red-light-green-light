@@ -193,6 +193,41 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                               :method :post
                               :parameters parameters))))))
 
+
+(defvar *private-key-file* "/etc/rlgl-signer/rlgl-signer-private-key.pem")
+(defvar *public-key-file* "/etc/rlgl-signer/rlgl-signer-public-key.pem")
+(defvar *public-key* (car (inferior-shell:run/lines
+                            (format nil "sh -c 'cat ~A | base64 -w0'" *public-key-file*))))
+
+(defun make-string-signature (s)
+  "Generate a detached signature for S."
+  (with-input-from-string (stream s)
+    (car (inferior-shell:run
+           (format nil "sh -c 'openssl dgst -sha256 -sign ~A - | base64 -w0'" *private-key-file*) :output :lines :input stream))))
+
+(defvar *rekor-uri* "https://rekor.sigstore.dev/api/v1/log/entries")
+
+(defun rekor-envelope (envelope)
+  (when *rekor-uri*
+    (let ((data (json:encode-json-to-string
+                  `((:API-VERSION . "0.0.1")
+                    (:KIND . "rekord")
+                    (:SPEC (:SIGNATURE (:FORMAT . "x509")
+                                       (:CONTENT . ,(make-string-signature envelope))
+                                       (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
+                           (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
+      (multiple-value-bind (a b c d e f g)
+        (drakma:http-request *rekor-uri*
+                             :accept "application/json"
+                             :method :post
+                             :content-type "application/json"
+                             :external-format-out :utf-8
+                             :external-format-in :utf-8
+                             :redirect 100
+                     :content data)
+       (let ((result (flexi-streams:octets-to-string a :external-format :utf-8)))
+          (log:info result))))))
+
 ;; ----------------------------------------------------------------------------
 ;; API authentication
 
@@ -576,6 +611,7 @@ token claims and token header"
                               (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
 			 (rlgl.db:record-log *db* player (version policy) red-or-green ref)
                          (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
+                         (rekor-envelope doc-digest)
 			 (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
 				 red-or-green
 				 *server-uri*
