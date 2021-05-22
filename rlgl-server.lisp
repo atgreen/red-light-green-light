@@ -637,17 +637,24 @@ token claims and token header"
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
-  (let ((report
-	  (handler-case (flexi-streams:octets-to-string
-			 (read-document *storage-driver* id)
-			 :external-format :utf-8)
-	    (error (c)
+  (let ((want-sig? (if (str:ends-with? ".sig" id)
+                       (setf id (str:trim 0 (- (length id) 4) id))
+                       nil)))
+    (let ((report
+  	  (handler-case (flexi-streams:octets-to-string
+  			 (read-document *storage-driver* id)
+  			 :external-format :utf-8)
+  	    (error (c)
 	      (log:error "~A" c)
-	      (alexandria:read-file-into-string
-	       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
-    (if (str:starts-with? "<" report)
-	report
-	(format nil "<html><pre>~A</pre></html>" report))))
+	      (if want-sig?
+                  "Error: document does not exist."
+                  (alexandria:read-file-into-string
+	            (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
+    (if want-sig?
+        (make-string-signature (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 (flexi-streams:string-to-octets report))))
+        (if (str:starts-with? "<" report)
+   	  report
+ 	  (format nil "<html><pre>~A</pre></html>" report))))))
 
 (snooze:defroute doc-html (:get :text/html &key id)
   (track-action "doc-html" :url (format nil "/doc-html?id=~A" id))
