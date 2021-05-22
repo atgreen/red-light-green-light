@@ -637,9 +637,10 @@ token claims and token header"
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
-  (let ((want-sig? (if (str:ends-with? ".SIG" (string id))
-                       (setf id (str:trim 0 (- (length id) 4) (string id)))
-                       nil)))
+  (let ((want-sig? (let ((id-string (string id)))
+                     (if (str:ends-with? ".SIG" id-string)
+                       (setf id (str:trim 0 (- (length id-string) 4) id-string))
+                       nil))))
     (let ((report
   	  (handler-case (flexi-streams:octets-to-string
   			 (read-document *storage-driver* id)
