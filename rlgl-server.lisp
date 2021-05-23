@@ -652,7 +652,7 @@ token claims and token header"
                   (alexandria:read-file-into-string
 	            (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
     (if want-sig?
-	(format nil "~A~%" (rlgl.db:find-signature-by-report *db* id))
+	(rlgl.db:find-signature-by-report *db* id)
         (if (str:starts-with? "<" report)
    	  report
  	  (format nil "<html><pre>~A</pre></html>" report))))))
