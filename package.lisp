@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -36,6 +36,7 @@
   (:shadow #:package)
   (:export #:record-log #:report-log #:db/sqlite #:db/postgresql
 	   #:find-puk-by-api-key #:find-user-by-keycloak-id #:find-policy-bound-api-key
+           #:find-signature-by-report
 	   #:register-test-api-key))
 
 (defpackage #:rlgl.user
