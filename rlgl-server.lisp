@@ -609,7 +609,7 @@ token claims and token header"
 		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                               (ref (store-document *storage-driver* doc-oc))
                               (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
-			 (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest)
+			 (rlgl.db:record-log *db* player (version policy) red-or-green ref (make-string-signature doc-digest))
                          (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                          (rekor-envelope doc-digest)
 			 (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
@@ -652,7 +652,7 @@ token claims and token header"
                   (alexandria:read-file-into-string
 	            (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
     (if want-sig?
-	(rlgl.db:find-signature-by-report *db* id)
+	(format nil "~A~%" (rlgl.db:find-signature-by-report *db* id))
         (if (str:starts-with? "<" report)
    	  report
  	  (format nil "<html><pre>~A</pre></html>" report))))))
