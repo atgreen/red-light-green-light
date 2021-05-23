@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -34,15 +34,16 @@
 	    '("drop table if exists log;"
 	      "drop table if exists users;"
 	      "drop table if exists api_keys;")))
+
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
-	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, unixtimestamp integer);"
+	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, unixtimestamp integer);"
 	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
 	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
-(defmethod record-log ((db db-backend) player version result report)
+(defmethod record-log ((db db-backend) player version result report signature)
   (let ((stmt (format nil (sql-insert-log-statement db)
-		      player version result report)))
+		      player version result report signature)))
     (log:info stmt)
     (dbi:do-sql (connect-cached db) stmt)))
 
@@ -62,6 +63,12 @@
 		    :format local-time:+rfc-1123-format+)
 		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
 	fstr)))
+
+(defmethod find-signature-by-report ((db db-backend) report)
+  (let* ((query (dbi:prepare (connect-cached db)
+			     (format nil "select signature from log where report = '~A';" report)))
+	 (result (dbi:fetch (dbi:execute query))))
+    (getf result :|signature|)))
 
 (defmethod find-puk-by-api-key ((db db-backend) api-key)
   (let* ((query (dbi:prepare (connect-cached db)

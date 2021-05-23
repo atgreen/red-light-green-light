@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -41,7 +41,7 @@
    :db-name "rlgl"
    :host "localhost"
    :port 5432
-   :sql-insert-log-statement "insert into log(id, version, colour, report, unixtimestamp) values ('~A', '~A', '~A', '~A', round(extract(epoch from now())));"))
+   :sql-insert-log-statement "insert into log(id, version, colour, report, signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', round(extract(epoch from now())));"))
 
 (defmethod initialize-instance :after ((db db/postgresql) &key)
   (let ((dbc (connect-cached db)))
