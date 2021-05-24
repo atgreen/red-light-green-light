@@ -68,7 +68,7 @@
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select signature from log where report = '~A';" report)))
 	 (result (dbi:fetch (dbi:execute query))))
-    (getf result :|signature|)))
+    (str:trim (getf result :|signature|))))
 
 (defmethod find-puk-by-api-key ((db db-backend) api-key)
   (let* ((query (dbi:prepare (connect-cached db)
