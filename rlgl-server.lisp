@@ -216,6 +216,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                        (:CONTENT . ,(make-string-signature envelope))
                                        (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
                            (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
+      (log:info data)
       (multiple-value-bind (a b c d e f g)
         (drakma:http-request *rekor-uri*
                              :accept "application/json"
