@@ -207,13 +207,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defvar *rekor-uri* "https://rekor.sigstore.dev/api/v1/log/entries")
 
-(defun rekor-envelope (envelope)
+(defun rekor-envelope (envelope signature)
   (when *rekor-uri*
     (let ((data (json:encode-json-to-string
                   `((:API-VERSION . "0.0.1")
                     (:KIND . "rekord")
                     (:SPEC (:SIGNATURE (:FORMAT . "x509")
-                                       (:CONTENT . ,(make-string-signature envelope))
+                                       (:CONTENT . ,signature)
                                        (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
                            (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
       (log:info data)
@@ -610,14 +610,15 @@ token claims and token header"
 		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                               (ref (store-document *storage-driver* doc-oc))
                               (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
-			 (rlgl.db:record-log *db* player (version policy) red-or-green ref (make-string-signature doc-digest))
-                         (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-                         (rekor-envelope doc-digest)
-			 (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
-				 red-or-green
-				 *server-uri*
-				 ref
-                                 doc-digest)))))))))))
+                         (let ((doc-digest-signature (make-string-signature doc-digest)))
+ 			   (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
+                           (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
+                           (rekor-envelope doc-digest doc-digest-signature)
+			   (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
+			  	   red-or-green
+				   *server-uri*
+				   ref
+                                   doc-digest))))))))))))
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
