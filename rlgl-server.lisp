@@ -51,6 +51,8 @@ db = \"sqlite\"
 sqlite-db-filename = \"/var/rlgl/rlgl.db\"
 postgresql-host = \"localhost\"
 postgresql-port = 5432
+private-key-file = \"/etc/rlgl-signer/rlgl-signer-private-key.pem\"
+public-key-file = \"/etc/rlgl-signer/rlgl-signer-public-key.pem\"
 keycloak-oidc-realm-uri = \"ignore\"
 keycloak-oidc-realm-redirect-uri = \"ignore\"
 keycloak-oidc-client-id = \"ignore\"
@@ -912,6 +914,13 @@ token claims and token header"
       (setf *matomo-token-auth*
             (or (uiop:getenv "MATOMO_TOKEN_AUTH")
                 (get-config-value "matomo-token-auth"))))
+
+    (setf *public-key-file*
+	  (or (uiop:getenv "PUBLIC_KEY_FILE")
+	      (get-config-value "public-key-file")))
+    (setf *private-key-file*
+	  (or (uiop:getenv "PRIVATE_KEY_FILE")
+	      (get-config-value "public-key-file")))
 
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
