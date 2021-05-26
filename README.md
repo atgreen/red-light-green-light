@@ -183,7 +183,7 @@ Verified OK
 The Red Light Green Light server also uploads the signed digest to
 sigstore for non-repudiation of the results.
 
-Given the `digest`, `digest.sig` and `rlgl-publc.pem` files created above, we can search for the sigstore log entry like so:
+Given the `digest`, `digest.sig` and `rlgl-public.pem` files created above, we can search for the sigstore log entry like so:
 
 ```shell
 $ rekor-cli --rekor_server https://rekor.sigstore.dev verify --artifact digest --signature digest.sig --public-key rlgl-public.pem --pki-format x509
