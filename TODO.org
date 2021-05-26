@@ -1,4 +1,8 @@
 * rekor integration
+  Maybe we just need RFC3161 (eg. freetsa.org) support.
+  The important part is proof-of-existance, which RFC3161 provides assuming
+  you can trust the provider.
+
 * Document Compression
 
   Compress all documents before hitting the storage driver, then serve

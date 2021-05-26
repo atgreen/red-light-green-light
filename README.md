@@ -154,12 +154,49 @@ also includes the sha3/256 checksum of the report for future
 reference.   You can validate the report with openssl like so...
 
 ```shell
-$ curl -s http://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256
+$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256
 (stdin)= f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4
 ```
 
 The report also includes a link to the original document, which is
 archived, along with its sha3/256 checksum.
+
+In addition to recording the report for future reference, the Red
+Light Green Light server signs the sha3/256 checksum with a private
+signing key. The base64-encoded signature is always available via curl
+by appending `.sig` to the report URL like so:
+
+```shell
+$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2.sig
+MGQCMBM/nx+jEdu2RVEwSPCYTqWF/bP/3FlX2FPFRGrRZjOgq/tQj0Eg5XDBO0vC1KLnFwIwVFtMPxsrv3DljSrD422qeA4zqz5JDA/PT3NpM91hI/sehmqJgmkAMQjJB/mkn0xl
+```
+
+You can validate this signature against the public signing key like so:
+
+```shell
+$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256 - | awk '{ printf $2 }' > digest
+$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2.sig | base64 -d > digest.sig
+$ openssl dgst -sha256 -verify rlgl-public.pem -signature digest.sig digest
+Verified OK
+```
+
+The Red Light Green Light server also uploads the signed digest to
+sigstore for non-repudiation of the results.
+
+Given the `digest`, `digest.sig` and `rlgl-publc.pem` files created above, we can search for the sigstore log entry like so:
+
+```shell
+$ rekor-cli --rekor_server https://rekor.sigstore.dev verify --artifact digest --signature digest.sig --public-key rlgl-public.pem --pki-format x509
+```
+
+This gives auditors confidence the server owning the private key
+associated with the given public key generated the report at hand at a
+specific time. Since the report references the original test report,
+as well as the sha3/256 digest of that original report, we also can be
+certain that it is the actual report that was used for the policy
+evaluation. And since the report includes the git commit hash of the
+policy used to evaluate the report, we can be certain that it is in
+fact the version of the policy that was used to generate the report.
 
 That's it!   The client side is very easy.
 
@@ -351,7 +388,7 @@ configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
 | Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------|------------------------------------|----------------------------------------------|
+|------------------------------------+------------------------------------+----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
 |                                    | `db`                               | Either `sqlite` or `postgresql`              |
 |                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
@@ -360,6 +397,8 @@ override settings found in the config file.
 |                                    | `postgresql-port`                  | Port for postgresql server                   |
 |                                    | `storage-driver`                   | Either `local` or `s3`                       |
 |                                    | `policy-dir`                       | Local directory for storing policy git repos |
+| `PUBLIC_KEY_FILE`                  | `public-key-file`                  | Public signing key for sigstore records      |
+| `PRIVATE_KEY_FILE`                 | `private-key-file`                 | Private signing key for sigstore records     |
 | `MATOMO_URI`                       | `matomo-uri`                       | URI for a Matomo sever (optional)            |
 | `MATOMO_IDSITE`                    | `matomo-idsite`                    | Site ID for Matomo tracking (optional)       |
 | `MATOMO_TOKEN_AUTH`                | `matomo-token-auth`                | Auth token for Matomo tracking (optional)    |
