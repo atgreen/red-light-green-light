@@ -1,7 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
-;;;                         
+;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -27,7 +27,8 @@
 (in-package #:rlgl.api-key)
 
 (defun authorize-by-api-key (db api-key)
-  (if (rlgl.db:find-puk-by-api-key db api-key)
+  (if (or (rlgl.db:find-puk-by-api-key db api-key)
+          (rlgl.db:find-policy-bound-api-key db api-key))
       t
       nil))
 
@@ -48,7 +49,7 @@
 
 (defun string-to-base32 (s start end)
   (str:substring
-   0 7 
+   0 7
    (base32:bytes-to-base32
     (int-to-byte-array (parse-integer
 			(str:substring start end s) :radix 16)))))
