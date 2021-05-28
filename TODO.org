@@ -1,3 +1,13 @@
+* git credentials for private repos
+  Add a command to bind git credentials to specific repos.
+  Credentials should be stored locally, not in the rlgl server, and
+  would be passed to the server for 'evaluate' runs.
+
+* Export command
+  Implement an export command that would generate a zip file
+  containing report results, original report, policy, hash signature
+  and public key.
+
 * rekor integration
   Maybe we just need RFC3161 (eg. freetsa.org) support.
   The important part is proof-of-existance, which RFC3161 provides assuming
