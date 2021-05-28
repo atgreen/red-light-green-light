@@ -207,7 +207,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
          (signature (with-input-from-string (stream s)
                       (car (inferior-shell:run cmd
                                                :output :lines :input stream)))))
-    (log:info cmd)
     (if (null signature)
         (error "Internal error generating document signature for ~A" s)
         signature)))
@@ -215,7 +214,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (defvar *rekor-uri* "https://rekor.sigstore.dev/api/v1/log/entries")
 
 (defun rekor-envelope (envelope signature)
-  (log:info signature)
   (when *rekor-uri*
     (let ((data (json:encode-json-to-string
                   `((:API-VERSION . "0.0.1")
@@ -224,7 +222,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                        (:CONTENT . ,signature)
                                        (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
                            (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
-      (log:info data)
       (multiple-value-bind (a b c d e f g)
         (drakma:http-request *rekor-uri*
                              :accept "application/json"
