@@ -316,6 +316,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)
+			   (:h4 "API Keys")
+                           "Get your personal API key by " (:a :href "/get-api-key" "clicking here") "."
+			   (:br)
+			   (:br)
 			   (:h4 "Public Signing Key")
                            "The public signing key used for " (:a :href "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
 			   (:br)
@@ -392,6 +396,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-linux-s390x.tgz" "rlgl command-line tool for s390x Linux"))
 			    (:li (:a :href "cli/rlgl-darwin-amd64.tgz" "rlgl command-line tool for 64-bit x86 OSX"))
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
+			   (:br)
+			   (:h4 "API Keys")
+                           "Get your personal API key by " (:a :href "/get-api-key" "clicking here") "."
+			   (:br)
 			   (:br)
 			   (:h4 "Public Signing Key")
                            "The public signing key used for " (:a :href "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
