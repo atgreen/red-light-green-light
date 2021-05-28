@@ -319,6 +319,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:h4 "Public Signing Key")
                            "The public signing key used for " (:a :href "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
 			   (:br)
+			   (:br)
 			   (:h4 "Documentation")
 			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
 			   (:br)
@@ -394,6 +395,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			   (:br)
 			   (:h4 "Public Signing Key")
                            "The public signing key used for " (:a :href "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
+			   (:br)
 			   (:br)
 			   (:h4 "Documentation")
 			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
