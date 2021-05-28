@@ -203,13 +203,19 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defun make-string-signature (s)
   "Generate a detached signature for S."
-  (with-input-from-string (stream s)
-    (car (inferior-shell:run
-           (format nil "sh -c 'openssl dgst -sha256 -sign ~A - | base64 -w0'" *private-key-file*) :output :lines :input stream))))
+  (let* ((cmd (format nil "sh -c 'openssl dgst -sha256 -sign ~A - | base64 -w0'" *private-key-file*))
+         (signature (with-input-from-string (stream s)
+                      (car (inferior-shell:run cmd
+                                               :output :lines :input stream)))))
+    (log:info cmd)
+    (if (null signature)
+        (error "Internal error generating document signature for ~A" s)
+        signature)))
 
 (defvar *rekor-uri* "https://rekor.sigstore.dev/api/v1/log/entries")
 
 (defun rekor-envelope (envelope signature)
+  (log:info signature)
   (when *rekor-uri*
     (let ((data (json:encode-json-to-string
                   `((:API-VERSION . "0.0.1")
@@ -920,7 +926,7 @@ token claims and token header"
 	      (get-config-value "public-key-file")))
     (setf *private-key-file*
 	  (or (uiop:getenv "PRIVATE_KEY_FILE")
-	      (get-config-value "public-key-file")))
+	      (get-config-value "private-key-file")))
 
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")
