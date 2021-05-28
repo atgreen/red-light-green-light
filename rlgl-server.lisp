@@ -317,7 +317,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)
 			   (:h4 "Public Signing Key")
-                           "The base64-encoded public signing key used for " (:a :ref "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
+                           "The public signing key used for " (:a :ref "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
 			   (:h4 "Documentation")
 			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
 			   (:br)
@@ -345,7 +345,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 ;; Render the home page.
 (snooze:defroute index (:get :text/*)
-  (log:info "ROOT")
+  (log:info "ROOT2")
   (track-action "home" :url "/")
   (with-html-string
     (:doctype)
@@ -392,7 +392,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 			    (:li (:a :href "cli/rlgl-windows-amd64.zip" "rlgl command-line tool for 64-bit x86 Windows")))
 			   (:br)
 			   (:h4 "Public Signing Key")
-                           "The base64-encoded public signing key used for " (:a :ref "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
+                           "The public signing key used for " (:a :ref "https://sigstore.dev/" "sigstore") " archiving is available by " (:a :href "/pubkey" "clicking here") "."
 			   (:h4 "Documentation")
 			   "Documentation is found in the " (:a :href "https://github.com/atgreen/red-light-green-light/blob/master/README.md" "Red Light Green Light source README file") "."
 			   (:br)
@@ -648,7 +648,7 @@ token claims and token header"
 (snooze:defroute pubkey (:get :text/plain)
   "Return the public key for this server."
   (track-action "pubkey")
-  *public-key*)
+  (alexandria:read-file-into-string *public-key-file* :external-format :latin-1))
 
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
