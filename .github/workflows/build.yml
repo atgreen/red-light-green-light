@@ -69,6 +69,6 @@ jobs:
     - name: Rollout to staging environment
       uses: actions-hub/kubectl@master
       env:
-        KUBE_CONFIG: ${{ secrets.STAGING_KUBECONFIG }}
+        KUBE_CONFIG: ${{ secrets.PROD_KUBECONFIG }}
       with:
         args: rollout restart deployment rlgl-server
