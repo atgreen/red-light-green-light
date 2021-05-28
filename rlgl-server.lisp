@@ -645,7 +645,7 @@ token claims and token header"
       (log:error "~A" c)
       (format nil "Error storing document: ~A" c))))
 
-(snooze:defroute pubkey (:get :text/text)
+(snooze:defroute pubkey (:get :text/plain)
   "Return the public key for this server."
   (track-action "pubkey")
   *public-key*)
