@@ -1024,9 +1024,7 @@ token claims and token header"
 (defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
   (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
 		      "rlgl_app")))
-    (log:info "START OF REQUEST DISPATCHER")
     (prom:counter.inc *http-requests-counter* :labels labels)
     (prom:histogram.time
      (prom:get-metric *http-request-duration* labels)
-     (log:info "IN REQUEST DISPATCHER")
      (call-next-method))))
