@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -68,10 +68,10 @@ based on URL."
 			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
 				   url policy-dirname)))
 			(progn
-			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull)\""
+			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull --ff-only)\""
 				    policy-dirname)
 			  (inferior-shell:run
-			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull)\""
+			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull --ff-only)\""
 				   policy-dirname))))))
 	(dolist (line output)
 	  (log:info line)))
