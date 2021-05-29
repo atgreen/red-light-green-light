@@ -662,28 +662,31 @@ token claims and token header"
   (track-action "pubkey")
   (alexandria:read-file-into-string *public-key-file* :external-format :latin-1))
 
+(defun want-sig? (id)
+  (let ((id-string (string id)))
+    (if (str:ends-with? ".SIG" id-string)
+       (str:subtring 0 (- (length id-string) 4) id-string))
+       nil))
+
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
-  (let ((want-sig? (let ((id-string (string id)))
-                     (if (str:ends-with? ".SIG" id-string)
-                       (setf id (str:substring 0 (- (length id-string) 4) id-string))
-                       nil))))
-    (let ((report
-  	  (handler-case (flexi-streams:octets-to-string
-  			 (read-document *storage-driver* id)
-  			 :external-format :utf-8)
-  	    (error (c)
-	      (log:error "~A" c)
-	      (if want-sig?
-                  "Error: document does not exist."
-                  (alexandria:read-file-into-string
-	            (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
-    (if want-sig?
-	(rlgl.db:find-signature-by-report *db* id)
+  (let ((sig-id (want-sig? id)))
+    (if sig-id
+      (rlgl.db:find-signature-by-report *db* sig-id)
+      (let ((report
+        (handler-case (flexi-streams:octets-to-string
+                       (read-document *storage-driver* id)
+                       :external-format :utf-8)
+          (error (c)
+            (log:error "~A" c)
+            (if want-sig?
+                "Error: document does not exist."
+                (alexandria:read-file-into-string
+                 (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
         (if (str:starts-with? "<" report)
-   	  report
- 	  (format nil "<html><pre>~A</pre></html>" report))))))
+            report
+            (format nil "<html><pre>~A</pre></html>" report)))))))
 
 (snooze:defroute doc-html (:get :text/html &key id)
   (track-action "doc-html" :url (format nil "/doc-html?id=~A" id))
@@ -697,13 +700,16 @@ token claims and token header"
 
 (snooze:defroute doc-text (:get :text/plain &key id)
   (track-action "doc-text" :url (format nil "/doc-text?id=~A" id))
-  (handler-case (flexi-streams:octets-to-string
-                 (read-document *storage-driver* id)
-                 :external-format :utf-8)
-    (error (c)
-      (log:error "~A" c)
-      (alexandria:read-file-into-string
-       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
+  (let ((sig-id (want-sig? id)))
+    (if sig-id
+      (rlgl.db:find-signature-by-report *db* sig-id)
+      (handler-case (flexi-streams:octets-to-string
+                     (read-document *storage-driver* id)
+                     :external-format :utf-8)
+        (error (c)
+          (log:error "~A" c)
+          (alexandria:read-file-into-string
+           (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
 
 (snooze:defroute doc-pdf (:get :application/pdf &key id)
   (track-action "doc-pdf" :url (format nil "/doc-pdf?id=~A" id))
