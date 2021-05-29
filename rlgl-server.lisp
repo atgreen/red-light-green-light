@@ -665,7 +665,7 @@ token claims and token header"
 (defun want-sig? (id)
   (let ((id-string (string id)))
     (if (str:ends-with? ".SIG" id-string)
-       (str:subtring 0 (- (length id-string) 4) id-string))
+       (str:substring 0 (- (length id-string) 4) id-string))
        nil))
 
 (snooze:defroute doc (:get :text/html &key id)
