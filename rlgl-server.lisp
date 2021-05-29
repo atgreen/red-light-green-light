@@ -686,7 +686,7 @@ token claims and token header"
                  (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
         (if (str:starts-with? "<" report)
             report
-            (format nil "<html><pre>~A</pre></html>" report)))))))
+            (format nil "<html><pre>~A</pre></html>" report))))))
 
 (snooze:defroute doc-html (:get :text/html &key id)
   (track-action "doc-html" :url (format nil "/doc-html?id=~A" id))
