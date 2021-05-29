@@ -680,10 +680,8 @@ token claims and token header"
                        :external-format :utf-8)
           (error (c)
             (log:error "~A" c)
-            (if want-sig?
-                "Error: document does not exist."
-                (alexandria:read-file-into-string
-                 (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
+            (alexandria:read-file-into-string
+             (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
         (if (str:starts-with? "<" report)
             report
             (format nil "<html><pre>~A</pre></html>" report))))))
