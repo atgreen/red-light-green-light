@@ -80,8 +80,7 @@ jobs:
         dockerfiles: |
           Dockerfile
         build-args: |
-          BASE_VERSION=${{ steps.base-hash.outputs.base-hash }}
-          RLGL_VERSION=${{ steps.hash.outputs.hash }}
+          RLGL_VERSION=${{ steps.version.outputs.version }}
 
     - name: Push To quay.io
       id: push-to-quay
