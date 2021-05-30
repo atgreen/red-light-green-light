@@ -48,7 +48,7 @@ jobs:
 
     - name: Test if base exists
       id: base-exists
-      run: echo "::set-output name=base-exists::$(podman manifest inspect quay.io/moxielogic/rlgl-server-base:$HASH > /dev/null 2>&1 && echo 'EXISTS')"
+      run: echo "::set-output name=base-exists::$(podman manifest inspect quay.io/moxielogic/rlgl-server-base:${{ steps.base-hash.outputs.base-hash }} > /dev/null 2>&1 && echo 'EXISTS')"
 
     - name: Prepare base image
       id: build-base
