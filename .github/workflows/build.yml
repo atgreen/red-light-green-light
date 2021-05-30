@@ -50,7 +50,7 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: rlgl-server-base
-        tags: ${{ steps.base-hash.outputs.base-hash }}
+        tags: ${{ steps.base-hash.outputs.base-hash }} latest
         dockerfiles: |
           Dockerfile.base
       if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
@@ -80,6 +80,7 @@ jobs:
         dockerfiles: |
           Dockerfile
         build-args: |
+          BASE_VERSION=${{ steps.base-hash.outputs.base-hash }}
           RLGL_VERSION=${{ steps.hash.outputs.hash }}
 
     - name: Push To quay.io

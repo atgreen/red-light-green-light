@@ -1,4 +1,4 @@
-FROM quay.io/containerlisp/lisp-10-ubi8
+FROM quay.io/moxielogic/rlgl-server-base:latest
 
 COPY . /tmp/src
 ARG RLGL_VERSION=RLGL_VERSION
