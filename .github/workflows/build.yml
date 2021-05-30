@@ -58,7 +58,7 @@ jobs:
         tags: base-hash
         dockerfiles: |
           Dockerfile.base
-      if: ${{ steps.base-exists.outputs.base-exists != "EXISTS" }}
+      if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
 
     - name: Push Base To quay.io
       id: push-to-quay
