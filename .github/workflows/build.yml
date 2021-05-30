@@ -39,7 +39,7 @@ jobs:
 
     - name: Get base hash
       id: base-hash
-      run: echo "::set-output name=base-hash::$(sha512sum rlgl-server.asd | cut -b 1-8)"
+      run: echo "::set-env name=HAVE_FILE::true::set-output name=base-hash::$(sha512sum rlgl-server.asd | cut -b 1-8)"
 
     - name: Test if base exists
       id: base-exists
@@ -50,7 +50,7 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: rlgl-server-base
-        tags: base-hash
+        tags: ${{ steps.base-hash.outputs.base-hash }}
         dockerfiles: |
           Dockerfile.base
       if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
