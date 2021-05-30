@@ -40,15 +40,15 @@ jobs:
 
     - name: Get version number
       id: version
-      run: echo "::set-output name=run::$(git describe --tags --dirty=+)"
+      run: echo "::set-output name=version::$(git describe --tags --dirty=+)"
 
     - name: Get base hash
       id: base-hash
-      run: echo "::set-output name=run::$(sha512sum rlgl-server.asd | cut -b 1-8)"
+      run: echo "::set-output name=base-hash::$(sha512sum rlgl-server.asd | cut -b 1-8)"
 
     - name: Test if base exists
       id: base-exists
-      run: echo "::set-output base-hash=run::$(podman manifest inspect quay.io/moxielogic/rlgl-server-base:$HASH > /dev/null 2>&1 && echo 'EXISTS')"
+      run: echo "::set-output name=base-exists::$(podman manifest inspect quay.io/moxielogic/rlgl-server-base:$HASH > /dev/null 2>&1 && echo 'EXISTS')"
 
     - name: Prepare base image
       id: build-base
