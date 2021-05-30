@@ -69,7 +69,7 @@ jobs:
         registry: quay.io/moxielogic
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
-      if: ${{ steps.base-exists.outputs.base-exists != "EXISTS" }}
+      if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
 
     - name: Buildah Action
       id: build-image
