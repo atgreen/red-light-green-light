@@ -44,7 +44,7 @@ jobs:
 
     - name: Get base hash
       id: base-hash
-      run: echo "::set-output base-hash=run::$(sha512sum rlgl-server.asd | cut -b 1-8)"
+      run: echo "::set-output name=run::$(sha512sum rlgl-server.asd | cut -b 1-8)"
 
     - name: Test if base exists
       id: base-exists
