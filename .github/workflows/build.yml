@@ -61,7 +61,7 @@ jobs:
       if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
 
     - name: Push Base To quay.io
-      id: push-to-quay
+      id: push-base-to-quay
       uses: redhat-actions/push-to-registry@v2
       with:
         image: ${{ steps.build-base.outputs.image }}
