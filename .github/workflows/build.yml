@@ -82,6 +82,17 @@ jobs:
         build-args: |
           RLGL_VERSION=${{ steps.version.outputs.version }}
 
+    - uses: debianmaster/actions-k3s@master
+      id: k3s
+      with:
+        version: 'v1.18.2-k3s1'
+
+    - run: |
+        kubectl get nodes
+        kubectl get pods -A
+        sleep 20
+        kubectl get pods -A
+
     - name: Push To quay.io
       id: push-to-quay
       uses: redhat-actions/push-to-registry@v2
