@@ -82,10 +82,10 @@ jobs:
         build-args: |
           RLGL_VERSION=${{ steps.version.outputs.version }}
 
-    - uses: debianmaster/actions-k3s@master
-      id: k3s
+    - uses: nolar/setup-k3d-k3s@v1
       with:
-        version: 'v1.18.2-k3s1'
+        version: v1.19
+      k3d-args: --disable=traefik
 
     - run: |
         kubectl get nodes
