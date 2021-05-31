@@ -85,12 +85,11 @@ jobs:
     - uses: nolar/setup-k3d-k3s@v1
       with:
         version: v1.19
-        k3d-args: --k3s-server-arg '--no-deploy=traefik'
 
     - run: |
         kubectl get nodes
         kubectl get pods -A
-        sleep 20
+        sleep 60
         kubectl get pods -A
 
     - name: Push To quay.io
