@@ -100,7 +100,7 @@
 			     (junk (log:info (dbi:fetch (dbi:execute query))))
 			     (api-key (getf (dbi:fetch (dbi:execute query)) :|api_key|)))
 			(log:info "~A" result)
-			(apply (make-user-fn db) puk user-uuid api-key preferred-username))))))
+			(funcall (make-user-fn db) puk user-uuid api-key preferred-username))))))
     (if (null user)
 	(progn
 	  (log:info "registering new user ~A" user-uuid)
@@ -112,6 +112,6 @@
 		 (newpuk (getf (dbi:fetch (dbi:execute query)) :|puk|)))
 	    (log:info "created user puk ~A" newpuk)
 	    (dbi:do-sql (connect-cached db)
-	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (apply (make-api-key-fn db)))))
+	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (funcall (make-api-key-fn db)))))
           (find-user-by-keycloak-id db user-uuid preferred-username))
 	user)))
