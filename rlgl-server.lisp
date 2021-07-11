@@ -478,27 +478,27 @@ token claims and token header"
 		       <div class="alert alert-warning alert-dismissible fade show" role="alert" >
 			 "You are logged in as user " ,(progn (rlgl.user:user-name user)) "."
 			 <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
-                           <span aria-hidden="true">X</span> </button>
-                         <div style="width:100px">
-                           <div class="rlgl-svg" />
-                         </div>
-			 <h1 class="mt-5">Your personal API key</h1>
-			 <br />
-                         Your personal API key is <b>,(progn (rlgl.user:user-api-key user))</b>.
-			 <br />
-			 <br />
-			 Use the following command to login to this server:
-                         <pre>
-			   ,(progn (format nil "rlgl login --key ~A ~A"
-					   (rlgl.user:user-api-key user)
-					   *server-uri*))
-                         </pre>
-			 <br />
-			 <hr />
+                           <span aria-hidden="true" >X</span> </button> </div>
+                       <div style="width:100px">
+                         <div class="rlgl-svg" /> </div>
+		       <h1 class="mt-5">Your personal API key</h1>
+		       <br />
+                       Your personal API key is <b>,(progn (rlgl.user:user-api-key user))</b>.
+		       <br />
+		       <br />
+		       Use the following command to login to this server:
+                       <pre>
+			 ,(progn (format nil "rlgl login --key ~A ~A"
+					 (rlgl.user:user-api-key user)
+					 *server-uri*))
+                       </pre>
+		       <br />
+		       <hr />
                          Red Light Green Light was written by Anthony Green <a href="mailto:green@moxielogic.com" >&lt;green@moxielogic.com&gt</a>
-                         and is available in source form under the terms of the AGPLv3 license from
-                         <a href="https://github.com/atgreen/red-light-green-light" > https://github.com/atgreen/red-light-green-light </a>. </div> </div>
+                       and is available in source form under the terms of the AGPLv3 license from
+                       <a href="https://github.com/atgreen/red-light-green-light" > https://github.com/atgreen/red-light-green-light </a>.
                      </div>
+                   </div>
                  </main>
                </page-template>)))))
       (let ((redirect-url
