@@ -218,15 +218,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                        (:CONTENT . ,signature)
                                        (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
                            (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
-      (metabang.bind:bind (((a _ _ _ _ _ _)
-                            (drakma:http-request *rekor-uri*
-                                                 :accept "application/json"
-                                                 :method :post
-                                                 :content-type "application/json"
-                                                 :external-format-out :utf-8
-                                                 :external-format-in :utf-8
-                                                 :redirect 100
-                                                 :content data)))
+      (multiple-value-bind (a b c d e f g)
+        (drakma:http-request *rekor-uri*
+                             :accept "application/json"
+                             :method :post
+                             :content-type "application/json"
+                             :external-format-out :utf-8
+                             :external-format-in :utf-8
+                             :redirect 100
+                     :content data)
        (let ((result (flexi-streams:octets-to-string a :external-format :utf-8)))
           (log:info result))))))
 
