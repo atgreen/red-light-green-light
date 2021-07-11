@@ -46,8 +46,7 @@
 
 (defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."
-  (let ((filename (format nil "RLGL-~A"
-			  (rlgl-util:random-hex-string))))
+  (let ((filename (concatenate 'string "RLGL-" (rlgl-util:random-hex-string))))
     (with-open-file (stream (format nil "~A/~A" (local-dir backend) filename)
 			    :direction :output
 			    :if-exists :supersede
