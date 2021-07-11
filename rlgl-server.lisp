@@ -233,7 +233,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; ----------------------------------------------------------------------------
 ;; API authentication
 
-(defvar *no-auth* t)
+(defvar *no-auth* nil)
 
 (defun authorize ()
   (unless *no-auth*
@@ -802,9 +802,12 @@ token claims and token header"
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
 
-(defun start-rlgl-server (&optional (sleep-forever? nil) (config-ini "/etc/rlgl/config.ini"))
+(defun start-rlgl-server (&optional (no-auth? nil) (sleep-forever? nil) (config-ini "/etc/rlgl/config.ini"))
   "Start the web application and have the main thread sleep forever if
   SLEEP-FOREVER? is not NIL."
+
+  (setf *no-auth* no-auth?)
+
   (setf hunchentoot:*catch-errors-p* t)
   (setf hunchentoot:*show-lisp-errors-p* t)
   (setf hunchentoot:*show-lisp-backtraces-p* t)

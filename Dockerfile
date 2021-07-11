@@ -8,4 +8,4 @@ USER 0
 RUN dnf install -y file poppler-utils gpg && dnf clean all
 RUN mkdir -p /var/rlgl/docs /var/rlgl/policy && chown -R 1001:0 /var/rlgl
 USER 1001
-CMD DEV_BACKEND=slynk APP_SYSTEM_NAME=rlgl-server APP_EVAL="\"(rlgl-server:start-rlgl-server t)\"" /usr/libexec/s2i/run
+CMD DEV_BACKEND=slynk APP_SYSTEM_NAME=rlgl-server APP_EVAL="\"(rlgl-server:start-rlgl-server nil t)\"" /usr/libexec/s2i/run
