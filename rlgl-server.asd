@@ -27,12 +27,9 @@
 	       (:file "policy")
 	       (:file "storage-local")
 	       (:file "storage-s3")
-	       (:file "db")
-	       (:file "db-sqlite")
-	       (:file "db-postgresql")
-	       (:file "user")
 	       (:file "rlgl-server"))
-  :depends-on (:rlgl-parsers :rlgl-util :metabang-bind
+  :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
+               :metabang-bind
                :cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre

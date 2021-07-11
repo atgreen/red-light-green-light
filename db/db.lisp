@@ -22,6 +22,8 @@
 
 (defclass db-backend ()
   ((key :initarg :key :reader key)
+   (make-user-fn :initarg :make-user-fn :reader make-user-fn)
+   (make-api-key-fn :initarg :make-api-key-fn :reader make-api-key-fn)
    (sql-insert-log-statement
     :initarg :sql-insert-log-statement
     :reader sql-insert-log-statement)))
@@ -47,7 +49,7 @@
     (log:info stmt)
     (dbi:do-sql (connect-cached db) stmt)))
 
-(defmethod report-log ((db db-backend) player)
+(defmethod report-log ((db db-backend) server-uri player)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select unixtimestamp, colour, version, report from log where id = '~A';" player)))
 	 (result (dbi:execute query))
@@ -61,7 +63,7 @@
 		   (local-time:format-timestring
 		    s (local-time:unix-to-timestamp time)
 		    :format local-time:+rfc-1123-format+)
-		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version rlgl-server:*server-uri* report)))
+		   (format s ": ~A [~5A] ~A/doc?id=~A~%" result version server-uri report)))
 	fstr)))
 
 (defmethod find-signature-by-report ((db db-backend) report)
@@ -98,7 +100,7 @@
 			     (junk (log:info (dbi:fetch (dbi:execute query))))
 			     (api-key (getf (dbi:fetch (dbi:execute query)) :|api_key|)))
 			(log:info "~A" result)
-			(rlgl.user:make-user puk user-uuid api-key preferred-username))))))
+			(apply (make-user-fn db) puk user-uuid api-key preferred-username))))))
     (if (null user)
 	(progn
 	  (log:info "registering new user ~A" user-uuid)
@@ -110,6 +112,6 @@
 		 (newpuk (getf (dbi:fetch (dbi:execute query)) :|puk|)))
 	    (log:info "created user puk ~A" newpuk)
 	    (dbi:do-sql (connect-cached db)
-	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (rlgl.api-key:make-api-key))))
-	  (find-user-by-keycloak-id db user-uuid preferred-username))
+	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (apply (make-api-key-fn db)))))
+          (find-user-by-keycloak-id db user-uuid preferred-username))
 	user)))

@@ -16,27 +16,24 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-;;;; package.lisp
+(in-package #:rlgl.user)
 
-(defpackage #:matcher
-  (:use #:cl)
-  (:shadow #:package)
-  (:export #:make-policy-matcher #:matcher #:githash #:log-entry
-	   #:kind #:expiration-date
-	   #:match-pair-in-alist #:match-candidate-pattern))
+(defclass user ()
+  ((id :reader user-id)
+   (uuid :reader user-uuid)
+   (api-key :reader user-api-key)
+   (name :reader user-name)))
 
-(defpackage #:policy
-  (:use #:cl #:matcher #:cl-fad)
-  (:shadow #:package)
-  (:export #:*policy-dir* #:make-policy #:apply-policy
-	   #:commit-url-format #:version #:compile-scanners))
+(defun make-user (id uuid api-key login)
+  (let ((u (make-instance 'user)))
+    (setf (slot-value u 'id) id)
+    (setf (slot-value u 'uuid) uuid)
+    (setf (slot-value u 'api-key) api-key)
+    (setf (slot-value u 'name) login)
+    u))
 
-(defpackage #:rlgl-server
-  (:use #:snooze #:cl #:matcher #:policy #:spinneret)
-  (:shadow #:package)
-  (:export #:start-rlgl-server #:stop-rlgl-server
-	   #:db
-	   #:db/sqlite
-	   #:db/postgresql
-	   #:storage/local
-	   #:storage/s3))
+(defun find-user-by-keycloak-id-token (db id-json)
+  (let ((user (rlgl.db:find-user-by-keycloak-id db
+						(cdr (assoc :SUB id-json))
+						(cdr (assoc :NAME id-json)))))
+    user))

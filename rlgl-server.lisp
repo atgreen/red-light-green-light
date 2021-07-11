@@ -218,15 +218,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                        (:CONTENT . ,signature)
                                        (:PUBLIC-KEY (:CONTENT . ,*public-key*)))
                            (:DATA (:CONTENT . ,(cl-base64:string-to-base64-string envelope))))))))
-      (multiple-value-bind (a b c d e f g)
-        (drakma:http-request *rekor-uri*
-                             :accept "application/json"
-                             :method :post
-                             :content-type "application/json"
-                             :external-format-out :utf-8
-                             :external-format-in :utf-8
-                             :redirect 100
-                     :content data)
+      (metabang.bind:bind (((a _ _ _ _ _ _)
+                            (drakma:http-request *rekor-uri*
+                                                 :accept "application/json"
+                                                 :method :post
+                                                 :content-type "application/json"
+                                                 :external-format-out :utf-8
+                                                 :external-format-in :utf-8
+                                                 :redirect 100
+                                                 :content data)))
        (let ((result (flexi-streams:octets-to-string a :external-format :utf-8)))
           (log:info result))))))
 
@@ -360,7 +360,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute report-log (:get :text/plain &key id)
   ;;  (authorize)
   (track-action "log")
-  (rlgl.db:report-log *db* id))
+  (rlgl.db:report-log *db* *server-uri* id))
 
 (defun base64-decode (base-64-string)
   "Takes a base64-uri string and return an array of octets"
@@ -380,8 +380,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (defun decode-jwt (jwt-string)
   "Decodes a JSON Web Token. Returns two alists,
 token claims and token header"
-  (destructuring-bind (header-string claims-string digest-string)
-      (split-sequence:split-sequence #\. jwt-string)
+  (metabang.bind:bind (((header-string claims-string _)
+                        (split-sequence:split-sequence #\. jwt-string)))
     (let* ((headers (json:decode-json-from-string
 		     (flexi-streams:octets-to-string
 		      (base64-decode
@@ -423,6 +423,7 @@ token claims and token header"
 	(format nil "# Could not generate baseline regression policy for ~A~%" id)))))
 
 (snooze:defroute get-api-key (:get :text/html &key code session_state)
+  (declare (ignore session_state))
   (if code
       (progn
         (track-action "get-api-key" :url "/get-api-key")
@@ -439,8 +440,7 @@ token claims and token header"
 		       :external-format :utf-8))
 	       (json (json:decode-json-from-string token)))
 	  ;; FIXME - deal with bad logins
-	  (multiple-value-bind (headers claims)
-	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
+          (metabang.bind:bind (((_ claims) (decode-jwt (cdr (assoc :ID--TOKEN json)))))
 	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
 	      (with-html-string
 		(:doctype)
@@ -889,9 +889,13 @@ token claims and token header"
 	    (alexandria:eswitch (db :test #'equal)
 	      ("sqlite"
 	       (make-instance 'rlgl.db:db/sqlite
+                              :make-user-fn #'rlgl.user:make-user
+                              :make-api-key-fn #'rlgl.api-key:make-api-key
 			      :filename (get-config-value "sqlite-db-filename")))
 	      ("postgresql"
 	       (make-instance 'rlgl.db:db/postgresql
+                              :make-user-fn #'rlgl.user:make-user
+                              :make-api-key-fn #'rlgl.api-key:make-api-key
 			      :password (or (uiop:getenv "POSTGRESQL_PASSWORD")
 					    (get-config-value "postgresql-password"))
 			      :host (get-config-value "postgresql-host")

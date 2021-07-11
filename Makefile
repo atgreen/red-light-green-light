@@ -7,6 +7,8 @@ binary:
 		--asdf-tree `pwd`/3rd-party/cl-json-util \
 		--asdf-tree `pwd`/3rd-party/snooze-20210518-git \
 		--asdf-tree `pwd`/parsers \
+		--asdf-tree `pwd`/db \
+		--asdf-tree `pwd`/user \
 		--asdf-tree `pwd`/util \
 		--asdf-tree ~/quicklisp/dists/quicklisp/software \
 		--load-system rlgl-server \
@@ -18,7 +20,9 @@ check: clean
 	     --disable-debugger \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./user") ql:*local-project-directories* )' \
 	     --eval '(pushnew (truename "./util") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./db") ql:*local-project-directories* )' \
 	     --eval '(pushnew (truename "./parsers") ql:*local-project-directories* )' \
 	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
 	     --eval '(ql:register-local-projects)' \
