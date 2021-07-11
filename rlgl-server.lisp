@@ -476,7 +476,7 @@ token claims and token header"
                    <div class="row" >
                      <div class="col" >
 		       <div class="alert alert-warning alert-dismissible fade show" role="alert" >
-			 "You are logged in as user " ,(progn (rlgl.user:user-name user)) "."
+			 You are logged in as user ,(progn (rlgl.user:user-name user)) .
 			 <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
                            <span aria-hidden="true" >X</span> </button> </div>
                        <div style="width:100px">
