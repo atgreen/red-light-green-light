@@ -440,7 +440,8 @@ token claims and token header"
 		       :external-format :utf-8))
 	       (json (json:decode-json-from-string token)))
 	  ;; FIXME - deal with bad logins
-          (metabang.bind:bind (((_ claims) (decode-jwt (cdr (assoc :ID--TOKEN json)))))
+	  (multiple-value-bind (headers claims)
+	      (decode-jwt (cdr (assoc :ID--TOKEN json)))
 	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
 	      (with-html-string
 		(:doctype)
