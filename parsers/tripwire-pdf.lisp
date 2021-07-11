@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,7 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(in-package :rlgl-server)
+(in-package :rlgl-parsers)
 
 ;;; MVP Tripwire Results report parser
 
@@ -64,9 +64,9 @@
                (setf tests (cons (json:decode-json-from-string
                                   (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": ~S, \"rule\": ~S, \"id\": ~S }"
                                           (find-next tpos "Status: " text)
-                                          (rlgl.util:escape-json-string policy-name)
-                                          (rlgl.util:escape-json-string rule-name)
-                                          (rlgl.util:escape-json-string test-name)))
+                                          (rlgl-util:escape-json-string policy-name)
+                                          (rlgl-util:escape-json-string rule-name)
+                                          (rlgl-util:escape-json-string test-name)))
                                  tests))
                (multiple-value-bind (next-test-name next-tpos)
                    (find-next (+ 1 tpos) "Test Name: " text)

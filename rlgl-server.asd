@@ -22,7 +22,6 @@
   :version "0"
   :serial t
   :components ((:file "package")
-	       (:file "util")
 	       (:file "api-key")
 	       (:file "matcher")
 	       (:file "policy")
@@ -32,17 +31,9 @@
 	       (:file "db-sqlite")
 	       (:file "db-postgresql")
 	       (:file "user")
-	       (:file "oscap-oval")
-	       (:file "oscap-xccdf")
-	       (:file "anchore")
-	       (:file "aqua")
-	       (:file "clair")
-	       (:file "dejagnu")
-	       (:file "junit")
-	       (:file "csv")
-               (:file "tripwire-pdf")
 	       (:file "rlgl-server"))
-  :depends-on (:cl-toml :snooze :cl-json :plump :lquery :ironclad
+  :depends-on (:rlgl-parsers :rlgl-util :metabang-bind
+               :cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
                :cxml :cl-dbi :cl-date-time-parser :quri

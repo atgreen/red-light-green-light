@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,7 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(in-package :rlgl-server)
+(in-package :rlgl-parsers)
 
 ;;; MVP OpenSCAP XCCDF Results report parser
 

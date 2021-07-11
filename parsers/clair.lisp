@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,28 +16,30 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(in-package :rlgl-server)
+(in-package :rlgl-parsers)
 
-;;; MVP CSV parser
+;;; MVP Clair Results report parser
 
 ;; ----------------------------------------------------------------------------
 
-(defclass parser/csv (report-parser)
+(defclass parser/clair (report-parser)
   ()
   (:default-initargs
-   :title  "CSV Report"
+   :title  "Clair Scan Report"
    :doctype "text"))
 
-(defmethod parse-report ((parser parser/csv) doc)
-  "Parse CSV content where the first row specifies the field names."
-  (let* ((csv (cl-csv:read-csv doc
-			       :trim-outer-whitespace t))
-	 (fields (make-array (length (car csv))
-			     :initial-contents (car csv))))
-    (loop for row in (cdr csv)
-	  ;; Filter out blank lines
-	  unless (and (= (length row) 1)
-		    (equalp "" (car row)))
-       collect (json:decode-json-from-string
-		  (let ((l (loop for i from 0 for e in row collect (list (aref fields i) e))))
-		    (format nil "{ ~{\"~A\": \"~A\"~^, ~} }" (alexandria:flatten l)))))))
+
+(defmethod parse-report ((parser parser/clair) doc)
+  (let* ((report (json:decode-json-from-source (flexi-streams:make-flexi-stream
+						(flexi-streams:make-in-memory-input-stream doc)
+						:external-format :utf-8)))
+	 (tests-pass (list))
+	 (tests-fail
+	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))
+	     (mapcar (lambda (v)
+		       (json:decode-json-from-string
+			(format nil "{ \"report\": \"clair\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+				(cdr (assoc :VULNERABILITY v))
+				(cdr (assoc :LINK v)))))
+		     vulnerabilities))))
+    (append tests-fail tests-pass)))

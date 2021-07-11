@@ -388,7 +388,7 @@ configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
 | Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------|------------------------------------|----------------------------------------------|
+|------------------------------------+------------------------------------+----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
 |                                    | `db`                               | Either `sqlite` or `postgresql`              |
 |                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
@@ -396,6 +396,7 @@ override settings found in the config file.
 |                                    | `postgresql-host`                  | Host for postgresql server                   |
 |                                    | `postgresql-port`                  | Port for postgresql server                   |
 |                                    | `storage-driver`                   | Either `local` or `s3`                       |
+|                                    | `local-dir`                        | Local directory for local storage driver     |
 |                                    | `policy-dir`                       | Local directory for storing policy git repos |
 | `PUBLIC_KEY_FILE`                  | `public-key-file`                  | Public signing key for sigstore records      |
 | `PRIVATE_KEY_FILE`                 | `private-key-file`                 | Private signing key for sigstore records     |

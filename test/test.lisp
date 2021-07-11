@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -25,7 +25,7 @@
 (setf prove:*default-reporter* :fiveam)
 
 (defun test-eval (report)
-  
+
     (subtest (format nil "upload ~A" report)
 	     (let ((upload-ref
 		    (drakma:http-request "http://localhost:8080/upload"
@@ -34,14 +34,14 @@
 					 :content (pathname report))))
 	       (like upload-ref "RLGL-[A-Z0-9]+")
 	       (setf *upload-ref* upload-ref)))
-  
+
     (subtest (format nil "evaluate ~A" report)
 	     (print
 	      (drakma:http-request "http://localhost:8080/evaluate"
 				   :method :post
 				   :content-type "application/json"
 				   :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
-						    (rlgl.util:random-hex-string 7)
+						    (rlgl-util:random-hex-string 7)
 						    "http://github.com/moxielogic/rlgl-toolchain-policy"
 						    *upload-ref*))))
     )
@@ -50,8 +50,8 @@
 (defun run ()
 
   (plan 1)
-  
-  (start-rlgl-server nil)
+
+  (start-rlgl-server nil "test/config.ini")
 
   ;; ---------------------------------------------------------------------------
   ;; API tests
@@ -62,10 +62,10 @@
 	      do
 		(let ((id (drakma:http-request "http://localhost:8080/start")))
 		  (is (length id) 7))))
-  
+
   (defvar *upload-ref* nil)
 
-  (test-eval "test/report.html") 
+  (test-eval "test/report.html")
   (test-eval "test/sample-junit.xml")
   (test-eval "test/mysql-aqua.html")
   (test-eval "test/clair-report.json")

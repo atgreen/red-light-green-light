@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,7 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(defpackage #:rlgl.util
+(defpackage #:rlgl-util
   (:use #:cl)
   (:shadow #:package)
   (:export #:random-hex-string
@@ -24,14 +24,15 @@
 	   #:make-absolute-pathname
 	   #:escape-json-string))
 
-(in-package #:rlgl.util)
+(in-package #:rlgl-util)
 
+(defvar *random-state-lock*
+  (bt:make-lock "Random state lock"))
 (setf *random-state* (make-random-state t))
 
-(defun random-hex-string (&optional (length 7))
-  (let ((chars "abcdef0123456789"))
-    (coerce (loop repeat length collect (aref chars (random (length chars))))
-            'string)))
+(defun random-hex-string ()
+  (bt:with-lock-held (*random-state-lock*)
+    (format nil "~:@(~36,8,'0R~)" (random (expt 36 8) *random-state*))))
 
 (defparameter +root-path+ (asdf:component-pathname (asdf:find-system "rlgl-server")))
 

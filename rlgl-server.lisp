@@ -94,7 +94,8 @@ keycloak-oidc-client-secret = \"ignore\"
 ;;
 
 (defclass storage-backend ()
-  ((key :initarg :key :reader key)))
+  ((key :initarg :key :reader key)
+   (config :initarg :config :reader config)))
 
 (defvar *storage-driver* nil)
 
@@ -105,11 +106,6 @@ keycloak-oidc-client-secret = \"ignore\"
 
 ;; ----------------------------------------------------------------------------
 ;; Parsing backends
-
-(defclass report-parser ()
-  ((name :initarg :name :reader name)
-   (title :initarg :title :reader title)
-   (doctype :initarg :doctype :reader doctype)))
 
 ;; Run all of the scripts in recog.d until we find
 ;; a match.
@@ -145,7 +141,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 	(delete-file fname)))
     (when (> (length result) 0)
       (make-instance (read-from-string
-		      (str:concat "rlgl-server:parser/" result))))))
+		      (str:concat "rlgl-parsers:parser/" result))))))
 
 ;; ----------------------------------------------------------------------------
 ;; HTML rendering helpers...
@@ -175,10 +171,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (let* ((request hunchentoot:*request*)
            (parameters `(("idsite" . ,*matomo-idsite*)
                          ("token_auth" . ,*matomo-token-auth*)
-                         ("rand" . ,(rlgl.util:random-hex-string))
+                         ("rand" . ,(rlgl-util:random-hex-string))
                          ("ua" . ,(hunchentoot:user-agent request))
                          ("action_name" . ,action)
-                        ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
+                         ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
                          ("cip" . ,(hunchentoot:real-remote-addr request))
                          ("rec" . "1")
                          ("apiv" . "1"))))
@@ -237,28 +233,32 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; ----------------------------------------------------------------------------
 ;; API authentication
 
+(defvar *no-auth* t)
+
 (defun authorize ()
-  (let* ((request hunchentoot:*request*)
-	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
-	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
-	 (token-type (first token-type-and-value))
-	 (token-string (second token-type-and-value)))
-    ;; Make sure that it is a bearer token
-    (if (and (equalp token-type "Bearer")
-             (rlgl.api-key:authorize-by-api-key *db* token-string))
-        (track-action "authorize" :api-key token-string)
-      (error "Authorization error"))))
+  (unless *no-auth*
+    (let* ((request hunchentoot:*request*)
+           (access-token (hunchentoot:header-in :AUTHORIZATION request))
+           (token-type-and-value (split-sequence:split-sequence #\space access-token))
+           (token-type (first token-type-and-value))
+           (token-string (second token-type-and-value)))
+      ;; Make sure that it is a bearer token
+      (if (and (equalp token-type "Bearer")
+               (rlgl.api-key:authorize-by-api-key *db* token-string))
+          (track-action "authorize" :api-key token-string)
+          (error "Authorization error")))))
 
 (defun authorize-policy-bound-api-key (policy-name)
-  (let* ((request hunchentoot:*request*)
-	 (access-token (hunchentoot:header-in :AUTHORIZATION request))
-	 (token-type-and-value (split-sequence:split-sequence #\space access-token))
-	 (token-type (first token-type-and-value))
-	 (token-string (second token-type-and-value)))
-    ;; Make sure that it is a bearer token
-    (unless (and (equalp token-type "Bearer")
-		 (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
-      (error "Authorization error"))))
+  (unless *no-auth*
+    (let* ((request hunchentoot:*request*)
+           (access-token (hunchentoot:header-in :AUTHORIZATION request))
+           (token-type-and-value (split-sequence:split-sequence #\space access-token))
+           (token-type (first token-type-and-value))
+           (token-string (second token-type-and-value)))
+      ;; Make sure that it is a bearer token
+      (unless (and (equalp token-type "Bearer")
+                   (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
+        (error "Authorization error")))))
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
@@ -351,8 +351,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute start (:get :text/plain)
   (authorize)
-  ;; Return a random 7 character hash
-  (rlgl.util:random-hex-string 7))
+  (rlgl-util:random-hex-string))
 
 (snooze:defroute login (:get :text/plain)
   (track-action "login" :url "/login")
@@ -520,7 +519,7 @@ token claims and token header"
 	    (cond
 	      ((null policy-name)
 	       (error "POLICY missing"))
-	      ((not (rlgl.util:valid-url? policy-name))
+	      ((not (rlgl-util:valid-url? policy-name))
 	       (error "POLICY not a valid URL"))
 	      ((null player)
 	       (error "ID missing"))
@@ -533,7 +532,7 @@ token claims and token header"
 				  (when (str:ends-with? ".csv" filename)
 				    (make-instance 'parser/csv))))
 		      (tests (if parser
-				 (parse-report parser doc)
+				 (rlgl-parsers:parse-report parser doc)
 				 (error "DOCUMENT not recognized"))))
 		 (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
 		 (progn
@@ -542,10 +541,10 @@ token claims and token header"
                      (log:info "Policy applied")
 		     (let ((stream (make-string-output-stream)))
 		       (render stream
-                               (doctype parser)
+                               (rlgl-parsers:doctype parser)
                                (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
                                (cdr (assoc :REF json)) processed-results
-			       (title parser)
+			       (rlgl-parsers:title parser)
 			       (commit-url-format policy))
 		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                               (ref (store-document *storage-driver* doc-oc))
@@ -570,7 +569,7 @@ token claims and token header"
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
 	     (doc (alexandria:read-file-into-byte-vector
-		   (rlgl.util:make-absolute-pathname fpath))))
+		   (rlgl-util:make-absolute-pathname fpath))))
 	(store-document *storage-driver* doc))
     (error (c)
       (log:error "~A" c)
@@ -600,7 +599,7 @@ token claims and token header"
           (error (c)
             (log:error "~A" c)
             (alexandria:read-file-into-string
-             (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
+             (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
         (if (str:starts-with? "<" report)
             report
             (format nil "<html><pre>~A</pre></html>" report))))))
@@ -613,7 +612,7 @@ token claims and token header"
     (error (c)
       (log:error "~A" c)
       (alexandria:read-file-into-string
-       (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
+       (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
 
 (snooze:defroute doc-text (:get :text/plain &key id)
   (track-action "doc-text" :url (format nil "/doc-text?id=~A" id))
@@ -626,7 +625,7 @@ token claims and token header"
         (error (c)
           (log:error "~A" c)
           (alexandria:read-file-into-string
-           (rlgl.util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
+           (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
 
 (snooze:defroute doc-pdf (:get :application/pdf &key id)
   (track-action "doc-pdf" :url (format nil "/doc-pdf?id=~A" id))
@@ -803,7 +802,7 @@ token claims and token header"
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
 
-(defun start-rlgl-server (&optional (sleep-forever? nil))
+(defun start-rlgl-server (&optional (sleep-forever? nil) (config-ini "/etc/rlgl/config.ini"))
   "Start the web application and have the main thread sleep forever if
   SLEEP-FOREVER? is not NIL."
   (setf hunchentoot:*catch-errors-p* t)
@@ -828,9 +827,9 @@ token claims and token header"
 
   ;; Read the user configuration settings.
   (setf *config*
-	(if (fad:file-exists-p "/etc/rlgl/config.ini")
+	(if (fad:file-exists-p config-ini)
 	    (cl-toml:parse
-	     (alexandria:read-file-into-string "/etc/rlgl/config.ini"
+	     (alexandria:read-file-into-string config-ini
 					       :external-format :latin-1))
 	    (make-hash-table)))
 
@@ -847,7 +846,7 @@ token claims and token header"
 
     (setf *server-uri* (or (uiop:getenv "RLGL_SERVER_URI")
 			   (get-config-value "server-uri")))
-    (unless (rlgl.util:valid-url? *server-uri*)
+    (unless (rlgl-util:valid-url? *server-uri*)
       (error "server-uri is not valid URL: ~A" *server-uri*))
 
     ;; Only read the matomo config values if the matomo URI is set.
@@ -906,7 +905,8 @@ token claims and token header"
 	  (make-instance
 	   (read-from-string
 	    (str:concat "rlgl-server:storage/"
-			(get-config-value "storage-driver")))))
+			(get-config-value "storage-driver")))
+           :config *config*))
 
     (log:info "About to initialize policy-dir")
 

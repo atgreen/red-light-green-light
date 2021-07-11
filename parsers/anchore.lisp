@@ -1,5 +1,7 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
+;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
 ;;; as published by the Free Software Foundation, either version 3 of
@@ -14,37 +16,29 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(in-package :rlgl-server)
+(in-package :rlgl-parsers)
 
-;;; MVP JUnit XML parser
+;;; MVP Anchore Results report parser
 
 ;; ----------------------------------------------------------------------------
 
-(defclass parser/junit (report-parser)
+(defclass parser/anchore (report-parser)
   ()
   (:default-initargs
-   :title  "JUnit Test Report"
+   :title  "Anchore Scan Report"
    :doctype "text"))
 
-(defmethod parse-report ((parser parser/junit) doc)
-  (let ((xmls (cxml:parse-octets doc
-				 (cxml-xmls:make-xmls-builder))))
-    (let ((children (cdr (cdr xmls))))
-      (remove nil
-	      (mapcar
-	       (lambda (child)
-		 (if (and (listp child)
-			  (string= (car child) "testcase"))
-		     (let ((classname nil)
-			   (result nil))
-		       (dolist (a (car (cdr child)))
-			 (cond
-			   ((string= (car a) "classname")
-			    (setf classname (car (cdr a))))
-			   ((string= (car a) "name")
-			    (setf result (car (cdr a))))))
+(defmethod parse-report ((parser parser/anchore) doc)
+  (let* ((report (json:decode-json-from-string doc))
+	 (tests-pass (list))
+	 (tests-fail
+	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))
+	     (mapcar (lambda (v)
 		       (json:decode-json-from-string
-			(format nil "{ \"report\": \"junit\", \"result\": \"~A\", \"id\": \"~A\" }"
-				result classname)))
-		     nil))
-	       children)))))
+			(format nil "{ \"report\": \"anchore\", \"result\": \"FAIL\", \"id\": \"~A\", \"package name\": \"~A\", \"severity\": \"~A\", \"url\": \"~A\" }"
+				(cdr (assoc :VULN v))
+				(cdr (assoc :PACKAGE--NAME v))
+				(cdr (assoc :SEVERITY v))
+				(cdr (assoc :URL v)))))
+		     vulnerabilities))))
+    (append tests-fail tests-pass)))

@@ -48,14 +48,6 @@
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
   (:shadow #:package)
   (:export #:start-rlgl-server #:stop-rlgl-server
-	   #:parser/anchore
-	   #:parser/aqua
-	   #:parser/clair
-	   #:parser/dejagnu
-	   #:parser/junit
-	   #:parser/oscap-oval
-	   #:parser/oscap-xccdf
-           #:parser/tripwire-pdf
 	   #:db
 	   #:db/sqlite
 	   #:db/postgresql

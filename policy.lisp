@@ -120,8 +120,7 @@ based on URL."
 
 (defun parse-numeric-range (value)
   "Extract the numeric values for a double-dotted range."
-  (multiple-value-bind (x y start-array end-array)
-      (cl-ppcre:scan +numeric-range+ value)
+  (metabang.bind:bind (((:values _ _ start-array end-array) (cl-ppcre:scan +numeric-range+ value)))
     (values
      (read-from-string
       (subseq value (aref start-array 0) (aref end-array 0)))

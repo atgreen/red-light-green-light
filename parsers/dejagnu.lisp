@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,7 +16,7 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(in-package :rlgl-server)
+(in-package :rlgl-parsers)
 
 ;;; MVP DejaGnu Results report parser
 
@@ -53,21 +53,21 @@
 		     (cons
 		      (json:decode-json-from-string
 		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
-			       host target (rlgl.util:escape-json-string
+			       host target (rlgl-util:escape-json-string
 					    (str:substring 6 nil line))))
 		      tests))
 		    ((str:starts-with? "XFAIL:" line)
 		     (cons
 		      (json:decode-json-from-string
 		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
-			       host target (rlgl.util:escape-json-string
+			       host target (rlgl-util:escape-json-string
 					    (str:substring 7 nil line))))
 		      tests))
 		    ((str:starts-with? "XPASS:" line)
 		     (cons
 		      (json:decode-json-from-string
 		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" }"
-			       host target (rlgl.util:escape-json-string
+			       host target (rlgl-util:escape-json-string
 					    (str:substring 7 nil line))))
 		      tests))
 		    (t tests))))
