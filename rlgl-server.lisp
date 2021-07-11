@@ -296,7 +296,17 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        </nav>
      </header>
      <body>
-       ,@(progn children)
+       <main class="container" role="main">
+         <div class="row" >
+           <div class="col" >
+             ,@(progn children)
+             <hr/>
+             Red Light Green Light was written by Anthony Green <a href="mailto:green@moxielogic.com" >&lt;green@moxielogic.com&gt</a>
+             and is available in source form under the terms of the AGPLv3 license from
+             <a href="https://github.com/atgreen/red-light-green-light" > https://github.com/atgreen/red-light-green-light </a>.
+           </div>
+         </div>
+       </main>
      </body>
      <footer class="page-footer font-small
                     special-color-dark pt-4">
@@ -320,60 +330,50 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (track-action "home" :url "/")
   (markup:write-html
    <page-template title="Red Light Green Light">
-     <main class="container" role="main">
-       <div class="row" >
-         <div class="col" >
-           <div style="width:100px">
-             <div class="rlgl-svg" />
-           </div>
-           <h1 class="mt-5" >Welcome!</h1>
-           <br/>
-           Red Light Green Light is a git-centric tool designed to accelerate CI/CD pipelines.
-           <br/>
-           <br/>
-           This hosted version of Red Light Green Light is an
-           experimental service and offers no guarantees.  Use at your
-           own risk.  Note that all documents and reports will age-out
-           after 30 days.
-           <br/>
-           <br/>
-           <h4>Downloads</h4>
-           <ul>
-             <li><a href="cli/rlgl-linux-amd64.tgz" >rlgl command-line tool for 64-bit x86 Linux</a></li>
-             <li><a href="cli/rlgl-linux-arm.tgz" >rlgl command-line tool for 64-bit ARM Linux</a></li>
-             <li><a href="cli/rlgl-linux-ppc64le.tgz" >rlgl command-line tool for 64-bit Little-Endian Power Linux</a></li>
-             <li><a href="cli/rlgl-linux-s390x.tgz" >rlgl command-line tool for s390x Linux</a></li>
-             <li><a href="cli/rlgl-darwin-amd64.tgz" >rlgl command-line tool for 64-bit x86 OSX</a></li>
-             <li><a href="cli/rlgl-windows-amd64.zip" >rlgl command-line tool for 64-bit x86 Windows</a></li>
-           </ul>
-           <br/>
-           <h4>API Keys</h4>
-           Get your personal API key by <a href="/get-api-key" >clicking here</a>.
-           <br/>
-           <br/>
-           <h4>Public Signing Key</h4>
-           The public signing key used for <a href="https://sigstore.dev/">sigstore</a> archiving
-           is available by <a href="/pubkey" >clicking here</a>.
-           <br/>
-           <br/>
-           <h4>Documentation</h4>
-           Documentation is found in the
-           <a href="https://github.com/atgreen/red-light-green-light/blob/master/README.md" >Red
-             Light Green Light source README file</a>.
-           <br/>
-           <br/>
-           <h4>Reporting Issues</h4>
-           Please feel free to ask questions and report issues here:
-           <a href="https://github.com/atgreen/red-light-green-light/issues" >https://github.com/atgreen/red-light-green-light/issues</a>.
-           <br/>
-           <br/>
-           <hr/>
-           Red Light Green Light was written by Anthony Green <a href="mailto:green@moxielogic.com" >&lt;green@moxielogic.com&gt</a>
-           and is available in source form under the terms of the AGPLv3 license from
-           <a href="https://github.com/atgreen/red-light-green-light" > https://github.com/atgreen/red-light-green-light </a>.
-         </div>
-       </div>
-     </main>
+     <div style="width:100px">
+       <div class="rlgl-svg" />
+     </div>
+     <h1 class="mt-5" >Welcome!</h1>
+     <br/>
+     Red Light Green Light is a git-centric tool designed to accelerate CI/CD pipelines.
+     <br/>
+     <br/>
+     This hosted version of Red Light Green Light is an
+     experimental service and offers no guarantees.  Use at your
+     own risk.  Note that all documents and reports will age-out
+     after 30 days.
+     <br/>
+     <br/>
+     <h4>Downloads</h4>
+     <ul>
+       <li><a href="cli/rlgl-linux-amd64.tgz" >rlgl command-line tool for 64-bit x86 Linux</a></li>
+       <li><a href="cli/rlgl-linux-arm.tgz" >rlgl command-line tool for 64-bit ARM Linux</a></li>
+       <li><a href="cli/rlgl-linux-ppc64le.tgz" >rlgl command-line tool for 64-bit Little-Endian Power Linux</a></li>
+       <li><a href="cli/rlgl-linux-s390x.tgz" >rlgl command-line tool for s390x Linux</a></li>
+       <li><a href="cli/rlgl-darwin-amd64.tgz" >rlgl command-line tool for 64-bit x86 OSX</a></li>
+       <li><a href="cli/rlgl-windows-amd64.zip" >rlgl command-line tool for 64-bit x86 Windows</a></li>
+     </ul>
+     <br/>
+     <h4>API Keys</h4>
+     Get your personal API key by <a href="/get-api-key" >clicking here</a>.
+     <br/>
+     <br/>
+     <h4>Public Signing Key</h4>
+     The public signing key used for <a href="https://sigstore.dev/">sigstore</a> archiving
+     is available by <a href="/pubkey" >clicking here</a>.
+     <br/>
+     <br/>
+     <h4>Documentation</h4>
+     Documentation is found in the
+     <a href="https://github.com/atgreen/red-light-green-light/blob/master/README.md" >Red
+       Light Green Light source README file</a>.
+     <br/>
+     <br/>
+     <h4>Reporting Issues</h4>
+     Please feel free to ask questions and report issues here:
+     <a href="https://github.com/atgreen/red-light-green-light/issues" >https://github.com/atgreen/red-light-green-light/issues</a>.
+     <br/>
+     <br/>
    </page-template>))
 
 (snooze:defroute start (:get :text/plain)
@@ -472,34 +472,20 @@ token claims and token header"
 	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
               (markup:write-html
                <page-template title="Red Light Green Light">
-                 <main class="container" role="main">
-                   <div class="row" >
-                     <div class="col" >
-		       <div class="alert alert-warning alert-dismissible fade show" role="alert" >
-			 You are logged in as user ,(progn (rlgl.user:user-name user)) .
-			 <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
-                           <span aria-hidden="true" >X</span> </button> </div>
-                       <div style="width:100px">
-                         <div class="rlgl-svg" /> </div>
-		       <h1 class="mt-5">Your personal API key</h1>
-		       <br />
-                       Your personal API key is <b>,(progn (rlgl.user:user-api-key user))</b>.
-		       <br />
-		       <br />
-		       Use the following command to login to this server:
-                       <pre>
-			 ,(progn (format nil "rlgl login --key ~A ~A"
-					 (rlgl.user:user-api-key user)
-					 *server-uri*))
-                       </pre>
-		       <br />
-		       <hr />
-                         Red Light Green Light was written by Anthony Green <a href="mailto:green@moxielogic.com" >&lt;green@moxielogic.com&gt</a>
-                       and is available in source form under the terms of the AGPLv3 license from
-                       <a href="https://github.com/atgreen/red-light-green-light" > https://github.com/atgreen/red-light-green-light </a>.
-                     </div>
-                   </div>
-                 </main>
+		 <div class="alert alert-warning alert-dismissible fade show" role="alert" >
+		   You are logged in as user ,(progn (rlgl.user:user-name user)) .
+		   <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
+                     <span aria-hidden="true" >X</span> </button> </div>
+                 <div style="width:100px">
+                   <div class="rlgl-svg" /> </div>
+		 <h1 class="mt-5">Your personal API key</h1>
+		 <br />
+                 Your personal API key is <b>,(progn (rlgl.user:user-api-key user))</b>.
+		 <br />
+		 <br />
+		 Use the following command to login to this server:<pre>
+,(progn (format nil "rlgl login --key ~A ~A" (rlgl.user:user-api-key user) *server-uri*))</pre>
+		 <br />
                </page-template>)))))
       (let ((redirect-url
 	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email"
