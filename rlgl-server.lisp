@@ -581,13 +581,18 @@ token claims and token header"
     (if sig-id
       (rlgl.db:find-signature-by-report *db* sig-id)
       (let ((report
-        (handler-case (flexi-streams:octets-to-string
-                       (read-document *storage-driver* id)
-                       :external-format :utf-8)
-          (error (c)
-            (log:error "~A" c)
-            (alexandria:read-file-into-string
-             (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1)))))
+              (handler-case (flexi-streams:octets-to-string
+                             (read-document *storage-driver* id)
+                             :external-format :utf-8)
+                (error (c)
+                  (log:error "~A" c)
+                  (markup:write-html
+                   <page-template title="Red Light Green Light">
+                     <div style="width:100px">
+                       <div class="rlgl-svg" /> </div>
+                     <h1 class="mt-5">This document appears to be missing.</h1>
+                     <br />
+                   </page-template>)))))
         (if (str:starts-with? "<" report)
             report
             (format nil "<html><pre>~A</pre></html>" report))))))
