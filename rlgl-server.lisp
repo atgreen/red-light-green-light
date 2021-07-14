@@ -288,7 +288,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; Return the rekor validation script
 (snooze:defroute validate (:get :text/plain &key id)
   (funcall (cl-template:compile-template *validate.sh-template*)
-           (list :id id
+           (list :id (string id)
                  :server-uri *server-uri*
                  :rlgl-git-version +rlgl-git-version+)))
 
