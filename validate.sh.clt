@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# Red Light Green Light validate.sh version <%= @ rlgl-git-version %>
+
+# Print out the sigstore record for a rlgl report.  This script
+# generates a digest of the report, validates the signature with the
+# public key of the signing service, and looks it up in the rekor
+# log.  It is provided in script that you can run for transparency
+# and audit purposes.
+
+# ---- Identify the document that we are verifing the sigstore document for ---
+DOC=<%= @ id %>
+
+function error_exit
+{
+    echo ERROR: ${1:-"Unknown Error"} 1>&2
+    exit 1
+}
+
+# ---- Verify that all required programs are installed ------------------------
+awk --help > /dev/null 2>&1 || error_exit "Cannot run awk.  Please install it."
+for PROGRAM in "rekor-cli version" "openssl version" "curl --help" "grep --help" "base64 --help"; do
+    $PROGRAM > /dev/null 2>&1 || error_exit "Cannot run $(echo ${PROGRAM} | awk '{ printf $1 }').  Please install it."
+done
+
+# ---- Create names of temporary files ----------------------------------------
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf -- "$TMPDIR"' EXIT
+PUBKEY=${TMPDIR}/rlgl.pem
+DIGEST=${TMPDIR}/${DOC}.digest
+SIGNATURE=${TMPDIR}/${DOC}.digest.sig
+
+# ---- Download all artifacts -------------------------------------------------
+curl -s <%= @ server-uri %>/pubkey > ${PUBKEY}
+curl -s <%= @ server-uri %>/doc?id=${DOC} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
+curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SIGNATURE}
+
+# ---- Validate the signature of the document digest --------------------------
+echo Checking document signature: $(openssl dgst -sha256 -verify ${PUBKEY} -signature ${SIGNATURE} ${DIGEST})
+echo
+
+# ---- Look up this document in rekor and print out the record -------------
+echo Searching for sigstore record:
+HASH=$(rekor-cli verify --artifact ${DIGEST} --signature ${SIGNATURE} --public-key ${PUBKEY} --pki-format x509 | grep "Entry Hash:" | awk '{ printf $3 }')
+rekor-cli get --uuid $HASH

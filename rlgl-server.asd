@@ -29,7 +29,7 @@
 	       (:file "storage-s3")
 	       (:file "rlgl-server"))
   :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
-               :metabang-bind :markup
+               :metabang-bind :markup :cl-template
                :cl-toml :snooze :cl-json :plump :lquery :ironclad
 	       :inferior-shell :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre

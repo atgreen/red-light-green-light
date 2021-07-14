@@ -68,6 +68,12 @@ keycloak-oidc-client-secret = \"ignore\"
 (defvar *keycloak-oidc-client-secret* nil)
 
 ;; ----------------------------------------------------------------------------
+;; Read the validation shell script template.
+
+(defvar *validate.sh-template*
+  (alexandria:read-file-into-string "validate.sh.clt" :external-format :latin-1))
+
+;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
 (defparameter *http-requests-counter* nil)
 (defparameter *http-request-duration* nil)
@@ -270,6 +276,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; Readiness probe
 (snooze:defroute healthz (:get :text/*)
   "ready")
+
+;; Return the rekor validation script
+(snooze:defroute validate (:get :text/plain &key id)
+  (funcall (cl-template:compile-template
+            *validate.sh-template*
+            (list :id id
+                  :server-uri *server-uri*
+                  :rlgl-git-version +rlgl-git-version+))))
 
 (markup:deftag page-template (children &key title)
    <html>
