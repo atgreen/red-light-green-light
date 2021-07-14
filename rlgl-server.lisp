@@ -40,6 +40,12 @@
  	(or (uiop:getenv "RLGL_VERSION") v)
  	v)))
 
+(defun rlgl-root ()
+  (fad:pathname-as-directory
+   (make-pathname :name nil
+                  :type nil
+                  :defaults #.(or *compile-file-truename* *load-truename*))))
+
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
 
@@ -71,7 +77,8 @@ keycloak-oidc-client-secret = \"ignore\"
 ;; Read the validation shell script template.
 
 (defvar *validate.sh-template*
-  (alexandria:read-file-into-string "validate.sh.clt" :external-format :latin-1))
+  (alexandria:read-file-into-string
+   (concatenate 'string (rlgl-root) "/validate.sh.clt") :external-format :latin-1))
 
 ;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
@@ -744,12 +751,6 @@ token claims and token header"
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
-
-(defun rlgl-root ()
-  (fad:pathname-as-directory
-   (make-pathname :name nil
-                  :type nil
-                  :defaults #.(or *compile-file-truename* *load-truename*))))
 
 (defparameter +rlgl-dispatch-table+
   (list
