@@ -78,7 +78,8 @@ keycloak-oidc-client-secret = \"ignore\"
 
 (defvar *validate.sh-template*
   (alexandria:read-file-into-string
-   (concatenate 'string (rlgl-root) "/validate.sh.clt") :external-format :latin-1))
+   (merge-pathnames #p"validate.sh.clt" (rlgl-root))
+   :external-format :latin-1))
 
 ;; ----------------------------------------------------------------------------
 (defparameter *rlgl-registry* nil)
