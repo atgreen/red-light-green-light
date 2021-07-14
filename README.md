@@ -140,17 +140,17 @@ $ ID=$(rlgl start)
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/dev.git --id $ID my-test-report.html
-GREEN: http://rlgl-server.example.com/RLGL-BC7DB3F (sha3/256: 35da0de414ec6eaaa5c758e1b6b364ab7cad20b39bdfce5b15b44570e0f62ef8)
+GREEN: http://rlgl-server.example.com/doc?id=RLGL-BC7DB3F (sha3/256: 35da0de414ec6eaaa5c758e1b6b364ab7cad20b39bdfce5b15b44570e0f62ef8)
 ```
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/prod.git --id $ID oval-scan.xml
-RED: http://rlgl-server.example.com/RLGL-1CF5B3A (sha3/256: eb7cad20b64ec6f8758ea4a62e15b439bdfce5b35da0de41aa5c4570e0f1b6b3)
+RED: http://rlgl-server.example.com/doc?id=RLGL-1CF5B3A (sha3/256: eb7cad20b64ec6f8758ea4a62e15b439bdfce5b35da0de41aa5c4570e0f1b6b3)
 ```
 
 ```shell
 $ rlgl evaluate --policy https://git.example.com/policy/rel.git --id $ID gcc.log
-GREEN: http://rlgl-server.example.com/RLGL-AFC7DB2 (sha3/256: f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4)
+GREEN: http://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 (sha3/256: f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4)
 ```
 
 Standard exit codes make it easy to integrate `rlgl` into your CI/CD
@@ -160,7 +160,7 @@ also includes the sha3/256 checksum of the report for future
 reference.   You can validate the report with openssl like so...
 
 ```shell
-$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256
+$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 | openssl dgst -sha3-256
 (stdin)= f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4
 ```
 
@@ -173,15 +173,15 @@ signing key. The base64-encoded signature is always available via curl
 by appending `.sig` to the report URL like so:
 
 ```shell
-$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2.sig
+$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2.sig
 MGQCMBM/nx+jEdu2RVEwSPCYTqWF/bP/3FlX2FPFRGrRZjOgq/tQj0Eg5XDBO0vC1KLnFwIwVFtMPxsrv3DljSrD422qeA4zqz5JDA/PT3NpM91hI/sehmqJgmkAMQjJB/mkn0xl
 ```
 
 You can validate this signature against the public signing key like so:
 
 ```shell
-$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2 | openssl dgst -sha3-256 - | awk '{ printf $2 }' > digest
-$ curl -s https://rlgl-server.example.com/RLGL-AFC7DB2.sig | base64 -d > digest.sig
+$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 | openssl dgst -sha3-256 - | awk '{ printf $2 }' > digest
+$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2.sig | base64 -d > digest.sig
 $ openssl dgst -sha256 -verify rlgl-public.pem -signature digest.sig digest
 Verified OK
 ```
@@ -255,10 +255,10 @@ currently archived forever.
 
 ```shell
 $ rlgl log --id=$ID
-Tue, 29 Jan 2019 13:15:29 -0500 Green: 00430cf0324532aab032423 http://rlgl-server.example.com?doc=RLGL-AFC7DB2
-Tue, 29 Jan 2019 13:16:31 -0500 Green: 10430cf0324532aab032423 http://rlgl-server.example.com?doc=RLGL-CFB5DB3
-Tue, 29 Jan 2019 13:16:50 -0500 Green: 20430cf0324532aab032423 http://rlgl-server.example.com?doc=RLGL-DFC55B6
-Tue, 29 Jan 2019 13:16:55 -0500   Red: 30430cf0324532aab032423 http://rlgl-server.example.com?doc=RLGL-8FB75B4
+Tue, 29 Jan 2019 13:15:29 -0500 Green: 00430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-AFC7DB2
+Tue, 29 Jan 2019 13:16:31 -0500 Green: 10430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-CFB5DB3
+Tue, 29 Jan 2019 13:16:50 -0500 Green: 20430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-DFC55B6
+Tue, 29 Jan 2019 13:16:55 -0500   Red: 30430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-8FB75B4
 ```
 
 The format of this log is:
