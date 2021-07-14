@@ -287,11 +287,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 ;; Return the rekor validation script
 (snooze:defroute validate (:get :text/plain &key id)
-  (funcall (cl-template:compile-template
-            *validate.sh-template*
-            (list :id id
-                  :server-uri *server-uri*
-                  :rlgl-git-version +rlgl-git-version+))))
+  (funcall (cl-template:compile-template *validate.sh-template*)
+           (list :id id
+                 :server-uri *server-uri*
+                 :rlgl-git-version +rlgl-git-version+)))
 
 (markup:deftag page-template (children &key title)
    <html>
