@@ -285,6 +285,22 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 (snooze:defroute healthz (:get :text/*)
   "ready")
 
+;; Create a policy-bound API key
+(defun do-new-policy-bound-api-key ()
+  (authorize)
+  (let ((json-string
+	  (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
+    (log:info "new-policy-bound-api-key: '~A'" json-string)
+    (let ((json (json:decode-json-from-string json-string)))
+      (let ((policy-name (cdr (assoc :POLICY json)))
+            (api-key (make-api-key)))
+        (if (valid-url? policy-name)
+            (register-policy-bound-api-key *db* api-key policy-name)
+            (progn
+              (let ((msg (format nil "Policy is not a valid URL: ~A" policy-name)))
+                (log:error msg)
+                msg)))))))
+
 ;; Return the rekor validation script
 (snooze:defroute validate (:get :text/plain &key id)
   (funcall (cl-template:compile-template *validate.sh-template*)
@@ -772,6 +788,7 @@ token claims and token header"
                             :defaults (rlgl-root))))
    (hunchentoot:create-prefix-dispatcher "/upload" 'do-upload)
    (hunchentoot:create-prefix-dispatcher "/evaluate" 'do-evaluate)
+   (hunchentoot:create-prefix-dispatcher "/new-policy-bound-api-key" 'do-new-policy-bound-api-key)
    (snooze:make-hunchentoot-app)))
 
 (defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)

@@ -419,6 +419,49 @@ func main() {
 			},
 		},
 		{
+			Name:  "new-policy-bound-api-key",
+			Usage: "create a new policy bound API key",
+
+			Action: func(c *cli.Context) error {
+
+				if config.Host == "" {
+					exitErr(fmt.Errorf("Login to server first"))
+				}
+
+				if c.NArg() == 0 {
+				   exitErr(fmt.Errorf("Missing policy argument"))
+				} else if c.NArg() > 1 {
+				   exitErr(fmt.Errorf("Too may arguments"))
+				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
+
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/new-policy-bound-api-key?policy=%s", config.Host, c.Args().First()), nil);
+				if err != nil {
+					log.Fatal(err)
+				}
+				var bearer = "Bearer " + config.Key;
+				request.Header.Add("Authorization", bearer)
+				request.Header.Add("Content-Type", "text");
+				client := &http.Client{}
+				response, err := client.Do(request)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer response.Body.Close()
+
+				responseData, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Print(string(responseData))
+
+				return nil
+			},
+		},
+		{
 			Name:  "baseline",
 			Aliases: []string{"b"},
 			Usage: "generate baseline XFAIL regression policy",

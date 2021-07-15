@@ -115,3 +115,8 @@
 	      (format nil "insert into api_keys(puk, api_key) values (~A, '~A');" newpuk (funcall (make-api-key-fn db)))))
           (find-user-by-keycloak-id db user-uuid preferred-username))
 	user)))
+
+(defmethod register-policy-bound-api-key ((db db-backend) api-key policy)
+  (dbi:do-sql (connect-cached db)
+    (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy))
+  api-key)
