@@ -236,6 +236,24 @@ evaluation. And since the report includes the git commit hash of the
 policy used to evaluate the report, we can be certain that it is in
 fact the version of the policy that was used to generate the report.
 
+Your API key is tied to your personal account.  It is personal and
+secret, and you should treat it accordingly.  You may, however, be in
+a situation where you want to share an API key with others.  For
+instance, if you are using public CI testing infrastructure for an
+open source project, it may not be practical or even possible to
+secure the API key. In situations like these, you can create what is
+called a 'policy bound API key'.  This is an API key that is not
+associated with any user.  Rather, it is bound to a specific policy
+URL.
+
+```shell
+$ rlgl new-policy-bound-api-key https://github.com/libffi/rlgl-policy
+78GN98B-QUCN87V-09UN45X-AAQ89BB
+```
+
+You can now share this API key with others, but it will only work with
+the policy found at `https://github.com/libffi/rlgl-policy`.
+
 That's it!   The client side is very easy.
 
 The server side, where policy is evaluated, is where the magic is.

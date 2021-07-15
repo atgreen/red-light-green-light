@@ -436,7 +436,7 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth);
 
-				values := map[string]string{"policy": policy}
+				values := map[string]string{"policy": c.Args().First()}
 
 				jsonValue, _ := json.Marshal(values)
 

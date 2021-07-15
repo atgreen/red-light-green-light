@@ -297,7 +297,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
         (if (rlgl-util:valid-url? policy-name)
             (let ((key (rlgl.db:register-policy-bound-api-key *db* api-key policy-name)))
               (log:info "New policy bound API key: ~A ~A" key policy-name)
-              key)
+              (format nil "~A~%" key))
             (progn
               (let ((msg (format nil "Policy is not a valid URL: ~A" policy-name)))
                 (log:error msg)
