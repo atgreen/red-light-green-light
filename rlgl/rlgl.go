@@ -1,4 +1,4 @@
-// rlgl.go - Copyright 2018, 2019, 2020  Anthony Green <green@moxielogic.com>
+// rlgl.go - Copyright 2018-2021  Anthony Green <green@moxielogic.com>
 //
 // This program is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Affero General Public License
@@ -31,7 +31,7 @@ import (
 	"strings"
 	"time"
 	"mime/multipart"
-	
+
 	"github.com/fatih/color"
 	"github.com/naoina/toml"
 	"github.com/urfave/cli/v2"
@@ -130,7 +130,7 @@ func xdgSupport() bool {
 func setProxy (proxy string, auth string) {
 
 	var transport *http.Transport;
-	
+
 	if proxy != "" {
 		proxyUrl, err := url.Parse(proxy)
 		if err != nil {
@@ -149,7 +149,7 @@ func setProxy (proxy string, auth string) {
 				Proxy: http.ProxyURL(proxyUrl),
 			}
 		}
-		
+
 		http.DefaultTransport = transport;
 	}
 }
@@ -157,47 +157,47 @@ func setProxy (proxy string, auth string) {
 
 func SendPostRequest (config *Config, url string, filename string, filetype string) []byte {
 	file, err := os.Open(filename)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-	
-	
+
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile(filetype, file.Name())
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	io.Copy(part, file)
 	writer.Close()
 	request, err := http.NewRequest("POST", url, body)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	var bearer = "Bearer " + config.Key;
 	request.Header.Add("Authorization", bearer)
-	
+
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	client := &http.Client{}
 	response, err := client.Do(request)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer response.Body.Close()
-	
+
 	content, err := ioutil.ReadAll(response.Body)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	return content
 }
 
@@ -271,7 +271,7 @@ func main() {
 				}
 
 				setProxy(proxy, proxyauth);
-				
+
 				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()))
 
 				if err != nil {
@@ -304,7 +304,7 @@ func main() {
 				setProxy(config.Proxy, config.ProxyAuth);
 
 				var bearer = "Bearer " + config.Key;
-				
+
 				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
 				req.Header.Add("Authorization",	bearer)
 
@@ -348,7 +348,7 @@ func main() {
 				}
 
 				// TODO: validate ID is a hex number
-				
+
 				if c.NArg() != 0 {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
@@ -365,6 +365,54 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
+				fmt.Print(string(responseData))
+
+				return nil
+			},
+		},
+		{
+			Name:  "validate",
+			Aliases: []string{"v"},
+			Usage: "validate document sigstore record",
+
+			Action: func(c *cli.Context) error {
+
+				if config.Host == "" {
+					exitErr(fmt.Errorf("Login to server first"))
+				}
+
+				if c.NArg() == 0 {
+				   exitErr(fmt.Errorf("Missing report argument"))
+				} else if c.NArg() > 1 {
+				   exitErr(fmt.Errorf("Too may arguments"))
+				}
+
+				setProxy(config.Proxy, config.ProxyAuth);
+
+				if !strings.HasPrefix(c.Args().First(), "RLGL-") {
+				   exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()));
+				}
+
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/validate?id=%s", config.Host, c.Args().First()), nil);
+				if err != nil {
+					log.Fatal(err)
+				}
+				var bearer = "Bearer " + config.Key;
+				request.Header.Add("Authorization", bearer)
+				request.Header.Add("Content-Type", "text");
+				client := &http.Client{}
+				response, err := client.Do(request)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer response.Body.Close()
+
+				responseData, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
 				fmt.Print(string(responseData))
 
 				return nil
@@ -407,7 +455,7 @@ func main() {
 					log.Fatal(err)
 				}
 				defer response.Body.Close()
-				
+
 				responseData, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
@@ -485,18 +533,18 @@ func main() {
 				request.Header.Add("Content-Type", "application/json");
 				client := &http.Client{}
 				response, err := client.Do(request)
-				
+
 				if err != nil {
 					log.Fatal(err)
 				}
 				defer response.Body.Close()
-				
+
 				responseData, err := ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
 				fmt.Print(string(responseData))
-				
+
 				if strings.HasPrefix(string(responseData), "GREEN:") {
 					os.Exit(0)
 				} else {
