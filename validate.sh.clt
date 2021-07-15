@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Red Light Green Light validate.sh version <%= @ rlgl-git-version %>
+# Red Light Green Light validate.sh version <%= @ rlgl-version %>
 
 # Print out the sigstore record for a rlgl report.  This script
 # generates a digest of the report, validates the signature with the

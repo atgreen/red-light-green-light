@@ -189,14 +189,22 @@ Verified OK
 The Red Light Green Light server also uploads the signed digest to
 sigstore for non-repudiation of the results.
 
-Given the `digest`, `digest.sig` and `rlgl-public.pem` files created above, we can search for the sigstore log entry like so:
+The `rlgl` tool can generate a simple shell script to validate
+signatures and search for the sigstore log entry.  View the shell
+script like so:
 
 ```shell
-$ rekor-cli --rekor_server https://rekor.sigstore.dev verify --artifact digest --signature digest.sig --public-key rlgl-public.pem --pki-format x509
+$ rlgl validate RLGL-AFC7DB2
+```
+
+You can execute the validation script simply by feeding the output to a shell program:
+
+```shell
+$ rlgl validate RLGL-AFC7DB2 | sh
 ```
 
 This gives auditors confidence the server owning the private key
-associated with the given public key generated the report at hand at a
+associated with the given public key generated the given report at a
 specific time. Since the report references the original test report,
 as well as the sha3/256 digest of that original report, we also can be
 certain that it is the actual report that was used for the policy

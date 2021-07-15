@@ -290,7 +290,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (funcall (cl-template:compile-template *validate.sh-template*)
            (list :id (string id)
                  :server-uri *server-uri*
-                 :rlgl-git-version +rlgl-git-version+)))
+                 :rlgl-version +rlgl-version+)))
 
 (markup:deftag page-template (children &key title)
    <html>
