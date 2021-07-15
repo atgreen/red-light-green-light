@@ -293,7 +293,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (log:info "new-policy-bound-api-key: '~A'" json-string)
     (let ((json (json:decode-json-from-string json-string)))
       (let ((policy-name (cdr (assoc :POLICY json)))
-            (api-key (make-api-key)))
+            (api-key (rlgl.api-key:make-api-key)))
         (if (rlgl-util:valid-url? policy-name)
             (let ((key (rlgl.db:register-policy-bound-api-key *db* api-key policy-name)))
               (log:info "New policy bound API key: ~A ~A" key policy-name)
