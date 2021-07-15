@@ -201,6 +201,30 @@ You can execute the validation script simply by feeding the output to a shell pr
 
 ```shell
 $ rlgl validate RLGL-AFC7DB2 | sh
+Checking document signature: Verified OK
+
+Searching for sigstore record:
+LogID: c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d
+Index: 5740
+IntegratedTime: 2021-07-13T22:06:51Z
+UUID: d5cb372f2067cbf2f9eb9edace960ad9ca51994a26d6450d044ed24ceffc204c
+Body: {
+  "RekordObj": {
+    "data": {
+      "hash": {
+        "algorithm": "sha256",
+        "value": "c9693cfbd2c371e30a012e42140e6127171cb25d435d0646c941f190b4a21f7c"
+      }
+    },
+    "signature": {
+      "content": "MGQCMBVJyQi5HseSBqyXa8dXQFb6P2h1FHjFesQRPBqDhMik+NfplFG7bt41K5rE8ywyKAIwLtIvwn/DGJSzBTvD7evBMnUzGOHopXtqxUTZhPo2skKaohV69nOPBy+y5YuJzpJb",
+      "format": "x509",
+      "publicKey": {
+        "content": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU4ZG8rQVFwbm5tanBwK1J1Y05tTy8zN04xVWpGNzZNZwpXd01Jcm1odlZvTjExajZXL0krSitQdk5NbDZiWHdvQnh0dk53V3dLbzFSdEZ3dGFXMWpWZnNCNEV6SkErb05PCkdEUDlNTmdCQW5uN3JiKzgrTm1XUW1IUllQeEJtbmFJCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
+      }
+    }
+  }
+}
 ```
 
 This gives auditors confidence the server owning the private key
@@ -402,7 +426,7 @@ configuration file, `/etc/rlgl/config.ini`. Environment variables
 override settings found in the config file.
 
 | Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------+------------------------------------+----------------------------------------------|
+|------------------------------------|------------------------------------|----------------------------------------------|
 | `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
 |                                    | `db`                               | Either `sqlite` or `postgresql`              |
 |                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
