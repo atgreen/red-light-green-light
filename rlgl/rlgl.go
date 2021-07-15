@@ -436,14 +436,19 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth);
 
-				request, err := http.NewRequest("GET", fmt.Sprintf("%s/new-policy-bound-api-key?policy=%s", config.Host, c.Args().First()), nil);
+				values := map[string]string{"policy": policy}
+
+				jsonValue, _ := json.Marshal(values)
+
+				request, err := http.NewRequest("POST", fmt.Sprintf("%s/new-policy-bound-api-key", config.Host), bytes.NewBufferString(string(jsonValue)));
 				if err != nil {
 					log.Fatal(err)
 				}
 				var bearer = "Bearer " + config.Key;
 				request.Header.Add("Authorization", bearer)
 				request.Header.Add("Content-Type", "text");
-				client := &http.Client{}
+
+                                client := &http.Client{}
 				response, err := client.Do(request)
 
 				if err != nil {

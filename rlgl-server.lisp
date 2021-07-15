@@ -294,8 +294,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (let ((json (json:decode-json-from-string json-string)))
       (let ((policy-name (cdr (assoc :POLICY json)))
             (api-key (make-api-key)))
-        (if (valid-url? policy-name)
-            (register-policy-bound-api-key *db* api-key policy-name)
+        (if (rlgl-util:valid-url? policy-name)
+            (let ((key (rlgl.db:register-policy-bound-api-key *db* api-key policy-name)))
+              (log:info "New policy bound API key: ~A ~A" key policy-name)
+              key)
             (progn
               (let ((msg (format nil "Policy is not a valid URL: ~A" policy-name)))
                 (log:error msg)
