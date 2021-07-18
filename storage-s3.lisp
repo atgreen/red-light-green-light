@@ -31,15 +31,16 @@
 
 (defclass storage/s3 (storage-backend)
   ((s3-endpoint       :initarg :s3-endpoint    :reader s3-endpoint)
-   (s3-bucket         :initarg :s3-bucket      :reader s3-bucket))
-  (:default-initargs
-   :s3-endpoint  "s3.amazonaws.com"
-   :s3-bucket    "rlgl-docs-2"))
+   (s3-bucket         :initarg :s3-bucket      :reader s3-bucket)))
 
 (defmethod initialize-instance :after ((backend storage/s3) &key)
   "Initialize a s3 storage backend."
   (log:info "Initializing storage/s3")
   (setf zs3:*credentials* (getenv-aws-credentials))
+  (setf (slot-value backend 's3-endpoint)
+        (or (gethash "s3-endpoint" (config backend) "s3.amazonaws.com")))
+  (setf (slot-value backend 's3-bucket)
+        (or (gethash "s3-bucket" (config backend) "rlgl-docs-2")))
   (unless (zs3:bucket-exists-p (s3-bucket backend))
     (zs3:create-bucket (s3-bucket backend))))
 

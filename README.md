@@ -453,6 +453,8 @@ override settings found in the config file.
 |                                    | `postgresql-port`                  | Port for postgresql server                   |
 |                                    | `storage-driver`                   | Either `local` or `s3`                       |
 |                                    | `local-dir`                        | Local directory for local storage driver     |
+|                                    | `s3-endpoint`                      | API endpoint for s3 storage                  |
+|                                    | `s3-bucket`                        | s3 bucket name for s3 storage                |
 |                                    | `policy-dir`                       | Local directory for storing policy git repos |
 | `PUBLIC_KEY_FILE`                  | `public-key-file`                  | Public signing key for sigstore records      |
 | `PRIVATE_KEY_FILE`                 | `private-key-file`                 | Private signing key for sigstore records     |
