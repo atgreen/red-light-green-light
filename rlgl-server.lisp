@@ -560,31 +560,31 @@ token claims and token header"
 				    (make-instance 'parser/csv))))
 		      (tests (if parser
 				 (rlgl-parsers:parse-report parser doc)
-				 (error "DOCUMENT not recognized"))))
-		 (log:info "Evaluating '~A'" (cdr (assoc :REF json)))
-		 (progn
-		   (multiple-value-bind (red-or-green processed-results)
-		       (apply-policy policy tests)
-                     (log:info "Policy applied")
-		     (let ((stream (make-string-output-stream)))
-		       (render stream
-                               (rlgl-parsers:doctype parser)
-                               (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
-                               (cdr (assoc :REF json)) processed-results
-			       (rlgl-parsers:title parser)
-			       (commit-url-format policy))
-		       (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
-                              (ref (store-document *storage-driver* doc-oc))
-                              (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
-                         (let ((doc-digest-signature (make-string-signature doc-digest)))
- 			   (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
-                           (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-                           (rekor-envelope doc-digest doc-digest-signature)
-			   (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
-			  	   red-or-green
-				   *server-uri*
-				   ref
-                                   doc-digest))))))))))))
+				 (error "Report not recognized"))))
+                 (let ((result
+		         (multiple-value-bind (red-or-green processed-results)
+		             (apply-policy policy tests)
+		           (let ((stream (make-string-output-stream)))
+		             (render stream
+                                     (rlgl-parsers:doctype parser)
+                                     (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
+                                     (cdr (assoc :REF json)) processed-results
+			             (rlgl-parsers:title parser)
+			             (commit-url-format policy))
+		             (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
+                                    (ref (store-document *storage-driver* doc-oc))
+                                    (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
+                               (let ((doc-digest-signature (make-string-signature doc-digest)))
+ 			         (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
+                                 (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
+                                 (rekor-envelope doc-digest doc-digest-signature)
+			         (format nil "~A: ~A/doc?id=~A (sha3/256: ~A)~%"
+			  	         red-or-green
+				         *server-uri*
+				         ref
+                                         doc-digest)))))))
+                   (log:info result)
+                   result)))))))
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
