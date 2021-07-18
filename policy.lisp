@@ -85,6 +85,7 @@ based on URL."
 
 	  (dolist (file (list xfail-file pass-file fail-file))
 	    (unless (file-exists-p (namestring file))
+              (fad:delete-directory-and-files policy-pathname)
 	      (error (format nil "Policy file \"~A\" missing." file))))
 
 	  (let ((p (make-instance 'policy)))
