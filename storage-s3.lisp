@@ -43,13 +43,16 @@
   (unless (zs3:bucket-exists-p (s3-bucket backend))
     (zs3:create-bucket (s3-bucket backend))))
 
+(defmethod delete-document ((backend storage/local) ref)
+  "Delete a document from local storage."
+  (zs3:delete-object (s3-bucket backend) (string ref)))
+
 (defmethod read-document ((backend storage/s3) ref)
   "Return a string containing the document."
-  (zs3:get-vector (s3-bucket backend)
-		  (format nil "~A" ref)))
+  (zs3:get-vector (s3-bucket backend) (string ref)))
 
 (defmethod store-document ((backend storage/s3) document)
   "Store a document into s3 storage."
-  (let ((ref (concatenate 'string "RLGL-" (rlgl-util:random-hex-string))))
+  (let ((ref (str:concat "RLGL-" (rlgl-util:random-hex-string))))
     (zs3:put-vector document (s3-bucket backend) ref)
     ref))

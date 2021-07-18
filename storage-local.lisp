@@ -28,7 +28,7 @@
   (log:info "Initializing storage/local")
   (setf (slot-value backend 'local-dir)
         (or (gethash "local-dir" (config backend) "/var/rlgl/docs")))
-  (let ((filename (format nil "~A/.key" (local-dir backend))))
+  (let ((filename (str:concat (local-dir backend) "/.key" )))
     (if (probe-file filename)
 	(setf (slot-value backend 'key)
 	      (alexandria:read-file-into-string filename :external-format :latin-1))
@@ -40,14 +40,18 @@
 	    (format stream key)
 	    (setf (slot-value backend 'key) key))))))
 
+(defmethod delete-document ((backend storage/local) ref)
+  "Delete a document from local storage."
+  (delete-file (str:concat (local-dir backend) "/" ref)))
+
 (defmethod read-document ((backend storage/local) ref)
   "Return an octet vector containing the document."
-  (alexandria:read-file-into-byte-vector (format nil "~A/~A" (local-dir backend) ref)))
+  (alexandria:read-file-into-byte-vector (str:concat (local-dir backend) "/" ref)))
 
 (defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."
   (let ((filename (concatenate 'string "RLGL-" (rlgl-util:random-hex-string))))
-    (with-open-file (stream (format nil "~A/~A" (local-dir backend) filename)
+    (with-open-file (stream (str:concat (local-dir backend) "/" filename)
 			    :direction :output
 			    :if-exists :supersede
 			    :if-does-not-exist :create

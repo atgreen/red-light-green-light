@@ -560,7 +560,9 @@ token claims and token header"
 				    (make-instance 'parser/csv))))
 		      (tests (if parser
 				 (rlgl-parsers:parse-report parser doc)
-				 (error "Report not recognized"))))
+                                 (progn
+                                   (delete-document *storage-driver* (cdr (assoc :REF json)))
+				   (error "Report not recognized")))))
                  (let ((result
 		         (multiple-value-bind (red-or-green processed-results)
 		             (apply-policy policy tests)
