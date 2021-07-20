@@ -316,7 +316,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                  :rlgl-version +rlgl-version+)))
 
 (snooze:defroute callback (:get :text/plain &key id signature)
-  (funcall (gethash (string id) *callbacks*) ((string signature))))
+  (funcall (gethash (string id) *callbacks*) (list (string signature))))
 
 (markup:deftag page-template (children &key title)
    <html>
