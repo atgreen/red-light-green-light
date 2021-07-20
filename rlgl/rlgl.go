@@ -696,7 +696,29 @@ func main() {
                                 var result map[string]interface{}
                                 json.Unmarshal([]byte(responseData), &result)
 
-				fmt.Printf("%s: %s (sha3/256: %s)", result["colour"], result["url"], result["digest"])
+				fmt.Printf("%s: %s (sha3/256: %s)\n", result["colour"], result["url"], result["digest"])
+
+				request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&signature=%s", config.Host, c.Args().First(), "AAAAA"), nil);
+				if err != nil {
+					log.Fatal(err)
+				}
+				bearer = "Bearer " + config.Key;
+				request.Header.Add("Authorization", bearer)
+				request.Header.Add("Content-Type", "text");
+				client = &http.Client{}
+				response, err = client.Do(request)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer response.Body.Close()
+
+				responseData, err = ioutil.ReadAll(response.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Print(string(responseData))
 
 				if result["colour"] == "GREEN" {
 					os.Exit(0)

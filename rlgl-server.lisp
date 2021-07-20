@@ -74,6 +74,11 @@ keycloak-oidc-client-secret = \"ignore\"
 (defvar *keycloak-oidc-client-secret* nil)
 
 ;; ----------------------------------------------------------------------------
+;; Hashtable of lambdas for client callbacks
+
+(defvar *callbacks* (make-hash-table :test 'equal))
+
+;; ----------------------------------------------------------------------------
 ;; Read the validation shell script template.
 
 (defvar *validate.sh-template*
@@ -309,6 +314,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
            (list :id (string id)
                  :server-uri *server-uri*
                  :rlgl-version +rlgl-version+)))
+
+(snooze:defroute callback (:get :text/plain &key id &key signature)
+  (funcall (gethash (string id) *callbacks*) ((string signature))))
 
 (markup:deftag page-template (children &key title)
    <html>
@@ -577,15 +585,19 @@ token claims and token header"
                                     (ref (store-document *storage-driver* doc-oc))
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
- 			         (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
-                                 (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-                                 (rekor-envelope doc-digest doc-digest-signature)
-			         (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
-			  	         (string red-or-green)
-				         *server-uri*
-				         ref
-                                         doc-digest
-                                         (rlgl-util:random-hex-string))))))))
+                                 (let ((callback-fn (lambda (signature)
+ 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
+                                                      (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
+                                                      (log:info signature)
+                                                      (rekor-envelope doc-digest doc-digest-signature)))
+                                       (callback-id (rlgl-util:random-hex-string)))
+                                   (setf (gethash callback-code *callbacks*) callback-fn)
+			           (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
+			  	           (string red-or-green)
+				           *server-uri*
+				           ref
+                                           doc-digest
+                                           callback-id))))))))
                    (log:info result)
                    result)))))))
     (error (c)
