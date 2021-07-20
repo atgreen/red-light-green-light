@@ -585,7 +585,7 @@ token claims and token header"
 				         *server-uri*
 				         ref
                                          doc-digest
-                                         (random-hex-string))))))))
+                                         (rlgl-util:random-hex-string))))))))
                    (log:info result)
                    result)))))))
     (error (c)
