@@ -581,7 +581,7 @@ token claims and token header"
                                  (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                  (rekor-envelope doc-digest doc-digest-signature)
 			         (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S), \"callback\": ~S }"
-			  	         red-or-green
+			  	         (string red-or-green)
 				         *server-uri*
 				         ref
                                          doc-digest
