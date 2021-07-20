@@ -316,6 +316,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                  :rlgl-version +rlgl-version+)))
 
 (snooze:defroute callback (:get :text/plain &key id signature)
+  (log:info "callback ~A ~A" id signature)
   (funcall (gethash (string id) *callbacks*) (list (string signature))))
 
 (markup:deftag page-template (children &key title)
@@ -586,7 +587,8 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
- 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
+                                                      (log:info "IN CALLBACK!")
+ 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature signature)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (log:info signature)
                                                       (rekor-envelope doc-digest doc-digest-signature)))

@@ -41,7 +41,7 @@
    :db-name "rlgl"
    :host "localhost"
    :port 5432
-   :sql-insert-log-statement "insert into log(id, version, colour, report, signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', round(extract(epoch from now())));"))
+   :sql-insert-log-statement "insert into log(id, version, colour, report, signature, client_signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', '~A', round(extract(epoch from now())));"))
 
 (defmethod initialize-instance :after ((db db/postgresql) &key)
   (let ((dbc (connect-cached db)))
