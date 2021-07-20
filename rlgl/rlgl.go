@@ -26,6 +26,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+        "encoding/hex"
 	"os"
         "regexp"
 	"strings"
@@ -33,7 +34,6 @@ import (
 	"mime/multipart"
 
         "crypto/rand"
-        "golang.org/x/crypto/sha3"
         "crypto/ecdsa"
         "crypto/elliptic"
         "crypto/x509"
@@ -652,7 +652,7 @@ func main() {
                                     log.Fatal(err)
                                 }
                                 defer f.Close()
-
+/*
                                 h := sha3.New256()
                                 if _, err := io.Copy(h, f); err != nil {
                                     log.Fatal(err)
@@ -668,6 +668,8 @@ func main() {
                                 }
 
 				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n, "signature": string(base64.StdEncoding.EncodeToString(r))}
+*/
+				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
 					values["title"] = title
 				}
@@ -696,9 +698,24 @@ func main() {
                                 var result map[string]interface{}
                                 json.Unmarshal([]byte(responseData), &result)
 
-				fmt.Printf("%s: %s (sha3/256: %s)\n", result["colour"], result["url"], result["digest"])
+                                cfgdir := basedir(cfgPath)
+                                var key, _ = loadPrivateKey(cfgdir)
 
-				request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&signature=%s", config.Host, result["callback"], "AAAAA"), nil);
+                                var data []byte
+                                data, err = hex.DecodeString(fmt.Sprintf("%s", result["digest"]))
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+
+                                var r []byte
+                                r, err = key.Sign(rand.Reader, data, nil)
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+
+				values = map[string]string{"policy": policy, "id": player, "name": name, "ref": n }
+
+                                request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&signature=%s", config.Host, result["callback"], string(base64.StdEncoding.EncodeToString(r))), nil)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -718,7 +735,7 @@ func main() {
 					log.Fatal(err)
 				}
 
-				fmt.Print(string(responseData))
+				fmt.Printf("%s: %s (sha3/256: %s)\n", result["colour"], result["url"], result["digest"])
 
 				if result["colour"] == "GREEN" {
 					os.Exit(0)
