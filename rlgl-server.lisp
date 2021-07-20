@@ -591,7 +591,7 @@ token claims and token header"
                                                       (log:info signature)
                                                       (rekor-envelope doc-digest doc-digest-signature)))
                                        (callback-id (rlgl-util:random-hex-string)))
-                                   (setf (gethash callback-code *callbacks*) callback-fn)
+                                   (setf (gethash callback-id *callbacks*) callback-fn)
 			           (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
 			  	           (string red-or-green)
 				           *server-uri*

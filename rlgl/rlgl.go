@@ -698,7 +698,7 @@ func main() {
 
 				fmt.Printf("%s: %s (sha3/256: %s)\n", result["colour"], result["url"], result["digest"])
 
-				request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&signature=%s", config.Host, c.Args().First(), "AAAAA"), nil);
+				request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&signature=%s", config.Host, result["callback"], "AAAAA"), nil);
 				if err != nil {
 					log.Fatal(err)
 				}
