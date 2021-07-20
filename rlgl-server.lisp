@@ -580,7 +580,7 @@ token claims and token header"
  			         (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature)
                                  (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                  (rekor-envelope doc-digest doc-digest-signature)
-			         (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S), \"callback\": ~S }"
+			         (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
 			  	         (string red-or-green)
 				         *server-uri*
 				         ref
