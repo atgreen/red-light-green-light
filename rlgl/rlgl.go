@@ -27,10 +27,17 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"regexp"
+        "regexp"
 	"strings"
 	"time"
 	"mime/multipart"
+
+        "crypto/rand"
+        "golang.org/x/crypto/sha3"
+        "crypto/ecdsa"
+        "crypto/elliptic"
+        "crypto/x509"
+        "encoding/pem"
 
 	"github.com/fatih/color"
 	"github.com/naoina/toml"
@@ -63,6 +70,52 @@ func exitErr(err error) {
 	output(red(err.Error()))
 	os.Exit(2)
 }
+
+func make_keys (path string) {
+
+    privateKey, _ := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+    publicKey := &privateKey.PublicKey
+
+    x509bytes, _ := x509.MarshalECPrivateKey(privateKey)
+    var pemPrivateBlock = &pem.Block{
+      Type: "EC PRIVATE KEY",
+      Bytes: x509bytes,
+    }
+
+    x509bytesPub, _ := x509.MarshalPKIXPublicKey(publicKey)
+    var pemPublicBlock = &pem.Block{
+      Type: "PUBLIC KEY",
+      Bytes: x509bytesPub,
+    }
+
+    cfgdir := basedir(path)
+    pemPrivateFile, err := os.Create(cfgdir + "/private_key.pem");
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+
+    err = pem.Encode(pemPrivateFile, pemPrivateBlock)
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    pemPrivateFile.Close()
+
+    pemPublicFile, err := os.Create(cfgdir + "/public_key.pem");
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+
+    err = pem.Encode(pemPublicFile, pemPublicBlock)
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
+    pemPublicFile.Close()
+}
+
 
 func (c *Config) Write(path string) {
 	cfgdir := basedir(path)
@@ -201,6 +254,33 @@ func SendPostRequest (config *Config, url string, filename string, filetype stri
 	return content
 }
 
+func loadPrivateKey(cfgdir string) (*ecdsa.PrivateKey, error) {
+
+                                priv, err := ioutil.ReadFile(cfgdir + "/private_key.pem");
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+
+                                block, _ := pem.Decode(priv)
+                                if block == nil {
+                                        log.Fatal("Failed to decode PEM private key")
+                                }
+
+                                var parsedKey interface{}
+                                parsedKey, err = x509.ParseECPrivateKey(block.Bytes)
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+
+
+    switch parsedKey := parsedKey.(type) {
+    case *ecdsa.PrivateKey:
+        return parsedKey, nil
+    }
+    log.Fatal("Unsupported private key type")
+    return nil, nil
+}
+
 func main() {
 	var policy string
 	var player string
@@ -210,7 +290,7 @@ func main() {
 	var title string
 	var config Config
 
-	cfgPath, cfgExists := getConfigPath()
+        cfgPath, cfgExists := getConfigPath()
 	if !cfgExists {
 		config.Write(cfgPath)
 	} else {
@@ -223,6 +303,8 @@ func main() {
 			exitErr(err)
 		}
 	}
+
+        make_keys(cfgPath);
 
 	app := cli.NewApp()
 
@@ -565,7 +647,27 @@ func main() {
 				message := SendPostRequest (&config, fmt.Sprintf("%s/upload", config.Host), c.Args().Get(0), "bin");
 				n = string(message)
 
-				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
+                                f, err := os.Open(c.Args().Get(0))
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+                                defer f.Close()
+
+                                h := sha3.New256()
+                                if _, err := io.Copy(h, f); err != nil {
+                                    log.Fatal(err)
+                                }
+
+                                cfgdir := basedir(cfgPath)
+                                var key, _ = loadPrivateKey(cfgdir)
+
+                                var r []byte
+                                r, err = key.Sign(rand.Reader, h.Sum(nil), nil)
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+
+				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n, "signature": string(base64.StdEncoding.EncodeToString(r))}
 				if title != "" {
 					values["title"] = title
 				}
@@ -591,12 +693,15 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				fmt.Print(string(responseData))
+                                var result map[string]interface{}
+                                json.Unmarshal([]byte(responseData), &result)
 
-				if strings.HasPrefix(string(responseData), "GREEN:") {
+				fmt.Printf("%s: %s (sha3/256: %s)", result["colour"], result["url"], result["digest"])
+
+				if result["colour"] == "GREEN" {
 					os.Exit(0)
 				} else {
-					if strings.HasPrefix(string(responseData), "RED:") {
+					if result["colour"] == "RED" {
 						os.Exit(1)
 					} else {
 						os.Exit(2)
