@@ -317,7 +317,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (snooze:defroute callback (:get :text/plain &key id signature)
   (log:info "callback ~A ~A" id signature)
-  (funcall (gethash (string id) *callbacks*) (list (string signature))))
+  (funcall (gethash (string id) *callbacks*) (string signature)))
 
 (markup:deftag page-template (children &key title)
    <html>
