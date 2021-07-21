@@ -315,7 +315,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                  :server-uri *server-uri*
                  :rlgl-version +rlgl-version+)))
 
-(snooze:defroute callback (:get :text/plain &key id)
+(snooze:defroute callback (:post :text/plain &key id)
   (let* ((json-string
 	   (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t))
          (json (json:decode-json-from-string json-string))
