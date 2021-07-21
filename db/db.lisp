@@ -40,7 +40,8 @@
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
 	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, client_signature char(140) not null, unixtimestamp integer);"
-            "alter table log add column if not exists client_signature char(140);"
+            "alter table log drop column client_signature;"
+            "alter table log add column if not exists client_signature char(256);"
 	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
 	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
