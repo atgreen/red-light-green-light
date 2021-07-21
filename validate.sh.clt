@@ -26,20 +26,30 @@ done
 # ---- Create names of temporary files ----------------------------------------
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf -- "$TMPDIR"' EXIT
-PUBKEY=${TMPDIR}/rlgl.pem
 DIGEST=${TMPDIR}/${DOC}.digest
-SIGNATURE=${TMPDIR}/${DOC}.digest.sig
+SERVER_PUBKEY=${TMPDIR}/rlgl.pem
+SERVER_SIGNATURE=${TMPDIR}/${DOC}.digest.sig
+CLIENT_PUBKEY=$1
+CLIENT_SIGNATURE=${TMPDIR}/${DOC}.digest.csig
 
 # ---- Download all artifacts -------------------------------------------------
-curl -s <%= @ server-uri %>/pubkey > ${PUBKEY}
+curl -s <%= @ server-uri %>/pubkey > ${SERVER_PUBKEY}
 curl -s <%= @ server-uri %>/doc?id=${DOC} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
-curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SIGNATURE}
+curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SERVER_SIGNATURE}
+curl -s <%= @ server-uri %>/doc?id=${DOC}.csig | base64 -d > ${CLIENT_SIGNATURE}
 
 # ---- Validate the signature of the document digest --------------------------
-echo Checking document signature: $(openssl dgst -sha256 -verify ${PUBKEY} -signature ${SIGNATURE} ${DIGEST})
+echo Checking document signature: $(openssl dgst -sha256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
 echo
 
-# ---- Look up this document in rekor and print out the record -------------
+# ---- Checking client signature ----------------------------------------------
+if [ -z "$CLIENT_SIGNATURE" ]; then
+    echo Missing client public key argument.  Not checking client signature.
+else
+    echo Checking client signature : $(openssl dgst -sha3-256 -verify ${CLIENT_PUBKEY} -signature ${CLIENT_SIGNATURE} ${DIGEST})
+fi
+
+# ---- Look up this document in rekor and print out the record ----------------
 echo Searching for sigstore record:
-HASH=$(rekor-cli verify --artifact ${DIGEST} --signature ${SIGNATURE} --public-key ${PUBKEY} --pki-format x509 | grep "Entry Hash:" | awk '{ printf $3 }')
+HASH=$(rekor-cli verify --artifact ${DIGEST} --signature ${SERVER_SIGNATURE} --public-key ${SERVER_PUBKEY} --pki-format x509 | grep "Entry Hash:" | awk '{ printf $3 }')
 rekor-cli get --uuid $HASH
