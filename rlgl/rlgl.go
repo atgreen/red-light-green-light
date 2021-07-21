@@ -652,24 +652,8 @@ func main() {
                                     log.Fatal(err)
                                 }
                                 defer f.Close()
-/*
-                                h := sha3.New256()
-                                if _, err := io.Copy(h, f); err != nil {
-                                    log.Fatal(err)
-                                }
 
-                                cfgdir := basedir(cfgPath)
-                                var key, _ = loadPrivateKey(cfgdir)
-
-                                var r []byte
-                                r, err = key.Sign(rand.Reader, h.Sum(nil), nil)
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-
-				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n, "signature": string(base64.StdEncoding.EncodeToString(r))}
-*/
-				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
+                                values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
 					values["title"] = title
 				}
@@ -706,16 +690,26 @@ func main() {
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-
+/*
+                                err = ioutil.WriteFile("digest.bin", data, 0644)
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+*/
                                 var r []byte
                                 r, err = key.Sign(rand.Reader, data, nil)
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-
+/*
+                                err = ioutil.WriteFile("signature.bin", r, 0644)
+                                if err != nil {
+                                    log.Fatal(err)
+                                }
+*/
 				values = map[string]string{"policy": policy, "id": player, "name": name, "ref": n }
                                 params := url.Values{}
-                                params.Add("signature", string(base64.StdEncoding.EncodeToString(r)))
+                                params.Add("signature", fmt.Sprintf("%x", r))
 
                                 request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&%s", config.Host, result["callback"], params.Encode()), nil)
 				if err != nil {
