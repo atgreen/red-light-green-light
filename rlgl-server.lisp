@@ -315,10 +315,11 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                  :server-uri *server-uri*
                  :rlgl-version +rlgl-version+)))
 
-(snooze:defroute callback (:post :text/plain &key id)
+(defun do-callback ()
   (let* ((json-string
 	   (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t))
          (json (json:decode-json-from-string json-string))
+         (id (cdr (assoc :ID json)))
          (signature (cdr (assoc :SIGNATURE json))))
     (log:info "callback: ~A ~A" id signature)
     (let ((callback (gethash (string id) *callbacks*)))
@@ -820,6 +821,7 @@ token claims and token header"
     "/cli/" (fad:pathname-as-directory
              (make-pathname :name "cli"
                             :defaults (rlgl-root))))
+   (hunchentoot:create-prefix-dispatcher "/callback" 'do-callback)
    (hunchentoot:create-prefix-dispatcher "/upload" 'do-upload)
    (hunchentoot:create-prefix-dispatcher "/evaluate" 'do-evaluate)
    (hunchentoot:create-prefix-dispatcher "/new-policy-bound-api-key" 'do-new-policy-bound-api-key)
