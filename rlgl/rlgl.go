@@ -707,11 +707,10 @@ func main() {
                                     log.Fatal(err)
                                 }
 */
-				values = map[string]string{"policy": policy, "id": player, "name": name, "ref": n }
-                                params := url.Values{}
-                                params.Add("signature", fmt.Sprintf("%x", r))
+				values = map[string]string{"signature": base64.StdEncoding.EncodeToString(r)}
+				jsonValue, _ = json.Marshal(values)
 
-                                request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&%s", config.Host, result["callback"], params.Encode()), nil)
+                                request, err = http.NewRequest("POST", fmt.Sprintf("%s/callback?id=%s", config.Host, result["callback"]), bytes.NewBufferString(string(jsonValue)))
 				if err != nil {
 					log.Fatal(err)
 				}

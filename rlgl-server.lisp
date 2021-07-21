@@ -315,9 +315,15 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                  :server-uri *server-uri*
                  :rlgl-version +rlgl-version+)))
 
-(snooze:defroute callback (:get :text/plain &key id signature)
-  (log:info "callback ~A ~A" id signature)
-  (funcall (gethash (string id) *callbacks*) (string signature)))
+(snooze:defroute callback (:get :text/plain &key id)
+  (let* ((json-string
+	   (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t))
+         (json (json:decode-json-from-string json-string))
+         (signature (cdr (assoc :SIGNATURE json))))
+    (log:info "callback: ~A ~A" id signature)
+    (let ((callback (gethash (string id) *callbacks*)))
+      (remhash (string id) *callbacks*)
+      (funcall (gethash (string id) *callbacks*) signature))))
 
 (markup:deftag page-template (children &key title)
    <html>
