@@ -322,8 +322,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
          (id (cdr (assoc :ID json)))
          (signature (cdr (assoc :SIGNATURE json))))
     (log:info "callback: ~A ~A" id signature)
-    (let ((callback (gethash (string id) *callbacks*)))
-      (remhash (string id) *callbacks*)
+    (log:info "   fn: ~A" (gethash id *callbacks*))
+    (let ((callback (gethash id *callbacks*)))
+      (remhash id *callbacks*)
       (funcall (gethash (string id) *callbacks*) signature))))
 
 (markup:deftag page-template (children &key title)
