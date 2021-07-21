@@ -630,28 +630,37 @@ token claims and token header"
        (str:substring 0 (- (length id-string) 4) id-string)
        nil)))
 
+(defun want-csig? (id)
+  (let ((id-string (string id)))
+    (if (str:ends-with? ".CSIG" id-string)
+       (str:substring 0 (- (length id-string) 5) id-string)
+       nil)))
+
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
-  (let ((sig-id (want-sig? id)))
+  (let ((sig-id (want-sig? id))
+        (csig-id (want-csig? id)))
     (if sig-id
-      (rlgl.db:find-signature-by-report *db* sig-id)
-      (let ((report
-              (handler-case (flexi-streams:octets-to-string
-                             (read-document *storage-driver* id)
-                             :external-format :utf-8)
-                (error (c)
-                  (log:error "~A" c)
-                  (markup:write-html
-                   <page-template title="Red Light Green Light">
-                     <div style="width:100px">
-                       <div class="rlgl-svg" /> </div>
-                     <h1 class="mt-5">This document appears to be missing.</h1>
-                     <br />
-                   </page-template>)))))
-        (if (str:starts-with? "<" report)
-            report
-            (format nil "<html><pre>~A</pre></html>" report))))))
+        (rlgl.db:find-signature-by-report *db* sig-id)
+        (if csig-id
+            (rlgl.db:find-client-signature-by-report *db* csig-id)
+            (let ((report
+                    (handler-case (flexi-streams:octets-to-string
+                                   (read-document *storage-driver* id)
+                                   :external-format :utf-8)
+                      (error (c)
+                        (log:error "~A" c)
+                        (markup:write-html
+                         <page-template title="Red Light Green Light">
+                           <div style="width:100px">
+                             <div class="rlgl-svg" /> </div>
+                           <h1 class="mt-5">This document appears to be missing.</h1>
+                           <br />
+                         </page-template>)))))
+              (if (str:starts-with? "<" report)
+                                       report
+                                       (format nil "<html><pre>~A</pre></html>" report)))))))
 
 (snooze:defroute doc-html (:get :text/html &key id)
   (track-action "doc-html" :url (format nil "/doc-html?id=~A" id))

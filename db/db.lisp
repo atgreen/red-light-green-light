@@ -72,6 +72,12 @@
 	 (result (dbi:fetch (dbi:execute query))))
     (str:trim (getf result :|signature|))))
 
+(defmethod find-client-signature-by-report ((db db-backend) report)
+  (let* ((query (dbi:prepare (connect-cached db)
+			     (format nil "select client_signature from log where report = '~A';" report)))
+	 (result (dbi:fetch (dbi:execute query))))
+    (str:trim (getf result :|client_signature|))))
+
 (defmethod find-puk-by-api-key ((db db-backend) api-key)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select puk from api_keys where api_key = '~A';" api-key)))
