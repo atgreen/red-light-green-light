@@ -324,7 +324,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (log:info "callback: ~A ~A" id signature)
     (log:info "   fn: ~A" (gethash id *callbacks*))
     (let ((callback (gethash id *callbacks*)))
-      (remhash id *callbacks*)
+      ;; (remhash id *callbacks*)
       (funcall (gethash (string id) *callbacks*) signature))))
 
 (markup:deftag page-template (children &key title)
