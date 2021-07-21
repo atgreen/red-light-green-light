@@ -432,7 +432,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (track-action "login" :url "/login")
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
-(snooze:defroute report-log (:get :text/plain &key id)
+(snooze:defroute log (:get :text/plain &key id)
   ;;  (authorize)
   (track-action "log")
   (rlgl.db:report-log *db* *server-uri* id))

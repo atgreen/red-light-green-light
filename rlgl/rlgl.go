@@ -716,6 +716,7 @@ func main() {
 				values = map[string]string{"policy": policy, "id": player, "name": name, "ref": n }
                                 params := url.Values{}
                                 params.Add("signature", string(base64.StdEncoding.EncodeToString(r)))
+
                                 request, err = http.NewRequest("GET", fmt.Sprintf("%s/callback?id=%s&%s", config.Host, result["callback"], params.Encode()), nil)
 				if err != nil {
 					log.Fatal(err)
