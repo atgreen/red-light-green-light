@@ -21,8 +21,6 @@ DOC=<%= @ id %>
 
 # ---- Error handling ---------------------------------------------------------
 set -e
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 function error_exit
 {
@@ -48,7 +46,7 @@ CLIENT_SIGNATURE=${TMPDIR}/${DOC}.digest.csig
 # ---- Download all artifacts -------------------------------------------------
 curl -s <%= @ server-uri %>/pubkey > ${SERVER_PUBKEY}
 curl -s <%= @ server-uri %>/doc?id=${DOC} > ${DOCUMENT}
-cat ${DOCUMENT} | openssl dgst -sha256 - | awk '{ printf $2 }' > ${DIGEST}
+cat ${DOCUMENT} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SERVER_SIGNATURE}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.csig | base64 -d > ${CLIENT_SIGNATURE}
 
