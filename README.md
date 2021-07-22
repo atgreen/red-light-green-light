@@ -253,7 +253,11 @@ Body: {
 
 You must set the `RLGL_CLIENT_PUBKEY` environment variable to tell the
 script where to find your client's public key.  Normally this is found
-in `~/.config/rlgl/public_key.pem`.
+in `~/.config/rlgl/public_key.pem`, and so:
+
+```shell
+$ rlgl verify RLGL-AFC7DB2 | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem sh
+```
 
 Verification gives auditors confidence the server owning the private
 key associated with the given public key was responsible for
