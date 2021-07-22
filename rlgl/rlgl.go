@@ -304,8 +304,6 @@ func main() {
 		}
 	}
 
-        make_keys(cfgPath);
-
 	app := cli.NewApp()
 
 	app.Commands = []*cli.Command{
@@ -331,6 +329,12 @@ func main() {
 					Value:       "",
 					Usage:       "proxy basic authentication (eg. USERNAME:PASSWORD)",
 					Destination: &proxyauth,
+				},
+				&cli.StringFlag{
+					Name:        "signing-key",
+					Value:       "",
+					Usage:       "optional private signing key",
+					Destination: &signingkey,
 				},
 			},
 
@@ -370,6 +374,20 @@ func main() {
 				config.Proxy = proxy
 				config.ProxyAuth = proxyauth
 				config.Write(cfgPath)
+
+                                if signingkey = "" {
+                                    make_keys(cfgPath);
+                                } else {
+                                    data, err := ioutil.ReadFile(signingkey)
+  				    if err != nil {
+					log.Fatal(err)
+   				    }
+                                    err = ioutil.WriteFile(basedir(cfgPath) + "/private_key.pem", data, 0400)
+  				    if err != nil {
+					log.Fatal(err)
+   				    }
+                                }
+
 				return nil
 			},
 		},
@@ -691,18 +709,8 @@ func main() {
                                     log.Fatal(err)
                                 }
 
-                                err = ioutil.WriteFile("digest.bin", data, 0644)
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-
                                 var r []byte
                                 r, err = key.Sign(rand.Reader, data, nil)
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-
-                                err = ioutil.WriteFile("signature.bin", r, 0644)
                                 if err != nil {
                                     log.Fatal(err)
                                 }
