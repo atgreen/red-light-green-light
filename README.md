@@ -255,17 +255,17 @@ You must set the `RLGL_CLIENT_PUBKEY` environment variable to tell the
 script where to find your client's public key.  Normally this is found
 in `~/.config/rlgl/public_key.pem`.
 
-This gives auditors confidence the server owning the private key
-associated with the given public key was responsible for generating
-the given report.  It also tells us that the evaluation was initiated
-by the client associated with the client public key.  The rekor record
-provides a timestamp telling us what time this happened at.  Since the
-report references the original test report, as well as the sha3/256
-digest of that original report, we also can be certain that it is the
-actual report that was used for the policy evaluation. And since the
-report includes the git commit hash of the policy used to evaluate the
-report, we can be certain that it is in fact the version of the policy
-that was used to generate the report.
+Verification gives auditors confidence the server owning the private
+key associated with the given public key was responsible for
+generating the given report.  It also tells us that the evaluation was
+initiated by the client associated with the client public key.  The
+rekor record provides a timestamp telling us what time this happened
+at.  Since the report references the original test report, as well as
+the sha3/256 digest of that original report, we also can be certain
+that it is the actual report that was used for the policy
+evaluation. And since the report includes the git commit hash of the
+policy used to evaluate the report, we can be certain that it is in
+fact the version of the policy that was used to generate the report.
 
 Your API key is tied to your personal account.  It is personal and
 secret, and you should treat it accordingly.  You may, however, be in
