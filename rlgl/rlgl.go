@@ -453,9 +453,9 @@ func main() {
 			},
 		},
 		{
-			Name:  "validate",
+			Name:  "verify",
 			Aliases: []string{"v"},
-			Usage: "validate document sigstore record",
+			Usage: "verify document sigstore record",
 
 			Action: func(c *cli.Context) error {
 
@@ -475,7 +475,7 @@ func main() {
 				   exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()));
 				}
 
-				request, err := http.NewRequest("GET", fmt.Sprintf("%s/validate?id=%s", config.Host, c.Args().First()), nil);
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/verify?id=%s", config.Host, c.Args().First()), nil);
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -690,23 +690,23 @@ func main() {
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-/*
+
                                 err = ioutil.WriteFile("digest.bin", data, 0644)
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-*/
+
                                 var r []byte
                                 r, err = key.Sign(rand.Reader, data, nil)
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-/*
+
                                 err = ioutil.WriteFile("signature.bin", r, 0644)
                                 if err != nil {
                                     log.Fatal(err)
                                 }
-*/
+
 				values = map[string]string{"signature": base64.StdEncoding.EncodeToString(r),
                                                            "id": fmt.Sprintf("%s", result["callback"])}
 				jsonValue, _ = json.Marshal(values)
