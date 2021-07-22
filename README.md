@@ -49,7 +49,7 @@ Generate an OpenSCAP report, or grab one from here:
 
 Evaluate the report against a sample policy:
 
-    $ rlgl evaluate --id=$ID --policy=https://github.com/atgreen/test-policy report.htm
+    $ rlgl evaluate --id=$ID --policy=https://github.com/atgreen/test-policy report.html
 
 To use a private repository, generate a personal access token at
 github.com with appropriate private repo access, and reference your
