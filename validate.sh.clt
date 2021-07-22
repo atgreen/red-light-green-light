@@ -2,15 +2,24 @@
 
 # Red Light Green Light validate.sh version <%= @ rlgl-version %>
 
-# Print out the sigstore record for a rlgl report.  This script
-# generates a digest of the report, validates the signature with the
-# public key of the signing service, and looks it up in the rekor
-# log.  It is provided in script that you can run for transparency
+# This validate feature is provided in source form for transparency
 # and audit purposes.
 
-# ---- Identify the document that we are verifing the sigstore document for ---
+# This script performs three important validations:
+#
+# - validate the server signature of the report using the server's
+#   public key
+#
+# - validate the client signature of the report using the client's
+#   public key
+#
+# - validate the transparency log entry for this report using
+#   rekor-cli
+
+# ---- Identify the document for which we are performing validation -----------
 DOC=<%= @ id %>
 
+# ---- Our error/exit function ------------------------------------------------
 function error_exit
 {
     echo ERROR: ${1:-"Unknown Error"} 1>&2
@@ -23,30 +32,30 @@ for PROGRAM in "rekor-cli version" "openssl version" "curl --help" "grep --help"
     $PROGRAM > /dev/null 2>&1 || error_exit "Cannot run $(echo ${PROGRAM} | awk '{ printf $1 }').  Please install it."
 done
 
-# ---- Create names of temporary files ----------------------------------------
+# ---- Create names of temporary files and ensure deletion on exit ------------
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf -- "$TMPDIR"' EXIT
+DOCUMENT=${TMPDIR}/${DOC}
 DIGEST=${TMPDIR}/${DOC}.digest
 SERVER_PUBKEY=${TMPDIR}/rlgl.pem
 SERVER_SIGNATURE=${TMPDIR}/${DOC}.digest.sig
-CLIENT_PUBKEY=$1
 CLIENT_SIGNATURE=${TMPDIR}/${DOC}.digest.csig
 
 # ---- Download all artifacts -------------------------------------------------
 curl -s <%= @ server-uri %>/pubkey > ${SERVER_PUBKEY}
-curl -s <%= @ server-uri %>/doc?id=${DOC} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
+curl -s <%= @ server-uri %>/doc?id=${DOC} > ${DOCUMENT}
+cat ${DOCUMENT} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SERVER_SIGNATURE}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.csig | base64 -d > ${CLIENT_SIGNATURE}
 
-# ---- Validate the signature of the document digest --------------------------
-echo Checking document signature: $(openssl dgst -sha256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
-echo
+# ---- Validate the server signature of the document digest -------------------
+echo Checking document signature: $(openssl dgst -sha3-256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
 
 # ---- Checking client signature ----------------------------------------------
-if [ -z "$CLIENT_SIGNATURE" ]; then
-    echo Missing client public key argument.  Not checking client signature.
+if [ -z "$RLGL_CLIENT_PUBKEY" ]; then
+    echo "Checking client signature  : Set the environment RLGL_CLIENT_PUBKEY to point at your public key"
 else
-    echo Checking client signature : $(openssl dgst -sha3-256 -verify ${CLIENT_PUBKEY} -signature ${CLIENT_SIGNATURE} ${DIGEST})
+    echo "Checking client signature  :" $(cat ${DOCUMENT} | openssl dgst -sha3-256 -verify ${RLGL_CLIENT_PUBKEY} -signature ${CLIENT_SIGNATURE})
 fi
 
 # ---- Look up this document in rekor and print out the record ----------------
