@@ -57,8 +57,9 @@ policy repo like so:
 
     $ rlgl evaluate --id=$ID --policy=https://${TOKEN}@github.com/atgreen/test-policy report.html
 
-Click on the resulting URL and explore.  Try forking the test policy
-report and making changes.
+Be sure to click on the resulting URL and explore.  You'll find the
+evaluation report, complete with links to git-hosted policy for
+specific results, as well as a link to the full, original report.
 
 Produce a log of reports for this player ID:
 
@@ -251,16 +252,17 @@ Body: {
 }
 ```
 
-You must set the `RLGL_CLIENT_PUBKEY` environment variable to tell the
-script where to find your client's public key.  Normally this is found
-in `~/.config/rlgl/public_key.pem`, and so:
+In order to verify client signatures, you must set the
+`RLGL_CLIENT_PUBKEY` environment variable to tell the script where to
+find your client's public key.  Normally this is found in
+`~/.config/rlgl/public_key.pem`, and so:
 
 ```shell
 $ rlgl verify RLGL-AFC7DB2 | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem sh
 ```
 
-Verification gives auditors confidence the server owning the private
-key associated with the given public key was responsible for
+Verification gives auditors confidence that the server owning the
+private key associated with the given public key was responsible for
 generating the given report.  It also tells us that the evaluation was
 initiated by the client associated with the client public key.  The
 rekor record provides a timestamp telling us what time this happened
