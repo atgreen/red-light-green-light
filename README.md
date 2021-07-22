@@ -64,6 +64,14 @@ Produce a log of reports for this player ID:
 
     $ rlgl log --id=$ID
 
+The report is signed by both the server and your client.  The server's
+signature is recorded in the pubic
+[rekor](https://github.com/sigstore/rekor) transparency log managed by
+the [sigstore](https://sigstore.dev) project.  You can verify these
+signatures and the log entry like so:
+
+    $ rlgl verify RLGL-[report ID]
+
 
 Problem Statement
 ----------------
@@ -118,7 +126,7 @@ pipeline.  Here's an example workflow:
 - First, we must log into our Red Light Green Light server with `rlgl`
 cli tool like so:
 ```
-$ rlgl login http://rlgl-server.example.com
+$ rlgl login --key MY_API_KEY http://rlgl-server.example.com
 ```
 
 - Each deployable artifact is given a Player ID.  The Player ID is
@@ -186,22 +194,35 @@ $ openssl dgst -sha256 -verify rlgl-public.pem -signature digest.sig digest
 Verified OK
 ```
 
+The `rlgl` client also signs the report, and uploads the signature to
+the server.  You can retrieve the base64-encoded client signature via
+curl by appending `.csig` to the report URL as above.
+
+Each `rlgl login` produces a new private/public keypair.  More
+commonly, however, you would generate your own keypair and private the
+private key at login time like so:
+
+```shell
+$ rlgl login --key MY_API_KEY --signing-key MY_PRIVATE_KEY_FILE.pem http://rlgl-server.example.com
+```
+
 The Red Light Green Light server also uploads the signed digest to
 sigstore for non-repudiation of the results.
 
-The `rlgl` tool can generate a simple shell script to validate
+The `rlgl` tool can generate a simple shell script to verify
 signatures and search for the sigstore log entry.  View the shell
 script like so:
 
 ```shell
-$ rlgl validate RLGL-AFC7DB2
+$ rlgl verify RLGL-AFC7DB2
 ```
 
-You can execute the validation script simply by feeding the output to a shell program:
+You can execute the verification script simply by feeding the output to a shell program:
 
 ```shell
-$ rlgl validate RLGL-AFC7DB2 | sh
+$ rlgl verify RLGL-AFC7DB2 | sh
 Checking document signature: Verified OK
+Checking client signature  : Verified OK
 
 Searching for sigstore record:
 LogID: c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d
@@ -227,14 +248,21 @@ Body: {
 }
 ```
 
+You must set the `RLGL_CLIENT_PUBKEY` environment variable to tell the
+script where to find your client's public key.  Normally this is found
+in `~/.config/rlgl/public_key.pem`.
+
 This gives auditors confidence the server owning the private key
-associated with the given public key generated the given report at a
-specific time. Since the report references the original test report,
-as well as the sha3/256 digest of that original report, we also can be
-certain that it is the actual report that was used for the policy
-evaluation. And since the report includes the git commit hash of the
-policy used to evaluate the report, we can be certain that it is in
-fact the version of the policy that was used to generate the report.
+associated with the given public key was responsible for generating
+the given report.  It also tells us that the evaluation was initiated
+by the client associated with the client public key.  The rekor record
+provides a timestamp telling us what time this happened at.  Since the
+report references the original test report, as well as the sha3/256
+digest of that original report, we also can be certain that it is the
+actual report that was used for the policy evaluation. And since the
+report includes the git commit hash of the policy used to evaluate the
+report, we can be certain that it is in fact the version of the policy
+that was used to generate the report.
 
 Your API key is tied to your personal account.  It is personal and
 secret, and you should treat it accordingly.  You may, however, be in
