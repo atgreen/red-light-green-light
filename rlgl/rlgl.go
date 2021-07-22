@@ -101,6 +101,7 @@ func make_keys (path string) {
         os.Exit(1)
     }
     pemPrivateFile.Close()
+    os.Chmod(cfgdir + "/private_key.pem", 0600)
 
     pemPublicFile, err := os.Create(cfgdir + "/public_key.pem");
     if err != nil {
@@ -114,6 +115,7 @@ func make_keys (path string) {
         os.Exit(1)
     }
     pemPublicFile.Close()
+    os.Chmod(cfgdir + "/public_key.pem", 0644)
 }
 
 
