@@ -287,6 +287,7 @@ func main() {
 	var key string
 	var proxy string
 	var proxyauth string
+        var signingkey string
 	var title string
 	var config Config
 
@@ -375,7 +376,7 @@ func main() {
 				config.ProxyAuth = proxyauth
 				config.Write(cfgPath)
 
-                                if signingkey = "" {
+                                if signingkey == "" {
                                     make_keys(cfgPath);
                                 } else {
                                     data, err := ioutil.ReadFile(signingkey)
