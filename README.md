@@ -70,7 +70,10 @@ signature is recorded in the pubic
 the [sigstore](https://sigstore.dev) project.  You can verify these
 signatures and the log entry like so:
 
-    $ rlgl verify RLGL-[report ID]
+    $ rlgl verify RLGL-[report ID] | sh
+
+The verification script is provided in source form for transparency
+reasons.
 
 
 Problem Statement
