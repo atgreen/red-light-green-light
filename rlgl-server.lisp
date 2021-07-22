@@ -220,7 +220,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defun make-string-signature (s)
   "Generate a detached signature for S."
-  (let* ((cmd (format nil "sh -c 'openssl dgst -sha3-256 -sign ~A - | base64 -w0'" *private-key-file*))
+  (let* ((cmd (format nil "sh -c 'openssl dgst -sha256 -sign ~A - | base64 -w0'" *private-key-file*))
          (signature (with-input-from-string (stream s)
                       (car (inferior-shell:run cmd
                                                :output :lines :input stream)))))

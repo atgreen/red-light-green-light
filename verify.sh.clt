@@ -44,12 +44,12 @@ CLIENT_SIGNATURE=${TMPDIR}/${DOC}.digest.csig
 # ---- Download all artifacts -------------------------------------------------
 curl -s <%= @ server-uri %>/pubkey > ${SERVER_PUBKEY}
 curl -s <%= @ server-uri %>/doc?id=${DOC} > ${DOCUMENT}
-cat ${DOCUMENT} | openssl dgst -sha3-256 - | awk '{ printf $2 }' > ${DIGEST}
+cat ${DOCUMENT} | openssl dgst -sha256 - | awk '{ printf $2 }' > ${DIGEST}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SERVER_SIGNATURE}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.csig | base64 -d > ${CLIENT_SIGNATURE}
 
 # ---- Validate the server signature of the document digest -------------------
-echo Checking document signature: $(openssl dgst -sha3-256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
+echo Checking document signature: $(openssl dgst -sha256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
 
 # ---- Checking client signature ----------------------------------------------
 if [ -z "$RLGL_CLIENT_PUBKEY" ]; then
