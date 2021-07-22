@@ -202,7 +202,7 @@ the server.  You can retrieve the base64-encoded client signature via
 curl by appending `.csig` to the report URL as above.
 
 Each `rlgl login` produces a new private/public keypair.  More
-commonly, however, you would generate your own keypair and private the
+commonly, however, you would generate your own keypair and provide the
 private key at login time like so:
 
 ```shell
