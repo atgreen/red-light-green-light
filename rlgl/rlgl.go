@@ -130,7 +130,7 @@ func (c *Config) Write(path string) {
 		}
 	}
 
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		exitErr(fmt.Errorf("failed to open config for writing: %s", err))
 	}
