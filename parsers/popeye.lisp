@@ -49,8 +49,8 @@
                                      (cons
                                       (json:decode-json-from-string
                                        (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"id\": \"~A\", \"level\": ~S }"
-                                               (str:concat section-title ": " outcome-name " : " (ppcre:regex-replace-all "\"" text "\\\"" )
-                                                           level)))
+                                               (str:concat section-title ": " outcome-name " : " (ppcre:regex-replace-all "\"" text "\\\"" ))
+                                               level))
                                       tests-fail))))
                        issues))))))))
     tests-fail))
