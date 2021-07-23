@@ -4,7 +4,6 @@
 > A git-centric policy management and enforcement tool designed to accelerate your CI/CD pipelines
 
 [![Build Status](https://github.com/atgreen/red-light-green-light/actions/workflows/build.yml/badge.svg)](https://github.com/atgreen/red-light-green-light/actions)
-[![Coverage Status](https://coveralls.io/repos/github/atgreen/red-light-green-light/badge.svg)](https://coveralls.io/github/atgreen/red-light-green-light)
 
 Quick Start
 ------------
@@ -15,7 +14,7 @@ that documents expire after 30 days.
 For an example of real-world rlgl policy in action, check out the
 policy used to validate unit test reports for
 [libffi](https://github.com/libffi/libffi) on
-[travis-ci](https://travis-ci.org/libffi/libffi) builds:
+[Github Actions](https://github.com/libffi/libffi/actions) builds:
 [https://github.com/libffi/rlgl-policy](https://github.com/libffi/rlgl-policy).
 
 Download and install one of the cli tools hosted at https://rl.gl.
