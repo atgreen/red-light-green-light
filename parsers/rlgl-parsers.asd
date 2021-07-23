@@ -31,6 +31,7 @@
                (:file "junit")
                (:file "oscap-oval")
                (:file "oscap-xccdf")
+               (:file "popeye")
                (:file "tripwire-pdf"))
   :depends-on (:cl-json :plump :lquery :flexi-streams
                :str :cxml :quri :cl-csv :rlgl-util :inferior-shell))
