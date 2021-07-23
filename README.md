@@ -435,7 +435,7 @@ Currently supported report parsers include:
 * [JUnit](https://junit.org/junit5/) XML results report
 * [OpenSCAP](https://www.open-scap.org/) OVAL scan reports
 * [OpenSCAP](https://www.open-scap.org/) XCCDF scan reports
-* [Popeye](https://popeyecli.io/) HTML scan reports
+* [Popeye](https://popeyecli.io/) Popeye k8s sanitizer HTML reports
 * [Tripwire](https://www.tripwire.com/) host scan reports in PDF format
 * Comma separated values (CSV) for generic policy enforcement on arbitrary metrics (file size, performance results, etc).
 
