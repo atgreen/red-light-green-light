@@ -25,7 +25,7 @@
   (:default-initargs
    :title  "Popeye Scan Report"
    :doctype "html"
-   :columns '(:RESULT :SECTION :OUTCOME :ID :LEVEL)))
+   :columns '(:RESULT :TYPE :RESOURCE :ID :LEVEL)))
 
 (defmethod parse-report ((parser parser/popeye) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
@@ -50,7 +50,7 @@
                                  (setf tests-fail
                                        (cons
                                         (json:decode-json-from-string
-                                         (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"section\": \"~A\", \"outcome\": \"~A\", \"id\": \"~A\", \"level\": ~S }"
+                                         (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"type\": \"~A\", \"resource\": \"~A\", \"id\": \"~A\", \"level\": ~S }"
                                                  section-title
                                                  outcome-name
                                                  (ppcre:regex-replace-all "\"" text "\\\"" )
