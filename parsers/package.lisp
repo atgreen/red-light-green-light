@@ -30,4 +30,5 @@
            #:parser/junit
            #:parser/oscap-oval
            #:parser/oscap-xccdf
+           #:parser/popeye
            #:parser/tripwire-pdf))
