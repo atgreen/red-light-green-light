@@ -25,7 +25,7 @@
   (:default-initargs
    :title  "Popeye Scan Report"
    :doctype "html"
-   :columns '(:RESULT :ID :LEVEL))
+   :columns '(:RESULT :ID :LEVEL)))
 
 (defmethod parse-report ((parser parser/popeye) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
