@@ -82,15 +82,15 @@ jobs:
         build-args: |
           RLGL_VERSION=${{ steps.version.outputs.version }}
 
-    - uses: nolar/setup-k3d-k3s@v1
-      with:
-        version: v1.19
+    # - uses: nolar/setup-k3d-k3s@v1
+    #   with:
+    #     version: v1.19
 
-    - run: |
-        kubectl get nodes
-        kubectl get pods -A
-        sleep 60
-        kubectl get pods -A
+    # - run: |
+    #     kubectl get nodes
+    #     kubectl get pods -A
+    #     sleep 60
+    #     kubectl get pods -A
 
     - name: Push To quay.io
       id: push-to-quay
@@ -105,9 +105,9 @@ jobs:
     - name: Print image url
       run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
 
-    - name: Rollout to staging environment
-      uses: actions-hub/kubectl@master
-      env:
-        KUBE_CONFIG: ${{ secrets.PROD_KUBECONFIG }}
-      with:
-        args: rollout restart deployment rlgl-server
+    # - name: Rollout to staging environment
+    #   uses: actions-hub/kubectl@master
+    #   env:
+    #     KUBE_CONFIG: ${{ secrets.PROD_KUBECONFIG }}
+    #   with:
+    #     args: rollout restart deployment rlgl-server
