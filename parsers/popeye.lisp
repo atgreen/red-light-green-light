@@ -46,7 +46,7 @@
                   (map nil (lambda (issue)
                              (let ((level (str:s-last (aref (lquery:$ issue (attr "class")) 0)))
                                    (text (str:trim (aref (lquery:$ issue (text)) 0))))
-                               (when (> level 0)
+                               (when (> (read-from-string level) 0)
                                  (setf tests-fail
                                        (cons
                                         (json:decode-json-from-string

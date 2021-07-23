@@ -22,4 +22,4 @@
   ((name :initarg :name :reader name)
    (title :initarg :title :reader title)
    (doctype :initarg :doctype :reader doctype)
-   (columns :initarg :columns :reader columns)))
+   (columns :initarg :columns :reader columns :initform nil)))
