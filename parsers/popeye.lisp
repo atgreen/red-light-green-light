@@ -48,10 +48,9 @@
                                (setf tests-fail
                                      (cons
                                       (json:decode-json-from-string
-                                       (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"section\": ~S, \"id\": \"~A\", \"level\": ~S }"
-                                               section-title
-                                               (ppcre:regex-replace-all "\"" text "\\\"" )
-                                               level))
+                                       (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"id\": \"~A\", \"level\": ~S }"
+                                               (str:concat section-title ": " outcome-name " : " (ppcre:regex-replace-all "\"" text "\\\"" )
+                                                           level))
                                       tests-fail))))
                        issues))))))))
     tests-fail))
