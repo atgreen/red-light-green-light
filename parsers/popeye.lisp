@@ -45,12 +45,13 @@
                   (map nil (lambda (issue)
                              (let ((level (str:s-last (aref (lquery:$ issue (attr "class")) 0)))
                                    (text (str:trim (aref (lquery:$ issue (text)) 0))))
-                               (setf tests-fail
-                                     (cons
-                                      (json:decode-json-from-string
-                                       (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"id\": \"~A\", \"level\": ~S }"
-                                               (str:concat section-title ": " outcome-name " : " (ppcre:regex-replace-all "\"" text "\\\"" ))
-                                               level))
-                                      tests-fail))))
+                               (when (> level 0)
+                                 (setf tests-fail
+                                       (cons
+                                        (json:decode-json-from-string
+                                         (format nil "{ \"report\": \"popeye\", \"result\": \"FAIL\", \"id\": \"~A\", \"level\": ~S }"
+                                                 (str:concat section-title ": " outcome-name " : " (ppcre:regex-replace-all "\"" text "\\\"" ))
+                                                 level))
+                                        tests-fail)))))
                        issues))))))))
-    tests-fail))
+    (reverse tests-fail)))
