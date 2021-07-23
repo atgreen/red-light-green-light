@@ -589,7 +589,8 @@ token claims and token header"
                                      (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
                                      (cdr (assoc :REF json)) processed-results
 			             (rlgl-parsers:title parser)
-			             (commit-url-format policy))
+			             (commit-url-format policy)
+                                     (rlgl-parsers:columns parser))
 		             (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                                     (ref (store-document *storage-driver* doc-oc))
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
@@ -705,7 +706,7 @@ token claims and token header"
 (defparameter *unknown-matcher*
   (make-policy-matcher :kind :unknown))
 
-(defun render (stream doctype digest report-ref results title commit-url-format)
+(defun render (stream doctype digest report-ref results title commit-url-format columns)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
@@ -767,27 +768,35 @@ token claims and token header"
                                              report-ref)
 			       :target "_blank" (format nil "Original Report (sha3/256: ~A)" digest))
 			   (:table :class "fold-table" :id "results"
-				   (:tr (:th "RESULT") (:th "ID"))
-				   (dolist (item results)
-				     (let ((matcher (car item))
-					   (alist (cdr item)))
-				       (:tr :class "view" :class (kind matcher)
-					    (:td (kind matcher))
-					    (:td (:a :href (cdr (assoc :URL alist))
-						     :target "_blank" (cdr (assoc :ID alist)))))
-				       (:tr :class "fold"
-					    (:td :colspan "2")
-					    (:div :class "fold-content"
-						  (when (and matcher
-							     (not (eq (kind matcher) :unknown)))
-						    (let ((log-lines (log-entry matcher)))
-						      (:div :id "border"
-							    (:a :href (format nil commit-url-format (githash matcher))
-								:target "_blank"
-								(:pre (str:trim (car log-lines))))
-							    (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))))
-						  (:div :id "border"
-							(:pre (cl-json-util:pretty-json (json:encode-json-to-string alist))))))))))))
+                                   (let ((report-columns (if columns columns
+                                                             '(:RESULT :ID))))
+                                     (:tr
+                                      (dolist (c report-columns)
+                                        (:th (string c))))
+				     (dolist (item results)
+				       (let ((matcher (car item))
+					     (alist (cdr item)))
+				         (:tr :class "view" :class (kind matcher)
+                                              (dolist (c report-columns)
+                                                (:td
+                                                 (ecase c
+                                                   (:RESULT (kind matcher))
+                                                   (:ID (:a :href (cdr (assoc :URL alist))
+                                                            :target "_blank" (cdr (assoc :ID alist))))
+                                                   (t (cdr (assoc c alist)))))))
+				         (:tr :class "fold"
+					      (:td :colspan (format nil "~A" (length report-columns)))
+					      (:div :class "fold-content"
+						    (when (and matcher
+							       (not (eq (kind matcher) :unknown)))
+						      (let ((log-lines (log-entry matcher)))
+						        (:div :id "border"
+							      (:a :href (format nil commit-url-format (githash matcher))
+								  :target "_blank"
+								  (:pre (str:trim (car log-lines))))
+							      (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))))
+						    (:div :id "border"
+							  (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
 	(:footer :class "page-footer font-small special-color-dark pt-4"
 		 (:div :class "footer-copyright text-center py-3" "Generated on "
 		       (simple-date-time:http-date (simple-date-time:now)) " by version" +rlgl-version+
