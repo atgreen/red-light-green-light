@@ -123,9 +123,9 @@ based on URL."
   "Extract the numeric values for a double-dotted range."
   (metabang.bind:bind (((:values _ _ start-array end-array) (cl-ppcre:scan +numeric-range+ value)))
     (values
-     (read-from-string
+     (parse-integer
       (subseq value (aref start-array 0) (aref end-array 0)))
-     (read-from-string
+     (parse-integer
       (subseq value (aref start-array 1) (aref end-array 1))))))
 
 (defun compile-scanners (matcher)
@@ -144,7 +144,7 @@ regexp (starting with \#^), or any other string."
 		       	 (parse-numeric-range (cdr pair))
 		       (eval `(lambda (s)
 				(and (cl-ppcre:scan +number-matcher+ s)
-				     (let ((num (read-from-string s)))
+				     (let ((num (parse-integer s)))
 				       (and (>= num ,start)
 					    (<= num ,end))))))))
 		    ((eq (char (cdr pair) 0) #\^)
