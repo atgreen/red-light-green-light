@@ -778,12 +778,12 @@ token claims and token header"
 					     (alist (cdr item)))
 				         (:tr :class "view" :class (kind matcher)
                                               (dolist (c report-columns)
-                                                (:td
-                                                 (ecase c
-                                                   (:RESULT (kind matcher))
-                                                   (:ID (:a :href (cdr (assoc :URL alist))
-                                                            :target "_blank" (cdr (assoc :ID alist))))
-                                                   (t (cdr (assoc c alist)))))))
+                                                (case c
+                                                  (:RESULT (:td (kind matcher)))
+                                                  (:ID (:td (:a :href (cdr (assoc :URL alist))
+                                                                :target "_blank" (cdr (assoc :ID alist)))))
+                                                  (:URL " ")
+                                                  (otherwise (:td (cdr (assoc c alist)))))))
 				         (:tr :class "fold"
 					      (:td :colspan (format nil "~A" (length report-columns)))
 					      (:div :class "fold-content"
