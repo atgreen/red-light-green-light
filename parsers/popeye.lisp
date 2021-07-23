@@ -1,4 +1,4 @@
-;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
+;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
 ;;; Copyright (C) 2021  Anthony Green <green@moxielogic.com>
 ;;;
@@ -24,7 +24,8 @@
   ()
   (:default-initargs
    :title  "Popeye Scan Report"
-   :doctype "html"))
+   :doctype "html"
+   :columns '(:RESULT :ID :LEVEL))
 
 (defmethod parse-report ((parser parser/popeye) doc)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
