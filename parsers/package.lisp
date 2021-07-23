@@ -22,6 +22,7 @@
   (:export #:parse-report
            #:doctype
            #:title
+           #:columns
            #:parser/anchore
            #:parser/aqua
            #:parser/clair
