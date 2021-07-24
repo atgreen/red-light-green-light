@@ -19,25 +19,25 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
-        "encoding/hex"
 	"os"
-        "regexp"
+	"regexp"
 	"strings"
 	"time"
-	"mime/multipart"
 
-        "crypto/rand"
-        "crypto/ecdsa"
-        "crypto/elliptic"
-        "crypto/x509"
-        "encoding/pem"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/pem"
 
 	"github.com/fatih/color"
 	"github.com/naoina/toml"
@@ -47,14 +47,14 @@ import (
 var (
 	// FIXME: get version from git, as it done in rlgl-server.lisp
 	VERSION = "undefined"
-	red  = color.New(color.FgRed).SprintFunc()
-	cyan = color.New(color.FgCyan).SprintFunc()
+	red     = color.New(color.FgRed).SprintFunc()
+	cyan    = color.New(color.FgCyan).SprintFunc()
 )
 
 type Config struct {
-	Host string
-	Key string
-	Proxy string
+	Host      string
+	Key       string
+	Proxy     string
 	ProxyAuth string
 }
 
@@ -71,53 +71,52 @@ func exitErr(err error) {
 	os.Exit(2)
 }
 
-func make_keys (path string) {
+func make_keys(path string) {
 
-    privateKey, _ := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-    publicKey := &privateKey.PublicKey
+	privateKey, _ := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	publicKey := &privateKey.PublicKey
 
-    x509bytes, _ := x509.MarshalECPrivateKey(privateKey)
-    var pemPrivateBlock = &pem.Block{
-      Type: "EC PRIVATE KEY",
-      Bytes: x509bytes,
-    }
+	x509bytes, _ := x509.MarshalECPrivateKey(privateKey)
+	var pemPrivateBlock = &pem.Block{
+		Type:  "EC PRIVATE KEY",
+		Bytes: x509bytes,
+	}
 
-    x509bytesPub, _ := x509.MarshalPKIXPublicKey(publicKey)
-    var pemPublicBlock = &pem.Block{
-      Type: "PUBLIC KEY",
-      Bytes: x509bytesPub,
-    }
+	x509bytesPub, _ := x509.MarshalPKIXPublicKey(publicKey)
+	var pemPublicBlock = &pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: x509bytesPub,
+	}
 
-    cfgdir := basedir(path)
-    pemPrivateFile, err := os.Create(cfgdir + "/private_key.pem");
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
+	cfgdir := basedir(path)
+	pemPrivateFile, err := os.Create(cfgdir + "/private_key.pem")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-    err = pem.Encode(pemPrivateFile, pemPrivateBlock)
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
-    pemPrivateFile.Close()
-    os.Chmod(cfgdir + "/private_key.pem", 0600)
+	err = pem.Encode(pemPrivateFile, pemPrivateBlock)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	pemPrivateFile.Close()
+	os.Chmod(cfgdir+"/private_key.pem", 0600)
 
-    pemPublicFile, err := os.Create(cfgdir + "/public_key.pem");
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
+	pemPublicFile, err := os.Create(cfgdir + "/public_key.pem")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-    err = pem.Encode(pemPublicFile, pemPublicBlock)
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
-    pemPublicFile.Close()
-    os.Chmod(cfgdir + "/public_key.pem", 0644)
+	err = pem.Encode(pemPublicFile, pemPublicBlock)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	pemPublicFile.Close()
+	os.Chmod(cfgdir+"/public_key.pem", 0644)
 }
-
 
 func (c *Config) Write(path string) {
 	cfgdir := basedir(path)
@@ -182,9 +181,9 @@ func xdgSupport() bool {
 	return false
 }
 
-func setProxy (proxy string, auth string) {
+func setProxy(proxy string, auth string) {
 
-	var transport *http.Transport;
+	var transport *http.Transport
 
 	if proxy != "" {
 		proxyUrl, err := url.Parse(proxy)
@@ -196,7 +195,7 @@ func setProxy (proxy string, auth string) {
 			hdr := http.Header{}
 			hdr.Add("Proxy-Authorization", basicAuth)
 			transport = &http.Transport{
-				Proxy: http.ProxyURL(proxyUrl),
+				Proxy:              http.ProxyURL(proxyUrl),
 				ProxyConnectHeader: hdr,
 			}
 		} else {
@@ -205,19 +204,17 @@ func setProxy (proxy string, auth string) {
 			}
 		}
 
-		http.DefaultTransport = transport;
+		http.DefaultTransport = transport
 	}
 }
 
-
-func SendPostRequest (config *Config, url string, filename string, filetype string) []byte {
+func SendPostRequest(config *Config, url string, filename string, filetype string) []byte {
 	file, err := os.Open(filename)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
-
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -235,7 +232,7 @@ func SendPostRequest (config *Config, url string, filename string, filetype stri
 		log.Fatal(err)
 	}
 
-	var bearer = "Bearer " + config.Key;
+	var bearer = "Bearer " + config.Key
 	request.Header.Add("Authorization", bearer)
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
@@ -258,29 +255,28 @@ func SendPostRequest (config *Config, url string, filename string, filetype stri
 
 func loadPrivateKey(cfgdir string) (*ecdsa.PrivateKey, error) {
 
-                                priv, err := ioutil.ReadFile(cfgdir + "/private_key.pem");
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
+	priv, err := ioutil.ReadFile(cfgdir + "/private_key.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-                                block, _ := pem.Decode(priv)
-                                if block == nil {
-                                        log.Fatal("Failed to decode PEM private key")
-                                }
+	block, _ := pem.Decode(priv)
+	if block == nil {
+		log.Fatal("Failed to decode PEM private key")
+	}
 
-                                var parsedKey interface{}
-                                parsedKey, err = x509.ParseECPrivateKey(block.Bytes)
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
+	var parsedKey interface{}
+	parsedKey, err = x509.ParseECPrivateKey(block.Bytes)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-
-    switch parsedKey := parsedKey.(type) {
-    case *ecdsa.PrivateKey:
-        return parsedKey, nil
-    }
-    log.Fatal("Unsupported private key type")
-    return nil, nil
+	switch parsedKey := parsedKey.(type) {
+	case *ecdsa.PrivateKey:
+		return parsedKey, nil
+	}
+	log.Fatal("Unsupported private key type")
+	return nil, nil
 }
 
 func main() {
@@ -289,11 +285,11 @@ func main() {
 	var key string
 	var proxy string
 	var proxyauth string
-        var signingkey string
+	var signingkey string
 	var title string
 	var config Config
 
-        cfgPath, cfgExists := getConfigPath()
+	cfgPath, cfgExists := getConfigPath()
 	if !cfgExists {
 		config.Write(cfgPath)
 	} else {
@@ -348,18 +344,18 @@ func main() {
 				}
 
 				if key == "" {
-					var slash string;
+					var slash string
 					if strings.HasSuffix(c.Args().First(), "/") {
-						slash = "";
+						slash = ""
 					} else {
-						slash = "/";
+						slash = "/"
 					}
 					exitErr(fmt.Errorf("Missing API key.  Generate a new one at %s%sget-api-key",
 						c.Args().First(),
 						slash))
 				}
 
-				setProxy(proxy, proxyauth);
+				setProxy(proxy, proxyauth)
 
 				response, err := http.Get(fmt.Sprintf("%s/login", c.Args().First()))
 
@@ -378,18 +374,18 @@ func main() {
 				config.ProxyAuth = proxyauth
 				config.Write(cfgPath)
 
-                                if signingkey == "" {
-                                    make_keys(cfgPath);
-                                } else {
-                                    data, err := ioutil.ReadFile(signingkey)
-  				    if err != nil {
-					log.Fatal(err)
-   				    }
-                                    err = ioutil.WriteFile(basedir(cfgPath) + "/private_key.pem", data, 0400)
-  				    if err != nil {
-					log.Fatal(err)
-   				    }
-                                }
+				if signingkey == "" {
+					make_keys(cfgPath)
+				} else {
+					data, err := ioutil.ReadFile(signingkey)
+					if err != nil {
+						log.Fatal(err)
+					}
+					err = ioutil.WriteFile(basedir(cfgPath)+"/private_key.pem", data, 0400)
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
 
 				return nil
 			},
@@ -404,12 +400,12 @@ func main() {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
-				var bearer = "Bearer " + config.Key;
+				var bearer = "Bearer " + config.Key
 
 				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
-				req.Header.Add("Authorization",	bearer)
+				req.Header.Add("Authorization", bearer)
 
 				// Send req using http Client
 				client := &http.Client{}
@@ -456,7 +452,7 @@ func main() {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
 				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player))
 
@@ -474,9 +470,9 @@ func main() {
 			},
 		},
 		{
-			Name:  "verify",
+			Name:    "verify",
 			Aliases: []string{"v"},
-			Usage: "verify document sigstore record",
+			Usage:   "verify document sigstore record",
 
 			Action: func(c *cli.Context) error {
 
@@ -485,24 +481,24 @@ func main() {
 				}
 
 				if c.NArg() == 0 {
-				   exitErr(fmt.Errorf("Missing report argument"))
+					exitErr(fmt.Errorf("Missing report argument"))
 				} else if c.NArg() > 1 {
-				   exitErr(fmt.Errorf("Too may arguments"))
+					exitErr(fmt.Errorf("Too may arguments"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
 				if !strings.HasPrefix(c.Args().First(), "RLGL-") {
-				   exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()));
+					exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()))
 				}
 
-				request, err := http.NewRequest("GET", fmt.Sprintf("%s/verify?id=%s", config.Host, c.Args().First()), nil);
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/verify?id=%s", config.Host, c.Args().First()), nil)
 				if err != nil {
 					log.Fatal(err)
 				}
-				var bearer = "Bearer " + config.Key;
+				var bearer = "Bearer " + config.Key
 				request.Header.Add("Authorization", bearer)
-				request.Header.Add("Content-Type", "text");
+				request.Header.Add("Content-Type", "text")
 				client := &http.Client{}
 				response, err := client.Do(request)
 
@@ -532,26 +528,26 @@ func main() {
 				}
 
 				if c.NArg() == 0 {
-				   exitErr(fmt.Errorf("Missing policy argument"))
+					exitErr(fmt.Errorf("Missing policy argument"))
 				} else if c.NArg() > 1 {
-				   exitErr(fmt.Errorf("Too may arguments"))
+					exitErr(fmt.Errorf("Too may arguments"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
 				values := map[string]string{"policy": c.Args().First()}
 
 				jsonValue, _ := json.Marshal(values)
 
-				request, err := http.NewRequest("POST", fmt.Sprintf("%s/new-policy-bound-api-key", config.Host), bytes.NewBufferString(string(jsonValue)));
+				request, err := http.NewRequest("POST", fmt.Sprintf("%s/new-policy-bound-api-key", config.Host), bytes.NewBufferString(string(jsonValue)))
 				if err != nil {
 					log.Fatal(err)
 				}
-				var bearer = "Bearer " + config.Key;
+				var bearer = "Bearer " + config.Key
 				request.Header.Add("Authorization", bearer)
-				request.Header.Add("Content-Type", "text");
+				request.Header.Add("Content-Type", "text")
 
-                                client := &http.Client{}
+				client := &http.Client{}
 				response, err := client.Do(request)
 
 				if err != nil {
@@ -570,9 +566,9 @@ func main() {
 			},
 		},
 		{
-			Name:  "baseline",
+			Name:    "baseline",
 			Aliases: []string{"b"},
-			Usage: "generate baseline XFAIL regression policy",
+			Usage:   "generate baseline XFAIL regression policy",
 
 			Action: func(c *cli.Context) error {
 
@@ -581,24 +577,24 @@ func main() {
 				}
 
 				if c.NArg() == 0 {
-				   exitErr(fmt.Errorf("Missing report argument"))
+					exitErr(fmt.Errorf("Missing report argument"))
 				} else if c.NArg() > 1 {
-				   exitErr(fmt.Errorf("Too may arguments"))
+					exitErr(fmt.Errorf("Too may arguments"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
 				if !strings.HasPrefix(c.Args().First(), "RLGL-") {
-				   exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()));
+					exitErr(fmt.Errorf("expecting a document ID, but got %s", c.Args().First()))
 				}
 
-				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-baseline-xfail-policy?id=%s", config.Host, c.Args().First()), nil);
+				request, err := http.NewRequest("GET", fmt.Sprintf("%s/get-baseline-xfail-policy?id=%s", config.Host, c.Args().First()), nil)
 				if err != nil {
 					log.Fatal(err)
 				}
-				var bearer = "Bearer " + config.Key;
+				var bearer = "Bearer " + config.Key
 				request.Header.Add("Authorization", bearer)
-				request.Header.Add("Content-Type", "text");
+				request.Header.Add("Content-Type", "text")
 				client := &http.Client{}
 				response, err := client.Do(request)
 
@@ -660,34 +656,34 @@ func main() {
 					exitErr(fmt.Errorf("Missing report"))
 				}
 
-				setProxy(config.Proxy, config.ProxyAuth);
+				setProxy(config.Proxy, config.ProxyAuth)
 
-				var n string;
-				var name string;
+				var n string
+				var name string
 
-				message := SendPostRequest (&config, fmt.Sprintf("%s/upload", config.Host), c.Args().Get(0), "bin");
+				message := SendPostRequest(&config, fmt.Sprintf("%s/upload", config.Host), c.Args().Get(0), "bin")
 				n = string(message)
 
-                                f, err := os.Open(c.Args().Get(0))
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-                                defer f.Close()
+				f, err := os.Open(c.Args().Get(0))
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer f.Close()
 
-                                values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
+				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
 				if title != "" {
 					values["title"] = title
 				}
 
 				jsonValue, _ := json.Marshal(values)
 
-				request, err := http.NewRequest("POST", fmt.Sprintf("%s/evaluate", config.Host), bytes.NewBufferString(string(jsonValue)));
+				request, err := http.NewRequest("POST", fmt.Sprintf("%s/evaluate", config.Host), bytes.NewBufferString(string(jsonValue)))
 				if err != nil {
 					log.Fatal(err)
 				}
-				var bearer = "Bearer " + config.Key;
+				var bearer = "Bearer " + config.Key
 				request.Header.Add("Authorization", bearer)
-				request.Header.Add("Content-Type", "application/json");
+				request.Header.Add("Content-Type", "application/json")
 				client := &http.Client{}
 				response, err := client.Do(request)
 
@@ -700,35 +696,35 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-                                var result map[string]interface{}
-                                json.Unmarshal([]byte(responseData), &result)
+				var result map[string]interface{}
+				json.Unmarshal([]byte(responseData), &result)
 
-                                cfgdir := basedir(cfgPath)
-                                var key, _ = loadPrivateKey(cfgdir)
+				cfgdir := basedir(cfgPath)
+				var key, _ = loadPrivateKey(cfgdir)
 
-                                var data []byte
-                                data, err = hex.DecodeString(fmt.Sprintf("%s", result["digest"]))
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-
-                                var r []byte
-                                r, err = key.Sign(rand.Reader, data, nil)
-                                if err != nil {
-                                    log.Fatal(err)
-                                }
-
-				values = map[string]string{"signature": base64.StdEncoding.EncodeToString(r),
-                                                           "id": fmt.Sprintf("%s", result["callback"])}
-				jsonValue, _ = json.Marshal(values)
-
-                                request, err = http.NewRequest("POST", fmt.Sprintf("%s/callback", config.Host), bytes.NewBufferString(string(jsonValue)))
+				var data []byte
+				data, err = hex.DecodeString(fmt.Sprintf("%s", result["digest"]))
 				if err != nil {
 					log.Fatal(err)
 				}
-				bearer = "Bearer " + config.Key;
+
+				var r []byte
+				r, err = key.Sign(rand.Reader, data, nil)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				values = map[string]string{"signature": base64.StdEncoding.EncodeToString(r),
+					"id": fmt.Sprintf("%s", result["callback"])}
+				jsonValue, _ = json.Marshal(values)
+
+				request, err = http.NewRequest("POST", fmt.Sprintf("%s/callback", config.Host), bytes.NewBufferString(string(jsonValue)))
+				if err != nil {
+					log.Fatal(err)
+				}
+				bearer = "Bearer " + config.Key
 				request.Header.Add("Authorization", bearer)
-				request.Header.Add("Content-Type", "text");
+				request.Header.Add("Content-Type", "text")
 				client = &http.Client{}
 				response, err = client.Do(request)
 
