@@ -58,10 +58,6 @@ type Config struct {
 	ProxyAuth string
 }
 
-func NewConfig() *Config {
-	return &Config{}
-}
-
 func output(s string) {
 	fmt.Printf("%s %s\n", cyan("rlgl"), s)
 }
@@ -101,7 +97,10 @@ func make_keys(path string) {
 		os.Exit(1)
 	}
 	pemPrivateFile.Close()
-	os.Chmod(cfgdir+"/private_key.pem", 0600)
+	err = os.Chmod(cfgdir+"/private_key.pem", 0600)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	pemPublicFile, err := os.Create(cfgdir + "/public_key.pem")
 	if err != nil {
@@ -115,7 +114,10 @@ func make_keys(path string) {
 		os.Exit(1)
 	}
 	pemPublicFile.Close()
-	os.Chmod(cfgdir+"/public_key.pem", 0644)
+        err = os.Chmod(cfgdir+"/public_key.pem", 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (c *Config) Write(path string) {
@@ -224,7 +226,11 @@ func SendPostRequest(config *Config, url string, filename string, filetype strin
 		log.Fatal(err)
 	}
 
-	io.Copy(part, file)
+	_, err = io.Copy(part, file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	writer.Close()
 	request, err := http.NewRequest("POST", url, body)
 
@@ -697,7 +703,10 @@ func main() {
 					log.Fatal(err)
 				}
 				var result map[string]interface{}
-				json.Unmarshal([]byte(responseData), &result)
+				err = json.Unmarshal([]byte(responseData), &result)
+				if err != nil {
+					log.Fatal(err)
+				}
 
 				cfgdir := basedir(cfgPath)
 				var key, _ = loadPrivateKey(cfgdir)
@@ -733,7 +742,7 @@ func main() {
 				}
 				defer response.Body.Close()
 
-				responseData, err = ioutil.ReadAll(response.Body)
+				_, err = ioutil.ReadAll(response.Body)
 				if err != nil {
 					log.Fatal(err)
 				}
