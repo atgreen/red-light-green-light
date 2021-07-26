@@ -71,6 +71,14 @@ jobs:
         (cd rlgl; make build)
         mv rlgl/build/* cli
 
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v2.5.1
+      with:
+        version: v1.39.0
+        skip-go-installation: true
+        skip-pkg-cache: true
+        working-directory: rlgl
+
     - name: Buildah Action
       id: build-image
       uses: redhat-actions/buildah-build@v2
