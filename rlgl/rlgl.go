@@ -411,6 +411,10 @@ func main() {
 				var bearer = "Bearer " + config.Key
 
 				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
+                                if err != nil {
+				    log.Fatal(err)
+				}
+
 				req.Header.Add("Authorization", bearer)
 
 				// Send req using http Client
@@ -776,7 +780,10 @@ func main() {
 	app.Usage = "Red Light Green Light"
 	app.Action = func(c *cli.Context) error {
 
-		cli.ShowAppHelp(c)
+		err := cli.ShowAppHelp(c)
+                if err != nil {
+		    log.Fatal(err)
+                }
 
 		return nil
 	}
