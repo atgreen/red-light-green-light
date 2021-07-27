@@ -1,6 +1,7 @@
 version: '3'
 services:
   rlgl-server:
+    name: rlgl-server
     image: "quay.io/moxielogic/rlgl-server:latest"
     ports:
       - "8080:8080"
