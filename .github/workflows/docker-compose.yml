@@ -6,11 +6,11 @@ services:
       - "8080:8080"
     volumes:
       - type: bind
-        source: .github/workflows/config.ini
+        source: config.ini
         target: /etc/rlgl/config.ini
       - type: bind
-        source: .github/workflows/private_key.pem
+        source: private_key.pem
         target: /etc/rlgl/private_key.pem
       - type: bind
-        source: .github/workflows/public_key.pem
+        source: public_key.pem
         target: /etc/rlgl/public_key.pem
