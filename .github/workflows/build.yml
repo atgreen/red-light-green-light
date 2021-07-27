@@ -100,9 +100,6 @@ jobs:
     #     sleep 60
     #     kubectl get pods -A
 
-    - name: Build the stack
-      run: docker-compose -f .github/workflows/docker-compose.yml up -d
-
     - name: Push To quay.io
       id: push-to-quay
       uses: redhat-actions/push-to-registry@v2
@@ -115,6 +112,9 @@ jobs:
 
     - name: Print image url
       run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+
+    - name: Build the stack
+      run: docker-compose -f .github/workflows/docker-compose.yml up -d
 
     # - name: Rollout to staging environment
     #   uses: actions-hub/kubectl@master
