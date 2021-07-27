@@ -1,7 +1,7 @@
 version: '3'
 services:
   rlgl-server:
-    container_name: rlgl-server:latest
+    image: "rlgl-server:latest"
     ports:
       - "8080:8080"
     volumes:
