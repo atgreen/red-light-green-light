@@ -14,5 +14,3 @@ services:
       - type: bind
         source: .github/workflows/public_key.pem
         target: /etc/rlgl/public_key.pem
-    networks:
-      - rlgl
