@@ -6,7 +6,7 @@ services:
       - "8080:8080"
     volumes:
       - type: bind
-        source: /home/runner/work/red-light-green-light/red-light-green-light/.github/workflows/private_key.pemconfig.ini
+        source: /home/runner/work/red-light-green-light/red-light-green-light/.github/workflows/config.ini
         target: /etc/rlgl/config.ini
       - type: bind
         source: /home/runner/work/red-light-green-light/red-light-green-light/.github/workflows/private_key.pem
