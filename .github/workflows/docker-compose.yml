@@ -1,0 +1,18 @@
+version: '3'
+services:
+  rlgl-server:
+    container_name: rlgl-server:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: .github/workflows/config.ini
+        target: /etc/rlgl/config.ini
+      - type: bind
+        source: .github/workflows/private_key.pem
+        target: /etc/rlgl/private_key.pem
+      - type: bind
+        source: .github/workflows/public_key.pem
+        target: /etc/rlgl/public_key.pem
+    networks:
+      - rlgl

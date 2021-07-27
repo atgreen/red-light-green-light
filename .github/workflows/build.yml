@@ -100,6 +100,9 @@ jobs:
     #     sleep 60
     #     kubectl get pods -A
 
+    - name: Build the stack
+      run: docker-compose -f .github/workflows/docker-compose.yml up -d
+
     - name: Push To quay.io
       id: push-to-quay
       uses: redhat-actions/push-to-registry@v2
