@@ -113,8 +113,20 @@ jobs:
     - name: Print image url
       run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
 
-    - name: Build the stack
+    - name: Run it...
       run: docker-compose -f .github/workflows/docker-compose.yml up -d
+
+    - name: Wait for it...
+      run: .github/workflows/container-ready.sh rlgl-server
+
+    - name: Try something
+      run: |
+        ip="$(docker container inspect rlgl-server --format '{{ (index .NetworkSettings.Networks "rlgl-server").IPAddress }}')"
+        if [ -z "${ip:-}" ]; then
+            err "Container ${cid} has no IP address"
+            return 1
+        fi
+        curl -s $ip:8080
 
     # - name: Rollout to staging environment
     #   uses: actions-hub/kubectl@master
