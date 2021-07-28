@@ -106,7 +106,7 @@ jobs:
     - name: Test
       run: |
         docker-compose -f .ci/docker-compose.yml up -d
-        ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "workflows_default").IPAddress }}' ci_rlgl-server_1)
+        ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks ci_default").IPAddress }}' ci_rlgl-server_1)
         if [ -z "${ip:-}" ]; then
             err "Container ${cid} has no IP address"
             return 1
