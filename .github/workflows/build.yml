@@ -105,6 +105,8 @@ jobs:
 
     - name: Test
       run: |
+        openssl ecparam -name secp256k1 -genkey -noout -out .ci/private_key.pem
+        openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
         docker-compose -f .ci/docker-compose.yml up -d
         ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
         if [ -z "${ip:-}" ]; then
