@@ -106,7 +106,7 @@ jobs:
     - name: Test
       run: |
         # Create a new test keypair
-        openssl ecparam -name secp256k1 -genkey -noout -out .ci/private_key.pem
+        openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
         openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
 
         # Test rekor-cli
