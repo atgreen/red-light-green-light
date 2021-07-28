@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -ex
 
 cd test
 curl -s http://${1}/cli/rlgl-linux-amd64.tgz | \
