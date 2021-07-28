@@ -22,7 +22,7 @@ DOC=<%= @ id %>
 # ---- Error handling ---------------------------------------------------------
 set -e
 
-function error_exit
+error_exit()
 {
     echo ERROR: ${1:-"Unknown Error"} 1>&2
     exit 1
