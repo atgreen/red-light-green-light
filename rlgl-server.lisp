@@ -215,8 +215,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defvar *private-key-file* "/etc/rlgl-signer/rlgl-signer-private-key.pem")
 (defvar *public-key-file* "/etc/rlgl-signer/rlgl-signer-public-key.pem")
-(defvar *public-key* (car (inferior-shell:run/lines
-                            (format nil "sh -c 'cat ~A | base64 -w0'" *public-key-file*))))
+(defvar *public-key* nil)
 
 (defun make-string-signature (s)
   "Generate a detached signature for S."
@@ -938,6 +937,8 @@ token claims and token header"
     (setf *public-key-file*
 	  (or (uiop:getenv "PUBLIC_KEY_FILE")
 	      (get-config-value "public-key-file")))
+    (setf *public-key* (car (inferior-shell:run/lines
+                             (format nil "sh -c 'cat ~A | base64 -w0'" *public-key-file*))))
     (setf *private-key-file*
 	  (or (uiop:getenv "PRIVATE_KEY_FILE")
 	      (get-config-value "private-key-file")))
