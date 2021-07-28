@@ -6,7 +6,7 @@ cd test
 curl -s http://${1}/cli/rlgl-linux-amd64.tgz | \
     tar --strip-components=2 -xvzf - ./rlgl/rlgl
 
-./rlgl --key=AAAAAAA-BBBBBBB-CCCCCCC-DDDDDDD login ${1}
+./rlgl login --key=AAAAAAA-BBBBBBB-CCCCCCC-DDDDDDD http://${1}
 ID=$(./rlgl start ${1})
 
 OUT=$(./rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html)
