@@ -115,7 +115,8 @@ jobs:
           'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
             do echo "Waiting for ${0}" && sleep 2;\
            done' http://$ip:8080/healthz
-        ./.ci/test.sh $ip:8080
+        ./.ci/test.sh $ip:8080 || true
+        docker logs ci_rlgl-server_1
 
     # - name: Rollout to staging environment
     #   uses: actions-hub/kubectl@master

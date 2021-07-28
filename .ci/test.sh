@@ -12,4 +12,5 @@ ID=$(./rlgl start ${1})
 OUT=$(./rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html || true)
 echo $OUT
 REPORT=$(echo $OUT | awk '{ print $2 }' | cut -f2 -d=)
+./rlgl verify $REPORT
 ./rlgl verify $REPORT | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem sh
