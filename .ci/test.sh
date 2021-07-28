@@ -20,4 +20,6 @@ OUT=$(rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.h
 echo $OUT
 REPORT=$(echo $OUT | awk '{ print $2 }' | cut -f2 -d=)
 rlgl verify $REPORT
-rlgl verify $REPORT | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem sh
+echo "set -x" >> /tmp/runme
+rlgl verify $REPORT >> /tmp/runme
+cat /tmp/runme | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem /bin/sh
