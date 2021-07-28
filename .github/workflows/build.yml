@@ -90,16 +90,6 @@ jobs:
         build-args: |
           RLGL_VERSION=${{ steps.version.outputs.version }}
 
-    # - uses: nolar/setup-k3d-k3s@v1
-    #   with:
-    #     version: v1.19
-
-    # - run: |
-    #     kubectl get nodes
-    #     kubectl get pods -A
-    #     sleep 60
-    #     kubectl get pods -A
-
     - name: Push To quay.io
       id: push-to-quay
       uses: redhat-actions/push-to-registry@v2
@@ -113,11 +103,9 @@ jobs:
     - name: Print image url
       run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
 
-    - name: Run it...
-      run: docker-compose -f .github/workflows/docker-compose.yml up -d
-
-    - name: Download the rlgl client
+    - name: Test
       run: |
+        docker-compose -f .ci/docker-compose.yml up -d
         ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "workflows_default").IPAddress }}' workflows_rlgl-server_1)
         if [ -z "${ip:-}" ]; then
             err "Container ${cid} has no IP address"
@@ -127,8 +115,7 @@ jobs:
           'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
             do echo "Waiting for ${0}" && sleep 2;\
            done' http://$ip:8080/healthz
-        curl -s http://$ip:8080/cli/rlgl-linux-amd64.tgz > rlgl.tgz
-        tar xvfz rlgl.tgz
+        ./.ci/test.sh $ip:8080
 
     # - name: Rollout to staging environment
     #   uses: actions-hub/kubectl@master

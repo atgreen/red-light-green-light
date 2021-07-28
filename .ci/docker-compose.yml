@@ -1,0 +1,16 @@
+version: '3.2'
+services:
+  rlgl-server:
+    image: "quay.io/moxielogic/rlgl-server:latest"
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: /home/runner/work/red-light-green-light/red-light-green-light/.ci/config.ini
+        target: /etc/rlgl/config.ini
+      - type: bind
+        source: /home/runner/work/red-light-green-light/red-light-green-light/.ci/private_key.pem
+        target: /etc/rlgl/private_key.pem
+      - type: bind
+        source: /home/runner/work/red-light-green-light/red-light-green-light/.ci/public_key.pem
+        target: /etc/rlgl/public_key.pem
