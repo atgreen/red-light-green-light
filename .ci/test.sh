@@ -16,10 +16,15 @@ rekor-cli version
 rlgl login --key=AAAAAAA-BBBBBBB-CCCCCCC-DDDDDDD http://${1}
 ID=$(rlgl start ${1})
 
+echo =========================================================================
+echo Evalute report
+echo =========================================================================
+echo rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html
 OUT=$(rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html || true)
 echo $OUT
 REPORT=$(echo $OUT | awk '{ print $2 }' | cut -f2 -d=)
-rlgl verify $REPORT
-echo "set -x" > /tmp/runme
-rlgl verify $REPORT >> /tmp/runme
-cat /tmp/runme | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem /bin/sh
+echo =========================================================================
+echo Verify report
+echo =========================================================================
+echo "rlgl verify $REPORT | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem /bin/sh"
+rlgl verify $REPORT | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem /bin/sh

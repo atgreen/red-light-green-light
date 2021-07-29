@@ -109,12 +109,6 @@ jobs:
         openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
         openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
 
-        # Test rekor-cli
-        openssl dgst -sha256 -sign .ci/private_key.pem -out README.md.sig README.md
-        curl -Ls https://github.com/sigstore/rekor/releases/download/v0.3.0/rekor-cli-linux-amd64 > rekor-cli
-        chmod +x rekor-cli
-        ./rekor-cli upload --artifact README.md --signature README.md.sig --pki-format=x509 --public-key=.ci/public_key.pem
-
         docker-compose -f .ci/docker-compose.yml up -d
         ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
         if [ -z "${ip:-}" ]; then
