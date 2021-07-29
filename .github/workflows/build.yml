@@ -126,6 +126,7 @@ jobs:
             do echo "Waiting for ${0}" && sleep 2;\
            done' http://$ip:8080/healthz
 
+        docker exec -t ci_rlgl-server_1 env
         docker exec -t ci_rlgl-server_1 ip a
 
         ./.ci/test.sh $ip:8080 || true
