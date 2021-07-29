@@ -439,8 +439,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (track-action "login" :url "/login")
   ;; Special hack -- reset *server-uri* as this may have changed
   ;; for testing purposes.
-  (when (fad:file-exists-p #p"/etc/rlgl/server-uri")
-    (setq *server-uri* (alexandria:read-file-into-string #p"/etc/rlgl/server-uri")))
+  (when (fad:file-exists-p #p"/tmp/server-uri")
+    (setq *server-uri* (alexandria:read-file-into-string #p"/tmp/server-uri")))
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
 (snooze:defroute report-log (:get :text/plain &key id)
