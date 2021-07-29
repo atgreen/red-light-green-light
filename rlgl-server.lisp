@@ -65,6 +65,7 @@ keycloak-oidc-realm-uri = \"ignore\"
 keycloak-oidc-realm-redirect-uri = \"ignore\"
 keycloak-oidc-client-id = \"ignore\"
 keycloak-oidc-client-secret = \"ignore\"
+rekor-server = \"https://rekor.sigstore.dev\"
 ")
 
 (defvar *server-uri* nil)
@@ -227,7 +228,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
         (error "Internal error generating document signature for ~A" s)
         signature)))
 
-(defvar *rekor-uri* "https://rekor.sigstore.dev/api/v1/log/entries")
+(defvar *rekor-uri* nil)
 
 (defun rekor-envelope (envelope signature)
   (when *rekor-uri*
@@ -599,7 +600,6 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
-                                                      (log:info "IN CALLBACK!")
  			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature signature)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (log:info signature)
@@ -946,6 +946,12 @@ token claims and token header"
     (setf *private-key-file*
 	  (or (uiop:getenv "PRIVATE_KEY_FILE")
 	      (get-config-value "private-key-file")))
+
+    (setf *rekor-uri*
+          (str:concat
+	   (or (uiop:getenv "REKOR_SERVER")
+	       (get-config-value "rekor-server"))
+           "/api/v1/log/entries"))
 
     (setf *keycloak-oidc-client-id*
 	  (or (uiop:getenv "KEYCLOAK_OIDC_CLIENT_ID")

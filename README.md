@@ -503,6 +503,7 @@ override settings found in the config file.
 | `KEYCLOAK_OIDC_REALM_REDIRECT_URI` | `keycloak-oidc-realm-redirect-uri` | Keycloak realm redirect URI (optional)       |
 | `KEYCLOAK_OIDC_REALM_URI`          | `keycloak-oidc-realm-uri`          | Keycloak realm URI (optional)                |
 |                                    | `test-api-key`                     | Used for testing                             |
+| `REKOR_SERVER`                     | `rekor-server`                     | Defaults to `https://rekor.sigstore.dev`     |
 | `AWS_ACCESS_KEY`                   |                                    | Required when using s3 storage               |
 | `AWS_SECRET_KEY`                   |                                    | Required when using s3 storage               |
 
