@@ -709,6 +709,7 @@ func main() {
                                 if responseData[0] != '{' {
                                         log.Fatal(string(responseData))
                                 }
+                                fmt.Println(string(responseData))
 				var result map[string]interface{}
 				err = json.Unmarshal([]byte(responseData), &result)
 				if err != nil {
