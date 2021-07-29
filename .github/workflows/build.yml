@@ -127,7 +127,7 @@ jobs:
            done' http://$ip:8080/healthz
 
         docker exec -t ci_rlgl-server_1 sh -c 'echo http://$ip:8080 > /tmp/server-uri'
-        docker exec -t ci_rlgl-server_1 cat /etc/rlgl/server-uri
+        docker exec -t ci_rlgl-server_1 cat /tmp/server-uri
 
         ./.ci/test.sh $ip:8080 || true
         docker logs ci_rlgl-server_1
