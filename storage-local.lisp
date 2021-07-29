@@ -42,11 +42,11 @@
 
 (defmethod delete-document ((backend storage/local) ref)
   "Delete a document from local storage."
-  (delete-file (str:concat (local-dir backend) "/" ref)))
+  (delete-file (str:concat (local-dir backend) "/" (string ref))))
 
 (defmethod read-document ((backend storage/local) ref)
   "Return an octet vector containing the document."
-  (alexandria:read-file-into-byte-vector (str:concat (local-dir backend) "/" ref)))
+  (alexandria:read-file-into-byte-vector (str:concat (local-dir backend) "/" (string ref))))
 
 (defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."
