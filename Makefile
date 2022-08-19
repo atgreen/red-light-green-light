@@ -3,9 +3,9 @@ all:
 binary:
 	buildapp --output rlgl-server \
 		--asdf-tree `pwd`/.. \
-		--asdf-tree `pwd`/3rd-party/postmodern-20220220-git \
-		--asdf-tree `pwd`/3rd-party/cl-json-util \
-		--asdf-tree `pwd`/3rd-party/snooze-20210518-git \
+		--asdf-tree `pwd`/local-projects/postmodern-20220220-git \
+		--asdf-tree `pwd`/local-projects/cl-json-util \
+		--asdf-tree `pwd`/local-projects/snooze-20210518-git \
 		--asdf-tree `pwd`/parsers \
 		--asdf-tree `pwd`/db \
 		--asdf-tree `pwd`/user \
