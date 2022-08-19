@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl-server
   :description "The Red Light Green Light server."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "0"
+  :version "1"
   :serial t
   :components ((:file "package")
 	       (:file "api-key")
