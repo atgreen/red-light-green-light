@@ -1,7 +1,5 @@
 FROM quay.io/moxielogic/rlgl-server-base:latest
 
-ENV SBCL_OPTS="--disable-debugger --lose-on-corruption"
-
 COPY . /tmp/src
 ARG RLGL_VERSION=RLGL_VERSION
 ENV RLGL_VERSION=${RLGL_VERSION}
