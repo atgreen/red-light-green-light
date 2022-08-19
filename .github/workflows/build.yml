@@ -39,7 +39,7 @@ jobs:
 
     - name: Get base hash
       id: base-hash
-      run: echo "::set-output name=base-hash::$(sha512sum rlgl-server.asd | cut -b 1-8)"
+      run: echo "::set-output name=base-hash::$(cat Dockerfile.base rlgl-server.asd | sha512sum | cut -b 1-8)"
 
     - name: Test if base exists
       id: base-exists
