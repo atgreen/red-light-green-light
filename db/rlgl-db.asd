@@ -25,4 +25,4 @@
                (:file "db")
                (:file "db-postgresql")
                (:file "db-sqlite"))
-  :depends-on (:dbi :dbd.postgres :local-time :log4cl :str))
+  :depends-on (:dbi :local-time :log4cl :str))

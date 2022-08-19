@@ -35,7 +35,7 @@
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
                :cxml :cl-dbi :cl-date-time-parser :quri
 	       :local-time :cl-csv :prometheus
-	       :dbd-sqlite3 :zs3 :simple-date-time
+	       :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
 	       :drakma :uuid :cl-base32
 	       :split-sequence :thread-pool
 	       :prometheus.formats.text
