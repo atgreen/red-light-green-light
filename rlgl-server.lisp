@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -532,10 +532,10 @@ token claims and token header"
 	    (let ((user (rlgl.user:find-user-by-keycloak-id-token *db* claims)))
               (markup:write-html
                <page-template title="Red Light Green Light">
-		 <div class="alert alert-warning alert-dismissible fade show" role="alert" >
-		   You are logged in as user ,(progn (rlgl.user:user-name user)) .
-		   <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
-                     <span aria-hidden="true" >X</span> </button> </div>
+		 <div class="alert alert-warning alert-dismissible" role="alert" >
+		   <button type="button" class="close" data-dismiss="alert">&times;</button>
+		   You are logged in as user ,(progn (rlgl.user:user-name user)).
+                 </div>
                  <div style="width:100px">
                    <div class="rlgl-svg" /> </div>
 		 <h1 class="mt-5">Your personal API key</h1>
