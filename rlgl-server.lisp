@@ -367,7 +367,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <footer class="page-footer font-small
                     special-color-dark pt-4">
        <div class="footer-copyright
-                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2021<a href="https://linkedin.com/in/green" > Anthony
+                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2022<a href="https://linkedin.com/in/green" > Anthony
            Green</a></div>
      </footer>
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
