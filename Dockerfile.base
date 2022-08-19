@@ -1,4 +1,4 @@
-FROM quay.io/containerlisp/lisp-10-ubi8
+FROM quay.io/containerlisp/lisp-10-ubi8:latest
 
 COPY rlgl-server.asd /tmp
 
