@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl-server
   :description "The Red Light Green Light server."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "2"
+  :version "3"
   :serial t
   :components ((:file "package")
 	       (:file "api-key")
