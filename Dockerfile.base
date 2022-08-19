@@ -5,6 +5,6 @@ COPY rlgl-server.asd /tmp
 RUN sbcl --eval '(let* ((ds (with-open-file (stream "/tmp/rlgl-server.asd")           \
                               (read stream)))                                         \
                         (pos (position :DEPENDS-ON ds)))                              \
-                   (pushnew (truename "./quicklisp/local-project/red-light-green-light/3rd-party") ql:*local-project-directories* ) \
+                   (pushnew (truename "./quicklisp/local-projects/red-light-green-light/3rd-party") ql:*local-project-directories* ) \
                    (dolist (p (nth (+ pos 1) ds))                                     \
                      (ql:quickload p)))'
