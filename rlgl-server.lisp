@@ -335,7 +335,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        <link sizes="180x180" rel="apple-touch-icon" href="images/apple-touch-icon.png" />
        <link sizes="32x32" rel="icon" type="image/png" href="images/favicon-32x32.png" />
        <link sizes="16x16" rel="icon" type="image/png" href="images/favicon-16x16.png" />
-       <link rel="manifest" href="site.webmanifest" />
+       <link rel="manifest" href="images/site.webmanifest" />
        <link rel="mask-icon" href="images/safari-pinned-tab.svg" />
        <meta name="msapplication-TileColor" content="#da532c" />
        <meta name="theme-color" content="#ffffff" />
