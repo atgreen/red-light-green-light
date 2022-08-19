@@ -335,14 +335,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        <link sizes="180x180" rel="apple-touch-icon" href="images/apple-touch-icon.png" />
        <link sizes="32x32" rel="icon" type="image/png" href="images/favicon-32x32.png" />
        <link sizes="16x16" rel="icon" type="image/png" href="images/favicon-16x16.png" />
-       <link rel="manifest" href="images/site.webmanifest" />
+       <link rel="manifest" href="site.webmanifest" />
        <link rel="mask-icon" href="images/safari-pinned-tab.svg" />
        <meta name="msapplication-TileColor" content="#da532c" />
        <meta name="theme-color" content="#ffffff" />
        <title>,(progn title)</title>
        <link rel="stylesheet" href="css/rlgl.css" />
-       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
-             integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
 	     crossorigin="anonymous" />
        <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js" ></script>
      </head>
@@ -376,8 +376,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
              integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
              crossorigin="anonymous" ></script>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
-             integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
              crossorigin="anonymous" ></script>
    </html>)
 
@@ -803,13 +803,13 @@ token claims and token header"
 	(:footer :class "page-footer font-small special-color-dark pt-4"
 		 (:div :class "footer-copyright text-center py-3" "Generated on "
 		       (simple-date-time:http-date (simple-date-time:now)) " by version" +rlgl-version+
-		       "   //   (C) 2018-2021" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
+		       "   //   (C) 2018-2022" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
        (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
 			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
 			     :crossorigin "anonymous"))
-       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-			     :crossorigin "anonymous"))
+;       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+;			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+;			     :crossorigin "anonymous"))
        (:script :attrs (emit-bootstrap.min.js))
        (:script :attrs (list :src "js/index.js"))))))
 
