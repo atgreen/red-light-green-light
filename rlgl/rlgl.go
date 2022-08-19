@@ -114,7 +114,7 @@ func make_keys(path string) {
 		os.Exit(1)
 	}
 	pemPublicFile.Close()
-        err = os.Chmod(cfgdir+"/public_key.pem", 0644)
+	err = os.Chmod(cfgdir+"/public_key.pem", 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -411,8 +411,8 @@ func main() {
 				var bearer = "Bearer " + config.Key
 
 				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
-                                if err != nil {
-				    log.Fatal(err)
+				if err != nil {
+					log.Fatal(err)
 				}
 
 				req.Header.Add("Authorization", bearer)
@@ -706,9 +706,9 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-                                if responseData[0] != '{' {
-                                        log.Fatal(string(responseData))
-                                }
+				if responseData[0] != '{' {
+					log.Fatal(string(responseData))
+				}
 				var result map[string]interface{}
 				err = json.Unmarshal([]byte(responseData), &result)
 				if err != nil {
@@ -784,9 +784,9 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 
 		err := cli.ShowAppHelp(c)
-                if err != nil {
-		    log.Fatal(err)
-                }
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		return nil
 	}
