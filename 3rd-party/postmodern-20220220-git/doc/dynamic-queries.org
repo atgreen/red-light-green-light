@@ -1,0 +1,213 @@
+#+TITLE: Dynamic Query Notes
+#+OPTIONS: num:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style.css" />
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
+#+OPTIONS: ^:nil
+* Overview
+  :PROPERTIES:
+  :ID:       3a08705b-191f-47c7-99fb-60714a522b4a
+  :END:
+The question gets asked how to build dynamic or composable queries in
+postmodern. First we need to understand the context - is the programmer
+building the query or are you taking data from a user and using that to
+build a query? We need to remember that the query macro assumes that everything
+that is not a list starting with a keyword will evaluate to a string.
+
+In any case you will need to ensure that either you have control over the inputs
+or they still result in parameterized queries. If not you have opened yourself up
+to an sql injection attack.
+
+If you are not using s-sql, then it becomes easy. The query macro
+assumes that everything that is not a list starting with a keyword will
+evaluate to a string. That means you can build it with a simple format
+string
+#+BEGIN_SRC lisp
+(query (format nil "select ~a from ~a where ~a"  "carrots" "garden" "length > 3"))
+#+END_SRC
+
+With s-sql, there are generally three approaches to building dynamic or
+composible queries: pass symbols and values as variables,  use sql-compile
+or use :raw.
+
+For purposes of this example, we will use the following employee table:
+
+#+BEGIN_SRC lisp
+(query (:create-table employee ((id :type int)
+                                (name :type text)
+                                (salary :type numeric)
+                                (start_date :type date)
+                                (city :type text)
+                                (region :type char)
+                                (age :type int))))
+
+(query (:insert-rows-into 'employee
+                          :columns 'id 'name 'salary 'start-date 'city 'region 'age
+                          :values '((1 "Jason" 40420 "02/01/94" "New York" "W" 29)
+                                    (2 "Robert" 14420 "01/02/95" "Vancouver" "N" 21)
+                                    (3 "Celia" 24020 "12/03/96" "Toronto" "W" 24)
+                                    (4 "Linda" 40620 "11/04/97" "New York" "N" 28)
+                                    (5 "David" 80026 "10/05/98" "Vancouver" "W" 31)
+                                    (6 "James" 70060 "09/06/99" "Toronto" "N" 26)
+                                    (7 "Alison" 90620 "08/07/00" "New York" "W" 38)
+                                    (8 "Chris" 26020 "07/08/01" "Vancouver" "N" 22)
+                                    (9 "Mary" 60020 "06/08/02" "Toronto" "W" 34))))
+#+END_SRC
+
+** Approach #1 Using symbols in variables
+     :PROPERTIES:
+     :ID: 13c9d0df-7b08-4788-bca9-be650e42809a
+     :CUSTOM_ID: symbols-in-variables
+     :END:
+*** Select Statements
+Consider the following two toy examples where we determine the table and columns
+to be selected using symbols (either keyword or quoted) inside variables.
+#+BEGIN_SRC lisp
+(let ((table 'employee) (col1 :id) (col2 :name) (id 3))
+    (query (:select col1 col2 :from table :where (:= 'id '$1)) id))
+((3 "Celia"))
+
+(let ((table 'employee) (col1 'name) (col2 'salary) (id 3))
+    (query (:select col1 col2 :from table :where (:= 'id '$1)) id))
+(("Celia" 24020))
+#+END_SRC
+This will not work if you use strings instead of symbols because sql-expand
+will wrap the strings in the variables in escape format as if they were string
+constants and Postgresql will throw an error because it is not expecting
+string constants in the middle of a select statement.
+
+*** Update Statements
+This works with update statements as well
+#+BEGIN_SRC lisp
+(let ((table 'employee) (col1 :id) (col2 :name) (new-name "Celeste") (id 3))
+    (query (:update table :set col2 new-name :where (:= col1 '$1)) id)
+    (query (:select col1 col2 :from table :where (:= 'id '$1)) id))
+((3 "Celeste"))
+#+END_SRC
+*** Insert Statements
+This works with insert-into statements as well
+#+BEGIN_SRC lisp
+(let ((table 'employee) (col1 'id) (col2 'name) (new-name "Rochelle")
+      (id 10) (col3 'salary) (col3-value 3452) (col4 'start-date)
+      (col4-value "02/01/03") (col5 'city) (col5-value "Victoria")
+      (col6 'region) (col6-value "N") (col7 'age) (col7-value 32))
+  (query (:insert-into table :set col1 id col2 new-name col3 col3-value
+                       col4 col4-value col5 col5-value col6 col6-value
+                       col7 col7-value)))
+
+(query (:select 'id 'name 'salary :from 'employee :where (:= 'id 10 )))
+((10 "Rochelle" 3452))
+#+END_SRC
+*** Delete Statements
+This works with delete statements as well
+#+BEGIN_SRC lisp
+(let ((table 'employee) (col1 :id) (col1-value 10))
+   (query (:delete-from table :where (:= col1 col1-value))))
+#+END_SRC
+** Approach #2 Use sql-compile
+  :PROPERTIES:
+  :ID:       9d70b61d-1a93-48ef-a2ed-ecc3e8e0dd2c
+  :END:
+Sql-compile does a run-time compilation of an s-sql expression. In the
+following example, we create a function that accepts a where-clause,
+a table-name, 3 columns to select and two parameters to go into the where
+clause.
+#+BEGIN_SRC lisp
+(defun toy-example (where-clause table-name col1 col2 col3 arg1 arg2)
+  (with-test-connection
+   (query (sql-compile
+           (append `(:select ,col1 ,col2 ,col3 :from ,table-name :where)
+                   where-clause))
+          arg1 arg2)))
+
+(toy-example '((:and (:= 'city '$1) (:> 'salary '$2))) 'employee 'id 'name 'city "Toronto" 45000)
+
+((6 "James" "Toronto") (9 "Mary" "Toronto"))
+
+#+END_SRC
+If we just look at what this call to sql-compile in toy-example generates, it would look like:
+#+BEGIN_SRC lisp
+"(SELECT id, name, city FROM employee WHERE ((city = $1) and (salary > $2)))"
+#+END_SRC
+This example is still a parameterized query but for security reasons you will
+need to be very careful how you generate the where clause.
+
+Another example with sql-compile and append, in this case updating a table and
+setting two columns to NULL.
+#+BEGIN_SRC lisp
+(sql-compile (append '(:update :table1 :set)
+                     (loop for a in '("col1" "col2")
+                           collect a
+                           collect :NULL)))
+
+"UPDATE table1 SET E'col1' = NULL, E'col2' = NULL"
+#+END_SRC
+
+Lets think about it differently. What if we know the universe of columns we
+want to select, but want to conditionally select some of them. Suppose we
+know our targetted table has columns:
+
+'id 'name 'salary 'start-date 'city 'region 'age.
+
+We may decide we always want name, city and age, but salary and start-date are
+conditional.
+
+#+BEGIN_SRC lisp
+(defun toy-example-2 (salaryp start-date-p)
+  (sql-compile
+   (remove nil `(:select 'name 'city 'age
+                         ,(if salaryp 'salary nil)
+                         ,(if start-date-p 'start-date nil)
+                         :from 'employee))))
+
+(query (toy-example-2 t t))
+
+(("Jason" "New York" 29 40420 #<SIMPLE-DATE:DATE 01-02-1994>)
+ ("Robert" "Vancouver" 21 14420 #<SIMPLE-DATE:DATE 02-01-1995>)
+ ("Celia" "Toronto" 24 24020 #<SIMPLE-DATE:DATE 03-12-1996>)
+ ("Linda" "New York" 28 40620 #<SIMPLE-DATE:DATE 04-11-1997>)
+ ("David" "Vancouver" 31 80026 #<SIMPLE-DATE:DATE 05-10-1998>)
+ ("James" "Toronto" 26 70060 #<SIMPLE-DATE:DATE 06-09-1999>)
+ ("Alison" "New York" 38 90620 #<SIMPLE-DATE:DATE 07-08-2000>)
+ ("Chris" "Vancouver" 22 26020 #<SIMPLE-DATE:DATE 08-07-2001>)
+ ("Mary" "Toronto" 34 60020 #<SIMPLE-DATE:DATE 08-06-2002>))
+
+(query (toy-example-2 t nil))
+
+(("Jason" "New York" 29 40420) ("Robert" "Vancouver" 21 14420)
+ ("Celia" "Toronto" 24 24020) ("Linda" "New York" 28 40620)
+ ("David" "Vancouver" 31 80026) ("James" "Toronto" 26 70060)
+ ("Alison" "New York" 38 90620) ("Chris" "Vancouver" 22 26020)
+ ("Mary" "Toronto" 34 60020))
+
+#+END_SRC
+You could skip the (remove nil... portion and substitute t for nil. E.g.
+#+BEGIN_SRC lisp
+(defun toy-example-2 (salaryp start-date-p)
+  (sql-compile
+   `(:select 'name 'city 'age
+             ,(if salaryp 'salary t)
+             ,(if start-date-p 'start-date t)
+             :from 'employee)))
+#+END_SRC
+But I prefer to remove those segments completely from the query.
+
+Following on this same thread of thought, you can define a portion of the
+sql in a let clause:
+#+BEGIN_SRC lisp
+(let ((sql1 '(:= name "Jason")))
+  (query (sql-compile
+    `(:select 'name 'city 'age :from 'employee :where ,sql1))))
+
+(("Jason" "New York" 29))
+#+END_SRC
+
+** Approach #3 Use :raw
+  :PROPERTIES:
+  :ID:       cde3bff7-cf1c-4d85-81d8-d4010ed91102
+  :END:
+To quote Marijn, the :raw keyword takes a string and inserts it straight
+into the query. I try to stay away from :raw if possible, but sometimes...
+
+#+BEGIN_SRC lisp
+(query (:select (:raw "tmp1.name") :from (:as 'baz (:raw "tmp1"))))
+#+END_SRC

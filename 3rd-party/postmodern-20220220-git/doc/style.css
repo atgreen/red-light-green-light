@@ -1,0 +1,105 @@
+body {
+  margin: 0;
+  font-family: tahoma, arial, sans-serif;
+  padding: 50px 100px;
+  color: black;
+}
+
+@media screen and (max-width: 699px) {
+  body { padding: 20px 5px }
+  h1.title { text-align: left }
+}
+
+h1 {
+  font-size: 250%;
+  border-bottom: 3px solid #449977;
+}
+
+h2 {
+  font-size: 140%;
+  border-bottom: 1px solid #449977;
+}
+
+h3 {
+  font-size: 110%;
+}
+
+code {
+  font-size: 1.2em;
+}
+
+p.news {
+  text-indent: -3em;
+  padding-left: 3em;
+}
+
+pre.code {
+  margin: 0 16px;
+  padding: 7px;
+  border: 1px solid #99CCBB;
+}
+
+p.def {
+  margin-top: 1.5em;
+  font-family: courier;
+}
+
+p.def span {
+  color: #555555;
+  font-weight: bold;
+  font-family: tahoma, arial, sans-serif;
+  font-size: .8em;
+}
+
+.desc {
+  margin-left: 1em;
+}
+
+thead {
+  font-weight: bold;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tr + tr {
+  border-top: 1px solid #88BB99;
+}
+
+thead tr {
+  border-bottom: 2px solid #88BB99;
+}
+
+td + td, th + th {
+  border-left: 2px solid #88BB99;
+}
+
+th {
+  text-align: left;
+  padding: 2px 5px;
+}
+
+td {
+  padding: 2px 5px;
+  vertical-align: top;
+}
+
+a:link {
+  color: #3333AA;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #773377;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul.symbol-index {
+  font-family: monospace;
+  font-size: 1.2em;
+}

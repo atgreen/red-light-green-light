@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2020-11-02 Mon 20:24 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dynamic Query Notes</title>
+<meta name="generator" content="Org mode">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<style>pre.src{background:#343131;color:white;} </style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2017 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">Dynamic Query Notes</h1>
+</header><nav id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgc1d26d1">Overview</a>
+<ul>
+<li><a href="#symbols-in-variables">Approach #1 Using symbols in variables</a>
+<ul>
+<li><a href="#orgfa692fc">Select Statements</a></li>
+<li><a href="#orgbf64d2b">Update Statements</a></li>
+<li><a href="#org8282243">Insert Statements</a></li>
+<li><a href="#orgc863976">Delete Statements</a></li>
+</ul>
+</li>
+<li><a href="#orgd4bb0e7">Approach #2 Use sql-compile</a></li>
+<li><a href="#orgcd9b4d3">Approach #3 Use :raw</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<div id="outline-container-orgc1d26d1" class="outline-2">
+<h2 id="orgc1d26d1"><a id="ID-3a08705b-191f-47c7-99fb-60714a522b4a"></a>Overview</h2>
+<div class="outline-text-2" id="text-orgc1d26d1">
+<p>
+The question gets asked how to build dynamic or composable queries in
+postmodern. First we need to understand the context - is the programmer
+building the query or are you taking data from a user and using that to
+build a query? We need to remember that the query macro assumes that everything
+that is not a list starting with a keyword will evaluate to a string.
+</p>
+
+<p>
+In any case you will need to ensure that either you have control over the inputs
+or they still result in parameterized queries. If not you have opened yourself up
+to an sql injection attack.
+</p>
+
+<p>
+If you are not using s-sql, then it becomes easy. The query macro
+assumes that everything that is not a list starting with a keyword will
+evaluate to a string. That means you can build it with a simple format
+string
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (format nil <span style="color: #cd8162;">"select ~a from ~a where ~a"</span>  <span style="color: #cd8162;">"carrots"</span> <span style="color: #cd8162;">"garden"</span> <span style="color: #cd8162;">"length &gt; 3"</span>))
+</pre>
+</div>
+
+<p>
+With s-sql, there are generally three approaches to building dynamic or
+composible queries: pass symbols and values as variables,  use sql-compile
+or use :raw.
+</p>
+
+<p>
+For purposes of this example, we will use the following employee table:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #98fb98; font-weight: bold;">:create-table</span> employee ((id <span style="color: #98fb98; font-weight: bold;">:type</span> int)
+                                (name <span style="color: #98fb98; font-weight: bold;">:type</span> text)
+                                (salary <span style="color: #98fb98; font-weight: bold;">:type</span> numeric)
+                                (start_date <span style="color: #98fb98; font-weight: bold;">:type</span> date)
+                                (city <span style="color: #98fb98; font-weight: bold;">:type</span> text)
+                                (region <span style="color: #98fb98; font-weight: bold;">:type</span> char)
+                                (age <span style="color: #98fb98; font-weight: bold;">:type</span> int))))
+
+(query (<span style="color: #98fb98; font-weight: bold;">:insert-rows-into</span> 'employee
+                          <span style="color: #98fb98; font-weight: bold;">:columns</span> 'id 'name 'salary 'start-date 'city 'region 'age
+                          <span style="color: #98fb98; font-weight: bold;">:values</span> '((1 <span style="color: #cd8162;">"Jason"</span> 40420 <span style="color: #cd8162;">"02/01/94"</span> <span style="color: #cd8162;">"New York"</span> <span style="color: #cd8162;">"W"</span> 29)
+                                    (2 <span style="color: #cd8162;">"Robert"</span> 14420 <span style="color: #cd8162;">"01/02/95"</span> <span style="color: #cd8162;">"Vancouver"</span> <span style="color: #cd8162;">"N"</span> 21)
+                                    (3 <span style="color: #cd8162;">"Celia"</span> 24020 <span style="color: #cd8162;">"12/03/96"</span> <span style="color: #cd8162;">"Toronto"</span> <span style="color: #cd8162;">"W"</span> 24)
+                                    (4 <span style="color: #cd8162;">"Linda"</span> 40620 <span style="color: #cd8162;">"11/04/97"</span> <span style="color: #cd8162;">"New York"</span> <span style="color: #cd8162;">"N"</span> 28)
+                                    (5 <span style="color: #cd8162;">"David"</span> 80026 <span style="color: #cd8162;">"10/05/98"</span> <span style="color: #cd8162;">"Vancouver"</span> <span style="color: #cd8162;">"W"</span> 31)
+                                    (6 <span style="color: #cd8162;">"James"</span> 70060 <span style="color: #cd8162;">"09/06/99"</span> <span style="color: #cd8162;">"Toronto"</span> <span style="color: #cd8162;">"N"</span> 26)
+                                    (7 <span style="color: #cd8162;">"Alison"</span> 90620 <span style="color: #cd8162;">"08/07/00"</span> <span style="color: #cd8162;">"New York"</span> <span style="color: #cd8162;">"W"</span> 38)
+                                    (8 <span style="color: #cd8162;">"Chris"</span> 26020 <span style="color: #cd8162;">"07/08/01"</span> <span style="color: #cd8162;">"Vancouver"</span> <span style="color: #cd8162;">"N"</span> 22)
+                                    (9 <span style="color: #cd8162;">"Mary"</span> 60020 <span style="color: #cd8162;">"06/08/02"</span> <span style="color: #cd8162;">"Toronto"</span> <span style="color: #cd8162;">"W"</span> 34))))
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org506e639" class="outline-3">
+<h3 id="symbols-in-variables"><a id="org506e639"></a><a id="ID-13c9d0df-7b08-4788-bca9-be650e42809a"></a>Approach #1 Using symbols in variables</h3>
+<div class="outline-text-3" id="text-symbols-in-variables">
+</div>
+<div id="outline-container-orgfa692fc" class="outline-4">
+<h4 id="orgfa692fc">Select Statements</h4>
+<div class="outline-text-4" id="text-orgfa692fc">
+<p>
+Consider the following two toy examples where we determine the table and columns
+to be selected using symbols (either keyword or quoted) inside variables.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">let</span> ((table 'employee) (col1 <span style="color: #98fb98; font-weight: bold;">:id</span>) (col2 <span style="color: #98fb98; font-weight: bold;">:name</span>) (id 3))
+    (query (<span style="color: #98fb98; font-weight: bold;">:select</span> col1 col2 <span style="color: #98fb98; font-weight: bold;">:from</span> table <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> 'id '$1)) id))
+((3 <span style="color: #cd8162;">"Celia"</span>))
+
+(<span style="color: #00ffff;">let</span> ((table 'employee) (col1 'name) (col2 'salary) (id 3))
+    (query (<span style="color: #98fb98; font-weight: bold;">:select</span> col1 col2 <span style="color: #98fb98; font-weight: bold;">:from</span> table <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> 'id '$1)) id))
+((<span style="color: #cd8162;">"Celia"</span> 24020))
+</pre>
+</div>
+<p>
+This will not work if you use strings instead of symbols because sql-expand
+will wrap the strings in the variables in escape format as if they were string
+constants and Postgresql will throw an error because it is not expecting
+string constants in the middle of a select statement.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgbf64d2b" class="outline-4">
+<h4 id="orgbf64d2b">Update Statements</h4>
+<div class="outline-text-4" id="text-orgbf64d2b">
+<p>
+This works with update statements as well
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">let</span> ((table 'employee) (col1 <span style="color: #98fb98; font-weight: bold;">:id</span>) (col2 <span style="color: #98fb98; font-weight: bold;">:name</span>) (new-name <span style="color: #cd8162;">"Celeste"</span>) (id 3))
+    (query (<span style="color: #98fb98; font-weight: bold;">:update</span> table <span style="color: #98fb98; font-weight: bold;">:set</span> col2 new-name <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> col1 '$1)) id)
+    (query (<span style="color: #98fb98; font-weight: bold;">:select</span> col1 col2 <span style="color: #98fb98; font-weight: bold;">:from</span> table <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> 'id '$1)) id))
+((3 <span style="color: #cd8162;">"Celeste"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8282243" class="outline-4">
+<h4 id="org8282243">Insert Statements</h4>
+<div class="outline-text-4" id="text-org8282243">
+<p>
+This works with insert-into statements as well
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">let</span> ((table 'employee) (col1 'id) (col2 'name) (new-name <span style="color: #cd8162;">"Rochelle"</span>)
+      (id 10) (col3 'salary) (col3-value 3452) (col4 'start-date)
+      (col4-value <span style="color: #cd8162;">"02/01/03"</span>) (col5 'city) (col5-value <span style="color: #cd8162;">"Victoria"</span>)
+      (col6 'region) (col6-value <span style="color: #cd8162;">"N"</span>) (col7 'age) (col7-value 32))
+  (query (<span style="color: #98fb98; font-weight: bold;">:insert-into</span> table <span style="color: #98fb98; font-weight: bold;">:set</span> col1 id col2 new-name col3 col3-value
+                       col4 col4-value col5 col5-value col6 col6-value
+                       col7 col7-value)))
+
+(query (<span style="color: #98fb98; font-weight: bold;">:select</span> 'id 'name 'salary <span style="color: #98fb98; font-weight: bold;">:from</span> 'employee <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> 'id 10 )))
+((10 <span style="color: #cd8162;">"Rochelle"</span> 3452))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc863976" class="outline-4">
+<h4 id="orgc863976">Delete Statements</h4>
+<div class="outline-text-4" id="text-orgc863976">
+<p>
+This works with delete statements as well
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">let</span> ((table 'employee) (col1 <span style="color: #98fb98; font-weight: bold;">:id</span>) (col1-value 10))
+   (query (<span style="color: #98fb98; font-weight: bold;">:delete-from</span> table <span style="color: #98fb98; font-weight: bold;">:where</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> col1 col1-value))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd4bb0e7" class="outline-3">
+<h3 id="orgd4bb0e7"><a id="ID-9d70b61d-1a93-48ef-a2ed-ecc3e8e0dd2c"></a>Approach #2 Use sql-compile</h3>
+<div class="outline-text-3" id="text-orgd4bb0e7">
+<p>
+Sql-compile does a run-time compilation of an s-sql expression. In the
+following example, we create a function that accepts a where-clause,
+a table-name, 3 columns to select and two parameters to go into the where
+clause.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">defun</span> <span style="color: #63b8ff;">toy-example</span> (where-clause table-name col1 col2 col3 arg1 arg2)
+  (<span style="color: #00ffff;">with-test-connection</span>
+   (query (sql-compile
+           (append `(<span style="color: #98fb98; font-weight: bold;">:select</span> ,col1 ,col2 ,col3 <span style="color: #98fb98; font-weight: bold;">:from</span> ,table-name <span style="color: #98fb98; font-weight: bold;">:where</span>)
+                   where-clause))
+          arg1 arg2)))
+
+(toy-example '((<span style="color: #98fb98; font-weight: bold;">:and</span> (<span style="color: #98fb98; font-weight: bold;">:=</span> 'city '$1) (<span style="color: #98fb98; font-weight: bold;">:&gt;</span> 'salary '$2))) 'employee 'id 'name 'city <span style="color: #cd8162;">"Toronto"</span> 45000)
+
+((6 <span style="color: #cd8162;">"James"</span> <span style="color: #cd8162;">"Toronto"</span>) (9 <span style="color: #cd8162;">"Mary"</span> <span style="color: #cd8162;">"Toronto"</span>))
+
+</pre>
+</div>
+<p>
+If we just look at what this call to sql-compile in toy-example generates, it would look like:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #cd8162;">"(SELECT id, name, city FROM employee WHERE ((city = $1) and (salary &gt; $2)))"</span>
+</pre>
+</div>
+<p>
+This example is still a parameterized query but for security reasons you will
+need to be very careful how you generate the where clause.
+</p>
+
+<p>
+Another example with sql-compile and append, in this case updating a table and
+setting two columns to NULL.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql-compile (append '(<span style="color: #98fb98; font-weight: bold;">:update</span> <span style="color: #98fb98; font-weight: bold;">:table1</span> <span style="color: #98fb98; font-weight: bold;">:set</span>)
+                     (<span style="color: #00ffff;">loop</span> for a in '(<span style="color: #cd8162;">"col1"</span> <span style="color: #cd8162;">"col2"</span>)
+                           collect a
+                           collect <span style="color: #98fb98; font-weight: bold;">:NULL</span>)))
+
+<span style="color: #cd8162;">"UPDATE table1 SET E'col1' = NULL, E'col2' = NULL"</span>
+</pre>
+</div>
+
+<p>
+Lets think about it differently. What if we know the universe of columns we
+want to select, but want to conditionally select some of them. Suppose we
+know our targetted table has columns:
+</p>
+
+<p>
+'id 'name 'salary 'start-date 'city 'region 'age.
+</p>
+
+<p>
+We may decide we always want name, city and age, but salary and start-date are
+conditional.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">defun</span> <span style="color: #63b8ff;">toy-example-2</span> (salaryp start-date-p)
+  (sql-compile
+   (remove nil `(<span style="color: #98fb98; font-weight: bold;">:select</span> 'name 'city 'age
+                         ,(<span style="color: #00ffff;">if</span> salaryp 'salary nil)
+                         ,(<span style="color: #00ffff;">if</span> start-date-p 'start-date nil)
+                         <span style="color: #98fb98; font-weight: bold;">:from</span> 'employee))))
+
+(query (toy-example-2 t t))
+
+((<span style="color: #cd8162;">"Jason"</span> <span style="color: #cd8162;">"New York"</span> 29 40420 #&lt;SIMPLE-DATE:DATE 01-02-1994&gt;)
+ (<span style="color: #cd8162;">"Robert"</span> <span style="color: #cd8162;">"Vancouver"</span> 21 14420 #&lt;SIMPLE-DATE:DATE 02-01-1995&gt;)
+ (<span style="color: #cd8162;">"Celia"</span> <span style="color: #cd8162;">"Toronto"</span> 24 24020 #&lt;SIMPLE-DATE:DATE 03-12-1996&gt;)
+ (<span style="color: #cd8162;">"Linda"</span> <span style="color: #cd8162;">"New York"</span> 28 40620 #&lt;SIMPLE-DATE:DATE 04-11-1997&gt;)
+ (<span style="color: #cd8162;">"David"</span> <span style="color: #cd8162;">"Vancouver"</span> 31 80026 #&lt;SIMPLE-DATE:DATE 05-10-1998&gt;)
+ (<span style="color: #cd8162;">"James"</span> <span style="color: #cd8162;">"Toronto"</span> 26 70060 #&lt;SIMPLE-DATE:DATE 06-09-1999&gt;)
+ (<span style="color: #cd8162;">"Alison"</span> <span style="color: #cd8162;">"New York"</span> 38 90620 #&lt;SIMPLE-DATE:DATE 07-08-2000&gt;)
+ (<span style="color: #cd8162;">"Chris"</span> <span style="color: #cd8162;">"Vancouver"</span> 22 26020 #&lt;SIMPLE-DATE:DATE 08-07-2001&gt;)
+ (<span style="color: #cd8162;">"Mary"</span> <span style="color: #cd8162;">"Toronto"</span> 34 60020 #&lt;SIMPLE-DATE:DATE 08-06-2002&gt;))
+
+(query (toy-example-2 t nil))
+
+((<span style="color: #cd8162;">"Jason"</span> <span style="color: #cd8162;">"New York"</span> 29 40420) (<span style="color: #cd8162;">"Robert"</span> <span style="color: #cd8162;">"Vancouver"</span> 21 14420)
+ (<span style="color: #cd8162;">"Celia"</span> <span style="color: #cd8162;">"Toronto"</span> 24 24020) (<span style="color: #cd8162;">"Linda"</span> <span style="color: #cd8162;">"New York"</span> 28 40620)
+ (<span style="color: #cd8162;">"David"</span> <span style="color: #cd8162;">"Vancouver"</span> 31 80026) (<span style="color: #cd8162;">"James"</span> <span style="color: #cd8162;">"Toronto"</span> 26 70060)
+ (<span style="color: #cd8162;">"Alison"</span> <span style="color: #cd8162;">"New York"</span> 38 90620) (<span style="color: #cd8162;">"Chris"</span> <span style="color: #cd8162;">"Vancouver"</span> 22 26020)
+ (<span style="color: #cd8162;">"Mary"</span> <span style="color: #cd8162;">"Toronto"</span> 34 60020))
+
+</pre>
+</div>
+<p>
+You could skip the (remove nil&#x2026; portion and substitute t for nil. E.g.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">defun</span> <span style="color: #63b8ff;">toy-example-2</span> (salaryp start-date-p)
+  (sql-compile
+   `(<span style="color: #98fb98; font-weight: bold;">:select</span> 'name 'city 'age
+             ,(<span style="color: #00ffff;">if</span> salaryp 'salary t)
+             ,(<span style="color: #00ffff;">if</span> start-date-p 'start-date t)
+             <span style="color: #98fb98; font-weight: bold;">:from</span> 'employee)))
+</pre>
+</div>
+<p>
+But I prefer to remove those segments completely from the query.
+</p>
+
+<p>
+Following on this same thread of thought, you can define a portion of the
+sql in a let clause:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #00ffff;">let</span> ((sql1 '(<span style="color: #98fb98; font-weight: bold;">:=</span> name <span style="color: #cd8162;">"Jason"</span>)))
+  (query (sql-compile
+    `(<span style="color: #98fb98; font-weight: bold;">:select</span> 'name 'city 'age <span style="color: #98fb98; font-weight: bold;">:from</span> 'employee <span style="color: #98fb98; font-weight: bold;">:where</span> ,sql1))))
+
+((<span style="color: #cd8162;">"Jason"</span> <span style="color: #cd8162;">"New York"</span> 29))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcd9b4d3" class="outline-3">
+<h3 id="orgcd9b4d3"><a id="ID-cde3bff7-cf1c-4d85-81d8-d4010ed91102"></a>Approach #3 Use :raw</h3>
+<div class="outline-text-3" id="text-orgcd9b4d3">
+<p>
+To quote Marijn, the :raw keyword takes a string and inserts it straight
+into the query. I try to stay away from :raw if possible, but sometimes&#x2026;
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #98fb98; font-weight: bold;">:select</span> (<span style="color: #98fb98; font-weight: bold;">:raw</span> <span style="color: #cd8162;">"tmp1.name"</span>) <span style="color: #98fb98; font-weight: bold;">:from</span> (<span style="color: #98fb98; font-weight: bold;">:as</span> 'baz (<span style="color: #98fb98; font-weight: bold;">:raw</span> <span style="color: #cd8162;">"tmp1"</span>))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

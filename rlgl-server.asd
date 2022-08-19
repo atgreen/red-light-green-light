@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl-server
   :description "The Red Light Green Light server."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "4"
+  :version "5"
   :serial t
   :components ((:file "package")
 	       (:file "api-key")
@@ -34,7 +34,7 @@
 	       :inferior-shell :hunchentoot :spinneret
 	       :cl-json-util :cl-fad :str :log4cl :cl-ppcre
                :cxml :cl-dbi :cl-date-time-parser :quri
-	       :local-time :cl-csv :prometheus
+	       :local-time :cl-csv :prometheus :cl-postgres
 	       :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
 	       :drakma :uuid :cl-base32
 	       :split-sequence :thread-pool

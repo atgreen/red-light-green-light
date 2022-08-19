@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2021-07-11 Sun 09:24 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S-SQL and Postgresql Arrays</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Sabra Crolleton">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<style>pre.src{background:#343131;color:white;} </style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">S-SQL and Postgresql Arrays</h1>
+</header><nav id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd36810a">Summary</a></li>
+<li><a href="#org75ef1b0">Use cases for arrays in a database</a>
+<ul>
+<li><a href="#orge7873c4">General Usage</a></li>
+<li><a href="#org4b3cec1">Rules of Thumb - Do Not Use Arrays If:</a></li>
+<li><a href="#org3f33f1b">Data Type Enforcement</a></li>
+<li><a href="#org2fea7a0">Indices on Arrays</a></li>
+</ul>
+</li>
+<li><a href="#orgb5cdcba">S-SQL Array Support</a>
+<ul>
+<li><a href="#org56e8463">:array (used inside a query calling a subquery, selecting into an array)</a></li>
+<li><a href="#org945577b">:array[] (declares an array and returns an array</a></li>
+<li><a href="#org73afdfb">:[] (used when you want a slice of an array</a></li>
+<li><a href="#org9b63f9c">General Usage Examples</a></li>
+</ul>
+</li>
+<li><a href="#org2ad6706">Dao Class Support for Arrays</a></li>
+<li><a href="#org1c8a03c">Array Operators</a>
+<ul>
+<li><a href="#orga4db3ff">Array Comparison Operators</a>
+<ul>
+<li><a href="#org5f5fd39">:= Equality Comparison (Are two arrays equal on an element by element basis)</a></li>
+<li><a href="#org6c16e07">:&lt;&gt; Not Equal Comparison</a></li>
+<li><a href="#org40f8311">:&lt; Less Than Comparison</a></li>
+<li><a href="#orgdeabea2">:&gt; Greater Than Comparison</a></li>
+<li><a href="#org0509480">:&gt;= Greater Than or Equal to Comparison</a></li>
+<li><a href="#orgcd62381">:&lt;= Less Than or Equal To Comparison</a></li>
+<li><a href="#orgff37692">:@&gt; Contains Comparison</a></li>
+<li><a href="#org21574f6">:&lt;@ Is Contained By Comparison</a></li>
+<li><a href="#org6198f17">:&amp;&amp; Has Elements in Common Comparison</a></li>
+</ul>
+</li>
+<li><a href="#org2d8669e">Array Concatenation Operators</a>
+<ul>
+<li><a href="#orge162d2a">:|| Concatentation Arrays and Elements</a></li>
+<li><a href="#org597a87a">:|| Concatenation with Multi-Dimensional Arrays</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org15f399a">Array functions</a>
+<ul>
+<li>
+<ul>
+<li><a href="#org0ceb04c">Array-prepend</a></li>
+<li><a href="#org825676b">array-append</a></li>
+<li><a href="#org05084f7">array-cat</a></li>
+<li><a href="#orgecdd61f">array-ndims</a></li>
+<li><a href="#org5e7fc37">array-dims</a></li>
+<li><a href="#orgcbca94b">array-fill</a></li>
+<li><a href="#org14aa248">array-length</a></li>
+<li><a href="#orgaf96c90">array-lower</a></li>
+<li><a href="#org982bf72">array-position</a></li>
+<li><a href="#org86302ea">array-positions</a></li>
+<li><a href="#org64914ee">array-remove</a></li>
+<li><a href="#org3defa23">array-replace</a></li>
+<li><a href="#orgb13453f">array-to-string</a></li>
+<li><a href="#org49216ce">array-upper</a></li>
+<li><a href="#orgdf09f26">cardinality</a></li>
+<li><a href="#orgd9fed40">string-to-array</a></li>
+<li><a href="#org421c3aa">unnest</a></li>
+<li><a href="#org60be0ed">array-agg</a></li>
+</ul>
+</li>
+<li><a href="#org3dcfcd7">NULL and nil</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<p>
+<a href="s-sql.html">Return to s-sql.html</a>
+<a href="dao-classes.html">Return to dao-classes.html</a>
+<a href="postmodern.html">Return to postmodern.html</a>
+</p>
+
+<div id="outline-container-orgd36810a" class="outline-2">
+<h2 id="orgd36810a">Summary</h2>
+<div class="outline-text-2" id="text-orgd36810a">
+<p>
+Arrays are a first class datatype within postgresql. The contents can only be of a single
+datatype. Postgresql will enforce that typing. They can be multidimensional. The starting index is 1, not 0. Regardless of whether you specify an array length when you create a table,
+Postgresql will always treat them as variable length.
+</p>
+
+<p>
+Postmodern/s-sql can be used to insert common lisp arrays into postgresql databases,
+pull postgresql database arrays out of databases into a common lisp array,
+and generally engage in all the ways that sql can use postgresql arrays.
+Postgresql arrays are documented at <a href="https://www.postgresql.org/docs/current/static/arrays.html">https://www.postgresql.org/docs/current/static/arrays.html</a>
+and <a href="https://www.postgresql.org/docs/current/static/functions-array.html">https://www.postgresql.org/docs/current/static/functions-array.html</a>.
+</p>
+
+<p>
+The Postmodern dao-classes can also have slots that are common lisp arrays with the same utility.
+</p>
+
+<p>
+This page will go into more detail on how to use the available operators and functions
+in s-sql.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org75ef1b0" class="outline-2">
+<h2 id="org75ef1b0">Use cases for arrays in a database</h2>
+<div class="outline-text-2" id="text-org75ef1b0">
+</div>
+
+<div id="outline-container-orge7873c4" class="outline-3">
+<h3 id="orge7873c4">General Usage</h3>
+<div class="outline-text-3" id="text-orge7873c4">
+<p>
+You can either use arrays as a datatype stored in the database or there may be reasons why you want to use them as an intermediate datatype in a query.
+</p>
+
+<p>
+There is a bit of controversy over the use of the array datatype in a database. There are those
+who adamantly oppose it, claiming that it is a violation of 1NF form (normalization).
+It is easy to use arrays for the wrong reason in a database and there can be other
+consequences which need to be taken into consideration - loss of referential integrity,
+updating one slot in the array will require re-reading the entire array, and some other
+lost search flexibility immediately come to mind. Like any design process decision, there
+are reasons when you should design a database that is fully normalized
+and use cases when denormalization can lead to speed and memory savings. You can read
+some of the points at  <a href="https://news.ycombinator.com/item?id=4415754">https://news.ycombinator.com/item?id=4415754</a>. Another article
+suggests that yould should not use arrays if you are going to have to keep accessing
+items in the array by position for types that are variable in length
+(hstores, jsonb, varchars, text). In such a case postgresql has to scan the array to
+find the nth element because it stores variable length items as arrays of values,
+not as an array of pointers to values. The article does not discuss using GIN indexes
+on the array. It does suggest using the postgresql unnest sql function to resolve
+some of these issues since it parses an array and returns a set of sets of entries
+(one entry per row (the subset) and the total as the superset. An example of using
+unnest in s-sql is set out below.
+</p>
+
+<p>
+I would agree with Dimitri Fontaine who points out that "arrays can be used to denormalize data
+and avoid lookup tables. A good rule of thumb for using them is you mostly use the array as a
+whole, even if you might at times search for elements in the array." As he notes, "..heavier
+processing is going to be more complex than a lookup table."
+<a href="https://tapoueh.org/blog/2018/04/postgresql-data-types-arrays/">https://tapoueh.org/blog/2018/04/postgresql-data-types-arrays/</a>
+</p>
+
+<p>
+Another way of saying it is to use arrays if you are storing "lists" of things, not if you are
+storing lists of "things".
+</p>
+
+<p>
+It really depends on your use case. If you need speed and very simple lookups, then arrays might
+be what you want because your physical storage looking at fewer table pages. If it is not a really
+simple lookup, use many-to-many tables because the lookup will take more time with an array than
+the physical storage seeking cost.
+</p>
+
+<p>
+At the same time, do not forget that you can use postgresql arrays in an intermediate
+step in a query or as the result of the query. They can be used in ways other than
+database table storage.
+</p>
+
+<p>
+The postgresql documentation provides an employee pay example where the pay-by-quarter is a
+one-dimensional array and the schedule is a two dimensional array.
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #ffad29; font-weight: bold;">CREATE</span> <span style="color: #ffad29; font-weight: bold;">TABLE</span> <span style="color: #00ede1; font-weight: bold;">sal_emp</span> (
+    <span style="color: #ffad29; font-weight: bold;">name</span>            text,
+    pay_by_quarter  <span style="color: #34cae2;">integer</span>[],
+    schedule        text[][]
+);
+</pre>
+</div>
+
+<p>
+I have seen suggestions that arrays can replace separate many-to-many tables in
+relationships, e.g.
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #ffad29; font-weight: bold;">CREATE</span> <span style="color: #ffad29; font-weight: bold;">TABLE</span> <span style="color: #00ede1; font-weight: bold;">posts</span> (
+    title TEXT,
+    tags TEXT[]
+);
+
+<span style="color: #74af68;">-- Select all posts with tag 'kitty'</span>
+<span style="color: #ffad29; font-weight: bold;">SELECT</span> * <span style="color: #ffad29; font-weight: bold;">FROM</span> posts <span style="color: #ffad29; font-weight: bold;">WHERE</span> tags @&gt; <span style="color: #e67128;">'{kitty}'</span>;
+</pre>
+</div>
+<p>
+THIS IS NOT THE SAME AS PUTTING FOREIGN KEYS INTO THE ARRAY! DO NOT DO THAT!
+Part of the reason for using an <a href="https://www.essentialsql.com/what-is-meant-by-acid/">ACID</a> database is to ensure integrity and putting
+foreign keys into an array prevents the database from enforcing the integrity of
+the foreign keys.
+</p>
+
+<p>
+One very interesting write-up took a slightly different approach. Instead of
+putting the one-to-many relationship directly in the posts table, it replaced
+a many-to-many table (linking a document table with a tag table)
+with a tags-array table (linking to the document table) and compared the size
+and speed metrics with the normal m-t-m table. See:
+</p>
+
+<p>
+<a href="http://www.databasesoup.com/2015/01/tag-all-things.html">http://www.databasesoup.com/2015/01/tag-all-things.html</a>,
+<a href="http://www.databasesoup.com/2015/01/tag-all-things-part-2.html">http://www.databasesoup.com/2015/01/tag-all-things-part-2.html</a>,
+<a href="http://www.databasesoup.com/2015/01/tag-all-things-part-3.html">http://www.databasesoup.com/2015/01/tag-all-things-part-3.html</a>
+</p>
+
+<p>
+In this case, it found searching for documents using the tag array approach to be much faster
+than the normal normalized approach, as well as having a smaller storage size.
+</p>
+
+<p>
+The s-sql version for creating the table currently requires a separate create table and
+two separate create index commands
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:create-table</span> documents
+                      ((doc-id <span style="color: #23d7d7;">:type</span> integer <span style="color: #23d7d7;">:constraint</span> 'dockey-id <span style="color: #23d7d7;">:primary-key</span> 't <span style="color: #23d7d7;">:unique</span>)
+                       (text <span style="color: #23d7d7;">:type</span> text))))
+
+(query (<span style="color: #23d7d7;">:create-table</span> doc-tags-array ((doc-id <span style="color: #23d7d7;">:type</span> integer <span style="color: #23d7d7;">:references</span> ((documents doc-id)))
+                                      (tags <span style="color: #23d7d7;">:type</span> text[] <span style="color: #23d7d7;">:default</span> <span style="color: #e67128;">"{}"</span>))))
+
+
+(query (<span style="color: #23d7d7;">:create-unique-index</span> 'doc-tags-id-doc-id <span style="color: #23d7d7;">:on</span> <span style="color: #e67128;">"doc-tags-array"</span>  <span style="color: #23d7d7;">:fields</span> 'doc-id))
+
+(query (<span style="color: #23d7d7;">:create-index</span> 'doc-tags-id-tags <span style="color: #23d7d7;">:on</span> <span style="color: #e67128;">"doc-tags-array"</span> <span style="color: #23d7d7;">:using</span> gin <span style="color: #23d7d7;">:fields</span> 'tags))
+
+</pre>
+</div>
+<p>
+And then the corresponding searches for one tag and two (or more) tags would be:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:limit</span>
+        (<span style="color: #23d7d7;">:order-by</span>
+         (<span style="color: #23d7d7;">:select</span> 'doc-id
+                  <span style="color: #23d7d7;">:from</span> 'doc-tags-array
+                  <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> 'tags (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"math"</span>)))
+         'doc-id)
+        25 0))
+
+(query (<span style="color: #23d7d7;">:limit</span>
+        (<span style="color: #23d7d7;">:order-by</span>
+         (<span style="color: #23d7d7;">:select</span> 'doc-id
+                  <span style="color: #23d7d7;">:from</span> 'doc-tags-array
+                  <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> 'tags (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"math"</span> <span style="color: #e67128;">"physics"</span>)))
+         'doc-id)
+        25))
+
+</pre>
+</div>
+
+<p>
+Note that is was a one-to-many relationship. If you need a
+many-to-many (mtm or m-t-m) relationship, you would need two sets of arrays.
+</p>
+
+<p>
+A similar approach was examined in
+ <a href="https://medium.com/@leshchuk/mtm-on-arrays-in-postgresql-a97f3c50b8c6">https://medium.com/@leshchuk/mtm-on-arrays-in-postgresql-a97f3c50b8c6</a>
+which concluded that if you do not need referential integrity in the
+one-to-many or many-to-many relationship, the array length is in
+the tens rather than hundreds or thousands, and you use a GIN index,
+there is a speed and memory benefit to using an array to contain
+the relationship ids compared to a mtm table. This is particularly
+the case if the relations are disproportionate - e.g. 1 million
+documents and 100 tags. In those tests, the cost of joins exceeded
+the indexed access speed of using arrays.
+</p>
+
+<p>
+One use case is to reduce the number of columns in a table
+where you are using the array as an atomic data unit.  If you
+discover that you are doing a lot of searches and joins on
+array slots, this is likely to be a bad design.
+</p>
+
+<p>
+Another use case is to store machine learning model weights which
+are a 2d array of numbers.
+</p>
+
+<p>
+The <a href="https://madlib.apache.org/">MADlib</a> advanced statistical and machine learning addon extension
+for <a href="https://www.postgresql.org">postgresql</a> and <a href="https://greenplum.org/">greenplum</a> uses arrays for intputs into its algorithms.
+</p>
+
+<p>
+Sidenote: The greenplum massively parallel database project is a
+fork from postgresql and is a bit behind on the standard postgresql
+functionality.
+</p>
+
+<p>
+In any case, s-sql may have available calls to postgresql functions
+which are not in the database version you are programming to.
+</p>
+
+<p>
+See also <a href="https://www.compose.com/articles/take-a-dip-into-postgresql-arrays/">https://www.compose.com/articles/take-a-dip-into-postgresql-arrays/</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4b3cec1" class="outline-3">
+<h3 id="org4b3cec1">Rules of Thumb - Do Not Use Arrays If:</h3>
+<div class="outline-text-3" id="text-org4b3cec1">
+<ul class="org-ul">
+<li>Do not use arrays where you need to maintain integrity for foreign relationships. That is what</li>
+</ul>
+<p>
+foreign keys are for.
+</p>
+
+<ul class="org-ul">
+<li>Do not use arrays if you have to change the items in the array frequently.</li>
+
+<li>Do not use arrays if you rely on an ORM unless you have ensured</li>
+</ul>
+<p>
+that the ORM can utilize arrays.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-org3f33f1b" class="outline-3">
+<h3 id="org3f33f1b">Data Type Enforcement</h3>
+<div class="outline-text-3" id="text-org3f33f1b">
+<p>
+Compared to jsonb, postgresql arrays enforce the data type. This can be critical in both maintaining the integrity of your data as well as optimization in your appliction code.
+This database enforced type safety does not, however, enforce the dimensionality of
+the array.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org2fea7a0" class="outline-3">
+<h3 id="org2fea7a0">Indices on Arrays</h3>
+<div class="outline-text-3" id="text-org2fea7a0">
+<p>
+It is highly recommended that you use GIN or GIST indexes to search
+for items in array column. You should remember that GIST indices are
+lossy while GIN indices are lossless.
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgb5cdcba" class="outline-2">
+<h2 id="orgb5cdcba">S-SQL Array Support</h2>
+<div class="outline-text-2" id="text-orgb5cdcba">
+<p>
+S-sql can feel a little messy with respect to arrays but that
+is in large part because (a) sql dealing with arrays is messy and
+(b) postgresql has both an array[] constructor and an array function.
+</p>
+
+<p>
+If you are just translating between a lisp array and a
+postgresql array, then postmodern handles the data type translation
+fairly easily as can be seen in the examples below.
+</p>
+
+<p>
+Generally speaking, there are three base s-sql array operators
+to know:
+</p>
+</div>
+
+<div id="outline-container-org56e8463" class="outline-3">
+<h3 id="org56e8463">:array (used inside a query calling a subquery, selecting into an array)</h3>
+<div class="outline-text-3" id="text-org56e8463">
+<p>
+The format of the call is:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #23d7d7;">:array</span> (query))
+</pre>
+</div>
+<p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> 'r.rolename
+                 (<span style="color: #23d7d7;">:as</span> (<span style="color: #23d7d7;">:array</span>
+                       (<span style="color: #23d7d7;">:select</span> 'b.rolename
+                                <span style="color: #23d7d7;">:from</span> (<span style="color: #23d7d7;">:as</span> 'pg_catalog.pg-auth-members 'm)
+                                <span style="color: #23d7d7;">:inner-join</span> (<span style="color: #23d7d7;">:as</span> 'pg-catalog.pg-roles 'b)
+                                <span style="color: #23d7d7;">:on</span> (<span style="color: #23d7d7;">:=</span> 'm.roleid 'b.oid)
+                                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'm.member 'r.oid )))
+                      'memberof)
+                 <span style="color: #23d7d7;">:from</span> (<span style="color: #23d7d7;">:as</span> 'pg-catalog.pg-roles 'r))
+        1))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org945577b" class="outline-3">
+<h3 id="org945577b">:array[] (declares an array and returns an array</h3>
+<div class="outline-text-3" id="text-org945577b">
+<p>
+The format of the call is:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #23d7d7;">:array[]</span> (<span style="color: #34cae2;">&amp;rest</span> args))
+</pre>
+</div>
+<p>
+Examples:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array[]</span> 2 6))
+       <span style="color: #23d7d7;">:single</span>)
+#(2 6)
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:/</span> 15 3) (<span style="color: #23d7d7;">:pi</span>) 6))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(5.0d0 3.141592653589793d0 6.0d0)
+</pre>
+</div>
+<p>
+Note that in the second example, the value of 6 is returned as a
+float because the entire array must be the same type.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org73afdfb" class="outline-3">
+<h3 id="org73afdfb">:[] (used when you want a slice of an array</h3>
+<div class="outline-text-3" id="text-org73afdfb">
+<p>
+The format of the call is:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #23d7d7;">:[]</span> (form start <span style="color: #34cae2;">&amp;optional</span> end))
+</pre>
+</div>
+<p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">let</span> ((arry1 #(2 6 7 12)))
+     (query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:[]</span> arry1 2 3))
+            <span style="color: #23d7d7;">:single</span>))
+
+#(6 7)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b63f9c" class="outline-3">
+<h3 id="org9b63f9c">General Usage Examples</h3>
+<div class="outline-text-3" id="text-org9b63f9c">
+<p>
+Just to make these usage examples really simple, we will use the
+simplest use case version discussed above, with a tags array in a table
+with the name of the item. In this case the name is the name of a
+recipe and the tags are ingredients that either go in the recipe
+or accompany the recipe.
+</p>
+
+<p>
+First to create the table and the indexes. The index on 'name is the
+default B-tree index. The index on the tags is a GIN index.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sql">(query (:<span style="color: #ffad29; font-weight: bold;">create</span>-<span style="color: #ffad29; font-weight: bold;">table</span> recipes
+                       ((<span style="color: #ffad29; font-weight: bold;">name</span> :<span style="color: #ffad29; font-weight: bold;">type</span> text)
+                        (tags :<span style="color: #ffad29; font-weight: bold;">type</span> text[] :<span style="color: #ffad29; font-weight: bold;">default</span> "{}"))))
+
+(query (:<span style="color: #ffad29; font-weight: bold;">create</span>-<span style="color: #ffad29; font-weight: bold;">unique</span>-index <span style="color: #e67128;">'recipe-tags-id-name</span>
+<span style="color: #e67128;">                              :on "recipes"</span>
+<span style="color: #e67128;">                              :fields '</span><span style="color: #ffad29; font-weight: bold;">name</span>))
+
+(query (:<span style="color: #ffad29; font-weight: bold;">create</span>-index <span style="color: #e67128;">'recipe-tags-id-tags</span>
+<span style="color: #e67128;">                       :on "recipes"</span>
+<span style="color: #e67128;">                       :using gin</span>
+<span style="color: #e67128;">                       :fields '</span>tags))
+</pre>
+</div>
+<p>
+Now use :insert-rows-into to populate the table. Notice we are actually
+passing in lisp arrays and it is automatically inserted in the table
+as a postgresql array.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:insert-rows-into</span>
+        'recipes
+        <span style="color: #23d7d7;">:columns</span> 'name 'tags
+        <span style="color: #23d7d7;">:values</span>
+        '((<span style="color: #e67128;">"Fattoush"</span> #(<span style="color: #e67128;">"greens"</span> <span style="color: #e67128;">"pita bread"</span> <span style="color: #e67128;">"olive oil"</span> <span style="color: #e67128;">"garlic"</span> <span style="color: #e67128;">"lemon"</span> <span style="color: #e67128;">"salt"</span> <span style="color: #e67128;">"spices"</span>))
+          (<span style="color: #e67128;">"Shawarma"</span> #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"tahini sauce"</span> <span style="color: #e67128;">"pita bread"</span>))
+          (<span style="color: #e67128;">"Baba Ghanoush"</span> #(<span style="color: #e67128;">"pita bread"</span> <span style="color: #e67128;">"olive oil"</span> <span style="color: #e67128;">"eggplant"</span> <span style="color: #e67128;">"tahini sauce"</span>))
+          (<span style="color: #e67128;">"Shish Taouk"</span> #(<span style="color: #e67128;">"chicken"</span> <span style="color: #e67128;">"lemon juice"</span> <span style="color: #e67128;">"garlic"</span> <span style="color: #e67128;">"paprika"</span> <span style="color: #e67128;">"yogurt"</span> <span style="color: #e67128;">"tomato paste"</span> <span style="color: #e67128;">"pita bread"</span>))
+          (<span style="color: #e67128;">"Kibbe nayeh"</span> #(<span style="color: #e67128;">"raw meat"</span> <span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"onion"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"pita bread"</span>))
+          (<span style="color: #e67128;">"Manakeesh"</span> #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"zaatar"</span> <span style="color: #e67128;">"kishik"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cucumbers"</span> <span style="color: #e67128;">"mint leaves"</span> <span style="color: #e67128;">"olives"</span>))
+          (<span style="color: #e67128;">"Fakafek"</span> #(<span style="color: #e67128;">"chickpeas"</span> <span style="color: #e67128;">"pita bread"</span> <span style="color: #e67128;">"tahini sauce"</span>))
+          (<span style="color: #e67128;">"Tabbouleh"</span> #(<span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"parsley"</span>))
+          (<span style="color: #e67128;">"Kofta"</span> #(<span style="color: #e67128;">"minced meat"</span> <span style="color: #e67128;">"parsley"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"onions"</span>))
+          (<span style="color: #e67128;">"Kunafeh"</span> #(<span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"sugar syrup"</span> <span style="color: #e67128;">"pistachios"</span>))
+          (<span style="color: #e67128;">"Baklava"</span> #(<span style="color: #e67128;">"filo dough"</span> <span style="color: #e67128;">"honey"</span> <span style="color: #e67128;">"nuts"</span>)))))
+</pre>
+</div>
+
+<p>
+This will automatically insert the required square brackets into the sql statement
+being passed to postgresql. This automatic translation between lisp and
+postgresql arrays does not work where you need a postgresql function in a query.
+(The database function is not going to be in a lisp array.)
+For that you need to use the :array[] sql-op. E.g.
+</p>
+
+<p>
+Sample desired sql statement:
+</p>
+<div class="org-src-container">
+<pre class="src src-sql">(<span style="color: #ffad29; font-weight: bold;">SELECT</span> <span style="color: #34cae2;">ARRAY</span>[(1 / 2)]::FLOATS[]);
+</pre>
+</div>
+<p>
+S-sql version
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:type</span> (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:/</span> 1 2)) float[])))
+</pre>
+</div>
+
+<p>
+First we can start by checking for records that have a specific tag
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'recipe-id 'tags
+                <span style="color: #23d7d7;">:from</span> 'recipe-tags-array
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> 'tags
+                            (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"bulgur"</span>))))
+((<span style="color: #e67128;">"Tabbouleh"</span> #(<span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"parsley"</span>))
+ (<span style="color: #e67128;">"Kibbe nayeh"</span> #(<span style="color: #e67128;">"raw meat"</span> <span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"pita bread"</span>)))
+
+</pre>
+</div>
+<p>
+We should look at this return a bit closer. As you might expect in postmodern,
+this query returns list of lists and each sublist contains the string name.
+What may be unexpected is that the second item in each sublist is actually
+a lisp array.
+</p>
+
+<p>
+Extending this to checking for items with two specific tags:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'recipe-id 'tags
+                <span style="color: #23d7d7;">:from</span> 'recipe-tags-array
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> 'tags
+                            (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"parsley"</span>))))
+
+((<span style="color: #e67128;">"Tabbouleh"</span> #(<span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"parsley"</span>)))
+</pre>
+</div>
+<p>
+As you should expect, we can also pass in a lisp variable which
+is an array, in this case we are using the :&amp;&amp; operator which
+acts as an 'or' logical test:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">let</span> ((tst-arry #(<span style="color: #e67128;">"parsley"</span> <span style="color: #e67128;">"cheese"</span>)))
+  (query (<span style="color: #23d7d7;">:order-by</span> (<span style="color: #23d7d7;">:select</span> '*
+                             <span style="color: #23d7d7;">:from</span> 'recipes
+                             <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&amp;&amp;</span> 'tags tst-arry))
+                    'name)))
+'((<span style="color: #e67128;">"Manakeesh"</span>
+   #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"zaatar"</span> <span style="color: #e67128;">"kishik"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cucumbers"</span> <span style="color: #e67128;">"mint leaves"</span>
+     <span style="color: #e67128;">"olives"</span>))
+  (<span style="color: #e67128;">"Tabbouleh"</span> #(<span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"parsley"</span>))
+  (<span style="color: #e67128;">"Kofta"</span> #(<span style="color: #e67128;">"minced meat"</span> <span style="color: #e67128;">"parsley"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"onions"</span>))
+  (<span style="color: #e67128;">"Kunafeh"</span> #(<span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"sugar syrup"</span> <span style="color: #e67128;">"pistachios"</span>)))
+
+</pre>
+</div>
+
+
+<p>
+Validating that this is returning a vector:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(type-of (query (<span style="color: #23d7d7;">:select</span> 'tags
+                         <span style="color: #23d7d7;">:from</span> 'recipes
+                         <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name <span style="color: #e67128;">"Manakeesh"</span>))
+                <span style="color: #23d7d7;">:single</span>))
+
+'(SIMPLE-VECTOR 8)
+</pre>
+</div>
+<p>
+We can also check the length of the array or cardinality:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:cardinality</span> 'tags)
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name <span style="color: #e67128;">"Manakeesh"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+</pre>
+</div>
+
+<p>
+Updating the array can be done either explicitly:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #74af68;">;;; </span><span style="color: #74af68;">Update array with an lisp array (changing onion to onions in the one row where it is singular</span>
+(query (<span style="color: #23d7d7;">:update</span> 'recipes
+                <span style="color: #23d7d7;">:set</span> 'tags #(<span style="color: #e67128;">"raw meat"</span> <span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"pita bread"</span>)
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name <span style="color: #e67128;">"Kibbe nayeh"</span>)))
+</pre>
+</div>
+<p>
+or passing in a lisp variable:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp"><span style="color: #74af68;">;;; </span><span style="color: #74af68;">checking passing a lisp array as a variable</span>
+(<span style="color: #ffad29; font-weight: bold;">let</span> ((lisp-arry #(<span style="color: #e67128;">"wine"</span> <span style="color: #e67128;">"garlic"</span> <span style="color: #e67128;">"soy sauce"</span>)))
+  (query (<span style="color: #23d7d7;">:update</span> 'recipes
+                  <span style="color: #23d7d7;">:set</span> 'tags '$1
+                  <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name 11))
+         lisp-arry))
+</pre>
+</div>
+
+<p>
+If you are selecting a slice of a postgresql array, then use :[].
+At this point it is a good reminder that postgresql arrays start
+at 1, not at 0. The first parameter following the field name is
+the starting point of the slice to return. The second parameter
+is the end point of the slice to return (defaulting to the
+starting point).
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:[]</span> 'tags 2)
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name 3)))
+
+'((<span style="color: #e67128;">"olive oil"</span>))
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:[]</span> 'tags 2 3)
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name 3)))
+
+'((#(<span style="color: #e67128;">"olive oil"</span> <span style="color: #e67128;">"eggplant"</span>)))
+
+</pre>
+</div>
+<p>
+If you are sub-selecting into a postgresql array, postgresql switches
+from square brackets to parens, so in s-sql you need to
+use :array. E.g.
+</p>
+
+<p>
+Sample desired sql statement:
+</p>
+<div class="org-src-container">
+<pre class="src src-sql">
+<span style="color: #ffad29; font-weight: bold;">SELECT</span> r.rolname,
+  <span style="color: #34cae2;">ARRAY</span>(<span style="color: #ffad29; font-weight: bold;">SELECT</span> b.rolname
+        <span style="color: #ffad29; font-weight: bold;">FROM</span> pg_catalog.pg_auth_members <span style="color: #ffad29; font-weight: bold;">m</span>
+        <span style="color: #ffad29; font-weight: bold;">JOIN</span> pg_catalog.pg_roles b <span style="color: #ffad29; font-weight: bold;">ON</span> (<span style="color: #ffad29; font-weight: bold;">m</span>.roleid = b.oid)
+        <span style="color: #ffad29; font-weight: bold;">WHERE</span> <span style="color: #ffad29; font-weight: bold;">m</span>.member = r.oid) <span style="color: #ffad29; font-weight: bold;">as</span> memberof
+<span style="color: #ffad29; font-weight: bold;">FROM</span> pg_catalog.pg_roles r
+<span style="color: #ffad29; font-weight: bold;">ORDER</span> <span style="color: #ffad29; font-weight: bold;">BY</span> 1;
+**************************
+</pre>
+</div>
+
+<p>
+And now the s-sql version. Here, because we are selecting into an array,
+we need to use just :array
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> 'r.rolename
+                 (<span style="color: #23d7d7;">:as</span> (<span style="color: #23d7d7;">:array</span>
+                       (<span style="color: #23d7d7;">:select</span> 'b.rolename
+                                <span style="color: #23d7d7;">:from</span> (<span style="color: #23d7d7;">:as</span> 'pg_catalog.pg-auth-members 'm)
+                                <span style="color: #23d7d7;">:inner-join</span> (<span style="color: #23d7d7;">:as</span> 'pg-catalog.pg-roles 'b)
+                                <span style="color: #23d7d7;">:on</span> (<span style="color: #23d7d7;">:=</span> 'm.roleid 'b.oid)
+                                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'm.member 'r.oid )))
+                      'memberof)
+                 <span style="color: #23d7d7;">:from</span> (<span style="color: #23d7d7;">:as</span> 'pg-catalog.pg-roles 'r))
+        1))
+</pre>
+</div>
+
+<p>
+The postgresql unnest function (:unnest ..)  expands every
+array entry into a separate row. In the following select, we pull out all
+the distinct tags in a list of lists where every list has a single tag entry.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:as</span> (<span style="color: #23d7d7;">:unnest</span> 'tags) 'tag) <span style="color: #23d7d7;">:distinct</span>
+                 <span style="color: #23d7d7;">:from</span> 'recipes)
+        'tag))
+
+'((<span style="color: #e67128;">"bulgur"</span>) (<span style="color: #e67128;">"cheese"</span>) (<span style="color: #e67128;">"chicken"</span>) (<span style="color: #e67128;">"chickpeas"</span>) (<span style="color: #e67128;">"cucumbers"</span>) (<span style="color: #e67128;">"eggplant"</span>)
+  (<span style="color: #e67128;">"filo dough"</span>) (<span style="color: #e67128;">"garlic"</span>) (<span style="color: #e67128;">"greens"</span>) (<span style="color: #e67128;">"honey"</span>) (<span style="color: #e67128;">"kishik"</span>) (<span style="color: #e67128;">"lemon"</span>)
+  (<span style="color: #e67128;">"lemon juice"</span>) (<span style="color: #e67128;">"meat"</span>) (<span style="color: #e67128;">"minced meat"</span>) (<span style="color: #e67128;">"mint leaves"</span>) (<span style="color: #e67128;">"nuts"</span>)
+  (<span style="color: #e67128;">"olive oil"</span>) (<span style="color: #e67128;">"olives"</span>) (<span style="color: #e67128;">"onions"</span>) (<span style="color: #e67128;">"paprika"</span>) (<span style="color: #e67128;">"parsley"</span>)
+  (<span style="color: #e67128;">"pistachios"</span>) (<span style="color: #e67128;">"pita bread"</span>) (<span style="color: #e67128;">"raw meat"</span>) (<span style="color: #e67128;">"salt"</span>) (<span style="color: #e67128;">"spices"</span>) (<span style="color: #e67128;">"sugar syrup"</span>)
+  (<span style="color: #e67128;">"tahini sauce"</span>) (<span style="color: #e67128;">"tomatoes"</span>) (<span style="color: #e67128;">"tomato paste"</span>) (<span style="color: #e67128;">"yogurt"</span>) (<span style="color: #e67128;">"zaatar"</span>))
+</pre>
+</div>
+
+<p>
+We can use with and group-by operators to count the unique tags:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:with</span>
+         (<span style="color: #23d7d7;">:as</span> 'p
+              (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:as</span> (<span style="color: #23d7d7;">:unnest</span> 'tags) 'tag)
+                       <span style="color: #23d7d7;">:from</span> 'recipes))
+         (<span style="color: #23d7d7;">:select</span> 'tag (<span style="color: #23d7d7;">:as</span> (<span style="color: #23d7d7;">:count</span> 'tag) 'cnt)
+                  <span style="color: #23d7d7;">:from</span> 'p
+                  <span style="color: #23d7d7;">:group-by</span> 'tag))
+        (<span style="color: #23d7d7;">:desc</span> 'cnt) 'tag))
+'((<span style="color: #e67128;">"pita bread"</span> 6) (<span style="color: #e67128;">"onions"</span> 3) (<span style="color: #e67128;">"spices"</span> 3) (<span style="color: #e67128;">"tahini sauce"</span> 3) (<span style="color: #e67128;">"bulgur"</span> 2)
+  (<span style="color: #e67128;">"cheese"</span> 2) (<span style="color: #e67128;">"garlic"</span> 2) (<span style="color: #e67128;">"meat"</span> 2) (<span style="color: #e67128;">"olive oil"</span> 2) (<span style="color: #e67128;">"parsley"</span> 2)
+  (<span style="color: #e67128;">"tomatoes"</span> 2) (<span style="color: #e67128;">"chicken"</span> 1) (<span style="color: #e67128;">"chickpeas"</span> 1) (<span style="color: #e67128;">"cucumbers"</span> 1) (<span style="color: #e67128;">"eggplant"</span> 1)
+  (<span style="color: #e67128;">"filo dough"</span> 1) (<span style="color: #e67128;">"greens"</span> 1) (<span style="color: #e67128;">"honey"</span> 1) (<span style="color: #e67128;">"kishik"</span> 1) (<span style="color: #e67128;">"lemon"</span> 1)
+  (<span style="color: #e67128;">"lemon juice"</span> 1) (<span style="color: #e67128;">"minced meat"</span> 1) (<span style="color: #e67128;">"mint leaves"</span> 1) (<span style="color: #e67128;">"nuts"</span> 1) (<span style="color: #e67128;">"olives"</span> 1)
+  (<span style="color: #e67128;">"paprika"</span> 1) (<span style="color: #e67128;">"pistachios"</span> 1) (<span style="color: #e67128;">"raw meat"</span> 1) (<span style="color: #e67128;">"salt"</span> 1) (<span style="color: #e67128;">"sugar syrup"</span> 1)
+  (<span style="color: #e67128;">"tomato paste"</span> 1) (<span style="color: #e67128;">"yogurt"</span> 1) (<span style="color: #e67128;">"zaatar"</span> 1))
+</pre>
+</div>
+
+<p>
+Yes, there are array-append, array-replace etc operators
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:update</span> 'recipes
+                <span style="color: #23d7d7;">:set</span> 'tags (<span style="color: #23d7d7;">:array-append</span> 'tags <span style="color: #e67128;">"appended-items"</span>)
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name <span style="color: #e67128;">"Kibbe nayeh"</span>)))
+
+(query (<span style="color: #23d7d7;">:update</span> 'recipes
+                <span style="color: #23d7d7;">:set</span> 'tags (<span style="color: #23d7d7;">:array-replace</span> 'tags <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"chocolate"</span>)))
+</pre>
+</div>
+<p>
+The above two versions checked all the row, even those without the target string,
+effectively the equivalent of not using the index.
+</p>
+
+<p>
+You can use a different operator that more effectively uses the GIN index and
+just touches the rows with the targeted string in the array:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:update</span> 'recipes
+                <span style="color: #23d7d7;">:set</span> 'tags (<span style="color: #23d7d7;">:array-replace</span> 'tags  <span style="color: #e67128;">"chocolate"</span> <span style="color: #e67128;">"spices"</span>)
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;@</span> <span style="color: #e67128;">"{\"chocolate\"}"</span> 'tags)))
+</pre>
+</div>
+
+<p>
+The use of the :any* operator needs to be considered as a special case. Quoting
+Marijn Haverbeke here,"Postgres has both a function-call-style any and an infix any,
+and S-SQL's syntax doesn't allow them to be distinguished." As a result, s-sql
+has a regular :any sql-op and a :any* sql-op, which expand slightly differently.
+</p>
+
+<p>
+To show the difference, look at the sql statements that are generated by the two
+operators :any* and :any
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql (<span style="color: #23d7d7;">:select</span> '*
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> <span style="color: #e67128;">"chicken"</span> (<span style="color: #23d7d7;">:any*</span> 'tags ))))
+
+<span style="color: #e67128;">"(SELECT * FROM recipes WHERE (E'chicken' = ANY(tags)))"</span>
+
+(sql (<span style="color: #23d7d7;">:select</span> '*
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> <span style="color: #e67128;">"chicken"</span> (<span style="color: #23d7d7;">:any</span> 'tags ))))
+
+<span style="color: #e67128;">"(SELECT * FROM recipes WHERE (E'chicken' = ANY tags))"</span>
+</pre>
+</div>
+
+<p>
+In the following two cases we want to use ':any*'. In the first simple query,
+we are looking for everything in the rows where the name of the recipe is in
+the lisp array we passed in.
+</p>
+
+<p>
+In the second query we look for all the rows where the string "chicken"
+appears in any of the tag arrays.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> '*
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name (<span style="color: #23d7d7;">:any*</span> '$1)))
+       #(<span style="color: #e67128;">"Trout"</span> <span style="color: #e67128;">"Shish Taouk"</span> <span style="color: #e67128;">"Hamburger"</span>))
+
+'((<span style="color: #e67128;">"Shish Taouk"</span>
+   #(<span style="color: #e67128;">"chicken"</span> <span style="color: #e67128;">"lemon juice"</span> <span style="color: #e67128;">"garlic"</span> <span style="color: #e67128;">"paprika"</span> <span style="color: #e67128;">"yogurt"</span> <span style="color: #e67128;">"tomato paste"</span>
+     <span style="color: #e67128;">"pita bread"</span>)))
+
+(query (<span style="color: #23d7d7;">:select</span> '*
+                <span style="color: #23d7d7;">:from</span> 'recipes
+                <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> '$1 (<span style="color: #23d7d7;">:any*</span> 'tags )))
+       <span style="color: #e67128;">"chicken"</span>)
+
+'((<span style="color: #e67128;">"Shish Taouk"</span>
+   #(<span style="color: #e67128;">"chicken"</span> <span style="color: #e67128;">"lemon juice"</span> <span style="color: #e67128;">"garlic"</span> <span style="color: #e67128;">"paprika"</span> <span style="color: #e67128;">"yogurt"</span> <span style="color: #e67128;">"tomato paste"</span>
+     <span style="color: #e67128;">"pita bread"</span>)))
+</pre>
+</div>
+
+<p>
+We can look for rows where x or y is found in the tags array. This uses
+the or operator which looks like :&amp;&amp;.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> '*
+                 <span style="color: #23d7d7;">:from</span> 'recipes
+                 <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&amp;&amp;</span> 'tags (<span style="color: #23d7d7;">:array[]</span> '$1 '$2)))
+        'name)
+       <span style="color: #e67128;">"parsley"</span> <span style="color: #e67128;">"cheese"</span>)
+'((<span style="color: #e67128;">"Manakeesh"</span>
+   #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"zaatar"</span> <span style="color: #e67128;">"kishik"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cucumbers"</span> <span style="color: #e67128;">"mint leaves"</span>
+     <span style="color: #e67128;">"olives"</span>))
+  (<span style="color: #e67128;">"Tabbouleh"</span> #(<span style="color: #e67128;">"bulgur"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"onions"</span> <span style="color: #e67128;">"parsley"</span>))
+  (<span style="color: #e67128;">"Kofta"</span> #(<span style="color: #e67128;">"minced meat"</span> <span style="color: #e67128;">"parsley"</span> <span style="color: #e67128;">"spices"</span> <span style="color: #e67128;">"onions"</span>))
+  (<span style="color: #e67128;">"Kunafeh"</span> #(<span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"sugar syrup"</span> <span style="color: #e67128;">"pistachios"</span>)))
+</pre>
+</div>
+
+<p>
+There are also specific operators for "contains" (:@&gt;) and "contained-by" (:&lt;@).
+This comparison is done on an element by element basis, so is easily
+thought of as whether the elements in array1 are a subset of the elements
+in array2 or vice versa.
+</p>
+
+<p>
+The following examples should be easy to follow.
+</p>
+
+<p>
+In the first example we are looking for rows where the elements of an
+array composed of the two strings passed in as parameters is contained
+by the row in the database.
+</p>
+
+<p>
+In the second example, we have flipped the parameters and operator around.
+We are looking for rows from the database table which contain the elements
+of an array composed of the two strings passed in as parameters.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'recipes
+                 <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;@</span> (<span style="color: #23d7d7;">:array[]</span> '$1 '$2)
+                             'tags))
+        'name)
+       <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cheese"</span>)
+
+'((<span style="color: #e67128;">"Manakeesh"</span>
+   #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"zaatar"</span> <span style="color: #e67128;">"kishik"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cucumbers"</span> <span style="color: #e67128;">"mint leaves"</span>
+     <span style="color: #e67128;">"olives"</span>)))
+
+(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'recipes
+                 <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> 'tags
+                             (<span style="color: #23d7d7;">:array[]</span> '$1 '$2)))
+        'name)
+       <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cheese"</span>)
+
+'((<span style="color: #e67128;">"Manakeesh"</span>
+   #(<span style="color: #e67128;">"meat"</span> <span style="color: #e67128;">"cheese"</span> <span style="color: #e67128;">"zaatar"</span> <span style="color: #e67128;">"kishik"</span> <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cucumbers"</span> <span style="color: #e67128;">"mint leaves"</span>
+     <span style="color: #e67128;">"olives"</span>)))
+</pre>
+</div>
+<p>
+In the following two examples, we do something similar, but we are looking
+to see if the tags array in any row in the database table is a subset of
+the small two element array we are passing in. The answer is nil.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'recipes
+                 <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:@&gt;</span> (<span style="color: #23d7d7;">:array[]</span> '$1 '$2)
+                             'tags))
+        'name)
+       <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cheese"</span>)
+
+nil
+
+(query (<span style="color: #23d7d7;">:order-by</span>
+        (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'recipes
+                 <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;@</span> 'tags
+                             (<span style="color: #23d7d7;">:array[]</span> '$1 '$2)))
+        'name)
+       <span style="color: #e67128;">"tomatoes"</span> <span style="color: #e67128;">"cheese"</span>)
+
+nil
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org2ad6706" class="outline-2">
+<h2 id="org2ad6706">Dao Class Support for Arrays</h2>
+<div class="outline-text-2" id="text-org2ad6706">
+</div>
+</div>
+<div id="outline-container-org1c8a03c" class="outline-2">
+<h2 id="org1c8a03c">Array Operators</h2>
+<div class="outline-text-2" id="text-org1c8a03c">
+</div>
+<div id="outline-container-orga4db3ff" class="outline-3">
+<h3 id="orga4db3ff">Array Comparison Operators</h3>
+<div class="outline-text-3" id="text-orga4db3ff">
+<p>
+Per postgresql <a href="https://www.postgresql.org/docs/current/static/functions-array.html">documentation</a> array comparisons compare the array contents
+element-by-element,  using the default B-tree comparison function for the
+element data type. In multidimensional arrays the elements are visited in
+row-major order (last subscript varies most rapidly). If the contents of
+two arrays are equal but the dimensionality is different, the first
+difference in the dimensionality information determines the sort order.
+</p>
+
+<p>
+Form is (:operator array1 array2)
+</p>
+</div>
+<div id="outline-container-org5f5fd39" class="outline-4">
+<h4 id="org5f5fd39">:= Equality Comparison (Are two arrays equal on an element by element basis)</h4>
+<div class="outline-text-4" id="text-org5f5fd39">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 1 2 3)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"a"</span> <span style="color: #e67128;">"b"</span> <span style="color: #e67128;">"c"</span>) (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"a"</span> <span style="color: #e67128;">"b"</span> <span style="color: #e67128;">"c"</span>)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> (<span style="color: #23d7d7;">:type</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) integer[]) (<span style="color: #23d7d7;">:array[]</span> 1 2 3)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 1 4 3)))
+       <span style="color: #23d7d7;">:single</span>)
+nil
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> (<span style="color: #23d7d7;">:type</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) integer[]) (<span style="color: #23d7d7;">:array[]</span> 1 2 3 5)))
+       <span style="color: #23d7d7;">:single</span>)
+
+nil
+
+(<span style="color: #ffad29; font-weight: bold;">let</span> ((arry1 #(1 2 3)) (arry2 #(1 2 3)))
+  (query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:=</span> arry1 arry2))
+         <span style="color: #23d7d7;">:single</span>))
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6c16e07" class="outline-4">
+<h4 id="org6c16e07">:&lt;&gt; Not Equal Comparison</h4>
+<div class="outline-text-4" id="text-org6c16e07">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&lt;&gt;</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 1 2 4)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org40f8311" class="outline-4">
+<h4 id="org40f8311">:&lt; Less Than Comparison</h4>
+<div class="outline-text-4" id="text-org40f8311">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&lt;</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 1 2 4)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdeabea2" class="outline-4">
+<h4 id="orgdeabea2">:&gt; Greater Than Comparison</h4>
+<div class="outline-text-4" id="text-orgdeabea2">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&gt;</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 3) (<span style="color: #23d7d7;">:array[]</span> 1 2 4)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0509480" class="outline-4">
+<h4 id="org0509480">:&gt;= Greater Than or Equal to Comparison</h4>
+<div class="outline-text-4" id="text-org0509480">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&gt;=</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 3) (<span style="color: #23d7d7;">:array[]</span> 1 4 3)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcd62381" class="outline-4">
+<h4 id="orgcd62381">:&lt;= Less Than or Equal To Comparison</h4>
+<div class="outline-text-4" id="text-orgcd62381">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&lt;=</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 1 2 3)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgff37692" class="outline-4">
+<h4 id="orgff37692">:@&gt; Contains Comparison</h4>
+<div class="outline-text-4" id="text-orgff37692">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:@&gt;</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 3) (<span style="color: #23d7d7;">:array[]</span> 3 1)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:@&gt;</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 73) (<span style="color: #23d7d7;">:array[]</span> 3 0)))
+       <span style="color: #23d7d7;">:single</span>)
+nil
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org21574f6" class="outline-4">
+<h4 id="org21574f6">:&lt;@ Is Contained By Comparison</h4>
+<div class="outline-text-4" id="text-org21574f6">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&lt;@</span> (<span style="color: #23d7d7;">:array[]</span> 2 7) (<span style="color: #23d7d7;">:array[]</span> 1 7 4 2 6)))
+        <span style="color: #23d7d7;">:single</span>)
+T
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&lt;@</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 3) (<span style="color: #23d7d7;">:array[]</span> 3 1)))
+       <span style="color: #23d7d7;">:single</span>)
+nil
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6198f17" class="outline-4">
+<h4 id="org6198f17">:&amp;&amp; Has Elements in Common Comparison</h4>
+<div class="outline-text-4" id="text-org6198f17">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:&amp;&amp;</span> (<span style="color: #23d7d7;">:array[]</span> 1 4 3) (<span style="color: #23d7d7;">:array[]</span> 3 1)))
+       <span style="color: #23d7d7;">:single</span>)
+T
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org2d8669e" class="outline-3">
+<h3 id="org2d8669e">Array Concatenation Operators</h3>
+<div class="outline-text-3" id="text-org2d8669e">
+<p>
+Form (:|| item1 item2 &#x2026;)
+</p>
+</div>
+<div id="outline-container-orge162d2a" class="outline-4">
+<h4 id="orge162d2a">:|| Concatentation Arrays and Elements</h4>
+<div class="outline-text-4" id="text-orge162d2a">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (:|| 3 (<span style="color: #23d7d7;">:array[]</span> 4 5 6)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(3 4 5 6)
+
+(query (<span style="color: #23d7d7;">:select</span> (:|| (<span style="color: #23d7d7;">:array[]</span> 4 5 6) 7))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(4 5 6 7)
+
+(query (<span style="color: #23d7d7;">:select</span> (:|| (<span style="color: #23d7d7;">:array[]</span> 1 2) (<span style="color: #23d7d7;">:array[]</span> 3 4)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3 4)
+
+(query (<span style="color: #23d7d7;">:select</span> (:|| 1 (<span style="color: #23d7d7;">:type</span> <span style="color: #e67128;">"[0:1]={2,3}"</span> int[])))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3)
+
+(query (<span style="color: #23d7d7;">:select</span> (:|| 3 (<span style="color: #23d7d7;">:array[]</span> 4 5 6) (<span style="color: #23d7d7;">:array[]</span> 7 8 9) 10))
+       <span style="color: #23d7d7;">:single</span>)
+#(3 4 5 6 7 8 9 10)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org597a87a" class="outline-4">
+<h4 id="org597a87a">:|| Concatenation with Multi-Dimensional Arrays</h4>
+<div class="outline-text-4" id="text-org597a87a">
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (:|| (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:array[]</span> 4 5 6) (<span style="color: #23d7d7;">:array[]</span> 7 8 9))))
+       <span style="color: #23d7d7;">:single</span>)
+
+#2A((1 2 3) (4 5 6) (7 8 9))
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org15f399a" class="outline-2">
+<h2 id="org15f399a">Array functions</h2>
+<div class="outline-text-2" id="text-org15f399a">
+</div>
+
+<div id="outline-container-org0ceb04c" class="outline-4">
+<h4 id="org0ceb04c">Array-prepend</h4>
+<div class="outline-text-4" id="text-org0ceb04c">
+<p>
+Form: (:array-prepend (array1 element))
+Appends an element to the beginning of an array
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-prepend</span> 1 (<span style="color: #23d7d7;">:array[]</span> 2 3)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org825676b" class="outline-4">
+<h4 id="org825676b">array-append</h4>
+<div class="outline-text-4" id="text-org825676b">
+<p>
+Form: (:array-append (array1 element))
+Appends an element to the end of an array.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-append</span> (<span style="color: #23d7d7;">:array[]</span> 4 5 6) 7))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(4 5 6 7)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org05084f7" class="outline-4">
+<h4 id="org05084f7">array-cat</h4>
+<div class="outline-text-4" id="text-org05084f7">
+<p>
+Form: (:array-cat (array1 array2))
+Concatenates two arrays. No more, no less. Both arrays need to have the same
+data type. They do not need to be the same length.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-cat</span> (<span style="color: #23d7d7;">:array[]</span> 1 2) (<span style="color: #23d7d7;">:array[]</span> 3 4)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3 4)
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-cat</span> (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:array[]</span> 1 2) (<span style="color: #23d7d7;">:array[]</span> 3 4)) (<span style="color: #23d7d7;">:array[]</span> 5 6)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#2A((1 2) (3 4) (5 6))
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-cat</span> (<span style="color: #23d7d7;">:array[]</span> 1 2) (<span style="color: #23d7d7;">:array[]</span> 3 4 5)))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3 4 5)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgecdd61f" class="outline-4">
+<h4 id="orgecdd61f">array-ndims</h4>
+<div class="outline-text-4" id="text-orgecdd61f">
+<p>
+Form: (:array-ndims (array))
+Array-ndims returns the number of dimensions of an array.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-ndims</span> (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 4 5 6))))
+       <span style="color: #23d7d7;">:single</span>)
+2
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org5e7fc37" class="outline-4">
+<h4 id="org5e7fc37">array-dims</h4>
+<div class="outline-text-4" id="text-org5e7fc37">
+<p>
+Form: (:array-dims (array1))
+Array-dims returns a text representation of an array's dimensions.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-dims</span> (<span style="color: #23d7d7;">:array[]</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) (<span style="color: #23d7d7;">:array[]</span> 4 5 6))))
+       <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"[1:2][1:3]"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcbca94b" class="outline-4">
+<h4 id="orgcbca94b">array-fill</h4>
+<div class="outline-text-4" id="text-orgcbca94b">
+<p>
+Form: (:array-fill (value array-dimension))
+Array-fill returns an array initialized with supplied value and length.
+This only works with one dimensional arrays
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">
+</pre>
+</div>
+<p>
+(query (:select (:array-fill 7 (:array[] 3)))
+       :single)
+</p>
+
+<p>
+#(7 7 7)
+</p>
+</div>
+</div>
+<div id="outline-container-org14aa248" class="outline-4">
+<h4 id="org14aa248">array-length</h4>
+<div class="outline-text-4" id="text-org14aa248">
+<p>
+Form: (:array-length (array1 array-dimension))
+Returns the length of the requested array dimension.
+In the following example, we request the first array
+dimension.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-length</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) 1 ))
+       <span style="color: #23d7d7;">:single</span>)
+3
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-length</span> (<span style="color: #23d7d7;">:array[]</span> #(#(1 2 3)#(4 5 6))) 1)) <span style="color: #23d7d7;">:single</span>)
+
+1
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-length</span> (<span style="color: #23d7d7;">:array[]</span> #(#(1 2 3)#(4 5 6))) 2)) <span style="color: #23d7d7;">:single</span>)
+
+2
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgaf96c90" class="outline-4">
+<h4 id="orgaf96c90">array-lower</h4>
+<div class="outline-text-4" id="text-orgaf96c90">
+<p>
+Form: (:array-lower (&amp;rest args))
+Array-lower returns the lower bound of the requested array dimension.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-lower</span> (<span style="color: #23d7d7;">:type</span> <span style="color: #e67128;">"[0:2]={1,2,3}"</span> integer[]) 1))
+       <span style="color: #23d7d7;">:single</span>)
+0
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org982bf72" class="outline-4">
+<h4 id="org982bf72">array-position</h4>
+<div class="outline-text-4" id="text-org982bf72">
+<p>
+Form: (:array-position (array element starting-point-if-not-one))
+Array-position returns the subscript of the first occurrence of the
+second argument in the array, starting at the element indicated by the third
+argument or at the first element. The array must be one-dimensional.
+Requires postgresql version 9.5 or newer.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-position</span> (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"sun"</span> <span style="color: #e67128;">"mon"</span> <span style="color: #e67128;">"tue"</span> <span style="color: #e67128;">"wed"</span> <span style="color: #e67128;">"thu"</span> <span style="color: #e67128;">"fri"</span> <span style="color: #e67128;">"sat"</span>) <span style="color: #e67128;">"mon"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+2
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org86302ea" class="outline-4">
+<h4 id="org86302ea">array-positions</h4>
+<div class="outline-text-4" id="text-org86302ea">
+<p>
+Form: (:array-positions (array element))
+Array-positions (note the plural) returns an array of subscripts
+of all occurrences of the second argument in the array given as
+the first argument. The array must be one-dimensional.
+Requires postgresql version 9.5 or newer.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-positions</span> (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"B"</span> <span style="color: #e67128;">"A"</span>) <span style="color: #e67128;">"A"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 4)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org64914ee" class="outline-4">
+<h4 id="org64914ee">array-remove</h4>
+<div class="outline-text-4" id="text-org64914ee">
+<p>
+Form: (:array-remove (array element))
+Array-remove removes all elements equal to the given value
+from the array (array must be one-dimensional).
+Requires postgresql 9.3 or newer.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-remove</span> (<span style="color: #23d7d7;">:array[]</span> <span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"B"</span> <span style="color: #e67128;">"A"</span>) <span style="color: #e67128;">"B"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(<span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"A"</span> <span style="color: #e67128;">"A"</span>)
+</pre>
+</div>
+<p>
+Obviously inside a selection query array-remove only removes the elements
+from the returning set and does not change the underlying data..
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3defa23" class="outline-4">
+<h4 id="org3defa23">array-replace</h4>
+<div class="outline-text-4" id="text-org3defa23">
+<p>
+Form: (:array-replace (array element-to-be-replaced element-used-as-replacement))
+Array-replaces replaces each array element equal to the given value
+with a new value. Requires postgresql 9.3 or newer.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-replace</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 5 4) 5 3))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(1 2 3 4)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb13453f" class="outline-4">
+<h4 id="orgb13453f">array-to-string</h4>
+<div class="outline-text-4" id="text-orgb13453f">
+<p>
+Form: (:array-to-string (array delimiter optional-null-string))
+Array-to-string concatenates array elements using supplied
+delimiter and optional null string.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-to-string</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3 <span style="color: #23d7d7;">:NULL</span> 5) <span style="color: #e67128;">","</span> <span style="color: #e67128;">"*"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+
+<span style="color: #e67128;">"1,2,3,*,5"</span>
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org49216ce" class="outline-4">
+<h4 id="org49216ce">array-upper</h4>
+<div class="outline-text-4" id="text-org49216ce">
+<p>
+Form: (:array-upper (array int))
+Array-upper returns upper bound of the requested array dimension.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-upper</span> (<span style="color: #23d7d7;">:array[]</span> 1 8 3 7) 1))
+       <span style="color: #23d7d7;">:single</span>)
+4
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgdf09f26" class="outline-4">
+<h4 id="orgdf09f26">cardinality</h4>
+<div class="outline-text-4" id="text-orgdf09f26">
+<p>
+Form: (:cardinality (array))
+Returns the total number of elements in the array or 0 if
+the array is empty. Requires postgresql 9.4 or newer.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-length</span> (<span style="color: #23d7d7;">:array[]</span> 1 2 3) 1 ))
+       <span style="color: #23d7d7;">:single</span>)
+3
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd9fed40" class="outline-4">
+<h4 id="orgd9fed40">string-to-array</h4>
+<div class="outline-text-4" id="text-orgd9fed40">
+<p>
+Form: (:string-to-array (text delimiter optional-null-string))
+String-to-array splits a string into array elements using
+the supplied delimiter and optional null string.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:string-to-array</span> <span style="color: #e67128;">"xx~^~yy~^~zz"</span> <span style="color: #e67128;">"~^~"</span> <span style="color: #e67128;">"yy"</span>))
+       <span style="color: #23d7d7;">:single</span>)
+
+#(<span style="color: #e67128;">"xx"</span> <span style="color: #23d7d7;">:NULL</span> <span style="color: #e67128;">"zz"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org421c3aa" class="outline-4">
+<h4 id="org421c3aa">unnest</h4>
+<div class="outline-text-4" id="text-org421c3aa">
+<p>
+Form: (:unnest (array))
+Unnest expands an array to a set of rows.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:unnest</span> (<span style="color: #23d7d7;">:array[]</span> 1 2))))
+
+'((1) (2))
+</pre>
+</div>
+<p>
+It is possible to call unnest with multiple arrays, but this is only
+allowed in the from clause of the query. See
+<a href="https://www.postgresql.org/docs/current/static/queries-table-expressions.html#QUERIES-TABLEFUNCTIONS">https://www.postgresql.org/docs/current/static/queries-table-expressions.html#QUERIES-TABLEFUNCTIONS</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org60be0ed" class="outline-4">
+<h4 id="org60be0ed">array-agg</h4>
+<div class="outline-text-4" id="text-org60be0ed">
+<p>
+Form: (:array-agg (expression))
+Array-agg returns the result in an array (both sql and, in postmodern, a lisp array).
+</p>
+
+<p>
+Note the fourth example (available only in postgresql versions 9.4 or newer)
+filters out null values.
+</p>
+
+<p>
+Like all the aggregate functions, you can pass :filter, :distinct or :order-by
+(in that order) as additional parameters.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-agg</span> 'name) <span style="color: #23d7d7;">:from</span> 'recipes) <span style="color: #23d7d7;">:single</span>)
+
+#(<span style="color: #e67128;">"Fattoush"</span> <span style="color: #e67128;">"Shawarma"</span> <span style="color: #e67128;">"Baba Ghanoush"</span> <span style="color: #e67128;">"Shish Taouk"</span> <span style="color: #e67128;">"Kibbe nayeh"</span> <span style="color: #e67128;">"Manakeesh"</span>
+  <span style="color: #e67128;">"Fakafek"</span> <span style="color: #e67128;">"Tabbouleh"</span> <span style="color: #e67128;">"Kofta"</span> <span style="color: #e67128;">"Kunafeh"</span> <span style="color: #e67128;">"Baklava"</span>)
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-agg</span> 'city <span style="color: #23d7d7;">:distinct</span>)
+        <span style="color: #23d7d7;">:from</span> 'employee)
+  <span style="color: #23d7d7;">:single</span>)
+
+#(<span style="color: #e67128;">"New York"</span> <span style="color: #e67128;">"Toronto"</span> <span style="color: #e67128;">"Vancouver"</span>)
+
+(query (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:array-agg</span> 'city <span style="color: #23d7d7;">:distinct</span> <span style="color: #23d7d7;">:order-by</span> (<span style="color: #23d7d7;">:desc</span> 'city))
+        <span style="color: #23d7d7;">:from</span> 'employee)
+  <span style="color: #23d7d7;">:single</span>)
+
+#(<span style="color: #e67128;">"Vancouver"</span> <span style="color: #e67128;">"Toronto"</span> <span style="color: #e67128;">"New York"</span>)
+
+(query (<span style="color: #23d7d7;">:select</span> 'city (<span style="color: #23d7d7;">:array-agg</span> 'salary <span style="color: #23d7d7;">:filter</span> (<span style="color: #23d7d7;">:&lt;</span> 'salary 50000))
+        <span style="color: #23d7d7;">:from</span> 'employee
+        <span style="color: #23d7d7;">:group-by</span> 'city))
+
+((<span style="color: #e67128;">"Vancouver"</span> #(14420 26020)) (<span style="color: #e67128;">"New York"</span> #(40420 40620)) (<span style="color: #e67128;">"Toronto"</span> #(24020)))
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org3dcfcd7" class="outline-3">
+<h3 id="org3dcfcd7">NULL and nil</h3>
+<div class="outline-text-3" id="text-org3dcfcd7">
+<p>
+An empty array will be returned by postmodern as nil.
+</p>
+
+<p>
+<a href="s-sql.html">Return to s-sql.html</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

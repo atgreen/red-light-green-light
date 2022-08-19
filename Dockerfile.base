@@ -2,8 +2,9 @@ FROM quay.io/containerlisp/lisp-10-ubi8:latest
 
 COPY rlgl-server.asd /tmp
 
-RUN sbcl --eval '(let* ((ds (with-open-file (stream "/tmp/rlgl-server.asd") \
-                              (read stream)))                               \
-                        (pos (position :DEPENDS-ON ds)))                    \
-                   (dolist (p (nth (+ pos 1) ds))                           \
+RUN sbcl --eval '(let* ((ds (with-open-file (stream "/tmp/rlgl-server.asd")           \
+                              (read stream)))                                         \
+                        (pos (position :DEPENDS-ON ds)))                              \
+                   (pushnew (truename "./3rd-party") ql:*local-project-directories* ) \
+                   (dolist (p (nth (+ pos 1) ds))                                     \
                      (ql:quickload p)))'
