@@ -1,5 +1,6 @@
 FROM quay.io/containerlisp/lisp-10-ubi8:latest
 
+USER 0
 COPY rlgl-server.asd /tmp
 COPY 3rd-party/* quicklisp/local-projects
 
@@ -8,3 +9,4 @@ RUN sbcl --eval '(let* ((ds (with-open-file (stream "/tmp/rlgl-server.asd")     
                         (pos (position :DEPENDS-ON ds)))                              \
                    (dolist (p (nth (+ pos 1) ds))                                     \
                      (ql:quickload p)))'
+USER 1001
