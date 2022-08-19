@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2021, 2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -25,4 +25,4 @@
                (:file "db")
                (:file "db-postgresql")
                (:file "db-sqlite"))
-  :depends-on (:dbi :local-time :log4cl :str))
+  :depends-on (:dbi :dbd.postgres :local-time :log4cl :str))
