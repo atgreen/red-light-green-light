@@ -347,8 +347,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
        <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js" ></script>
      </head>
      <header>
-       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" style="margin-left: 1rem; margin-right: 1rem;">
-         <a class="navbar-brand" href=(progn *server-uri*)>Red Light Green Light</a>
+       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+         <div class="container-fluid" style="margin-left: 1rem; margin-right: 1rem;">
+           <a class="navbar-brand" href=(progn *server-uri*)>Red Light Green Light</a>
+         </div>
        </nav>
      </header>
      <body>
@@ -757,9 +759,10 @@ token claims and token header"
        (:body
 	(:header
 	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
-               :style "margin-left: 1rem; margin-right: 1rem;"
-	       (:a :class "navbar-brand"
-		   :href "https://github.com/atgreen/red-light-green-light" "   Red Light Green Light")))
+               (:div :class "container-fluid"
+                     :style "margin-left: 1rem; margin-right: 1rem;"
+	             (:a :class "navbar-brand"
+		         :href "https://github.com/atgreen/red-light-green-light" "   Red Light Green Light"))))
 	(:main :role "main" :class "container"
 	       (:div :class "row"
 		     (:div :class "col"
