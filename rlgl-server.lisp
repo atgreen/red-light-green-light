@@ -738,6 +738,8 @@ token claims and token header"
 		       (reverse xfail)
 		       (reverse pass)
 		       (reverse unknown))))
+  (log:info results)
+  (log:info columns)
   (markup:write-html-to-stream
    <page-template title="Red Light Green Light">
    <div class="row" >
@@ -745,7 +747,7 @@ token claims and token header"
        <div style="width:100px" >
          <div class="rlgl-svg" />
        </div>
-       <h1 class="mt-5"> ,title </h1>
+       <h1 class="mt-5" > ,(format nil "~A" title) </h1>
        <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
          ,(format nil "Original Report (sha3-256: ~A)" digest)
        </a>
