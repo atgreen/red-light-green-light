@@ -738,84 +738,57 @@ token claims and token header"
 		       (reverse xfail)
 		       (reverse pass)
 		       (reverse unknown))))
-  (let ((*html* stream))
-    (with-html
-	(:doctype)
-      (:html
-       (:head
-	(:meta :charset "utf-8")
-	(:meta :name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=no")
-	(:link :rel "apple-touch-icon" :sizes "180x180" :href "images/apple-touch-icon.png")
-	(:link :rel "icon" :type "image/png" :sizes "32x32" :href "images/favicon-32x32.png")
-	(:link :rel "icon" :type "image/png" :sizes "16x16" :href "images/favicon-16x16.png")
-	(:link :rel "manifest" :href "images/site.webmanifest")
-	(:link :rel "mask-icon" :href "images/safari-pinned-tab.svg")
-	(:meta :name "msapplication-TileColor" :content "#da532c")
-	(:meta :name "theme-color" :content "#ffffff")
-	(:title "Red Light Green Light Report")
-	(:link :rel "stylesheet" :href "css/rlgl.css")
-	(:link :attrs (emit-bootstrap.min.css))
-	(:script :src "https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"))
-       (:body
-	(:header
-	 (:nav :class "navbar navbar-expand-md navbar-dark fixed-top bg-dark"
-               (:div :class "container-fluid"
-                     :style "margin-left: 1rem; margin-right: 1rem;"
-	             (:a :class "navbar-brand"
-		         :href "https://github.com/atgreen/red-light-green-light" "   Red Light Green Light"))))
-	(:main :role "main" :class "container"
-	       (:div :class "row"
-		     (:div :class "col"
-			   (:div :style "width:100px"
-				 (:div :class "rlgl-svg"))
-			   (:h1 :class "mt-5" title)
-			   (:a :href (format nil "~A/doc-~A?id=~A"
-                                             *server-uri*
-                                             doctype
-                                             report-ref)
-			       :target "_blank" (format nil "Original Report (sha3/256: ~A)" digest))
-			   (:table :class "fold-table" :id "results"
-                                   (let ((report-columns (if columns columns
-                                                             '(:RESULT :ID))))
-                                     (:tr
-                                      (dolist (c report-columns)
-                                        (:th (string c))))
-				     (dolist (item results)
-				       (let ((matcher (car item))
-					     (alist (cdr item)))
-				         (:tr :class "view" :class (kind matcher)
-                                              (dolist (c report-columns)
-                                                (case c
-                                                  (:RESULT (:td (kind matcher)))
-                                                  (:ID (:td (:a :href (cdr (assoc :URL alist))
-                                                                :target "_blank" (cdr (assoc :ID alist)))))
-                                                  (:URL " ")
-                                                  (otherwise (:td (cdr (assoc c alist)))))))
-				         (:tr :class "fold"
-					      (:td :colspan (format nil "~A" (length report-columns)))
-					      (:div :class "fold-content"
-						    (when (and matcher
-							       (not (eq (kind matcher) :unknown)))
-						      (let ((log-lines (log-entry matcher)))
-						        (:div :id "border"
-							      (:a :href (format nil commit-url-format (githash matcher))
-								  :target "_blank"
-								  (:pre (str:trim (car log-lines))))
-							      (:pre (str:trim (format nil "~{~A~%~}" (cdr log-lines)))))))
-						    (:div :id "border"
-							  (:pre (cl-json-util:pretty-json (json:encode-json-to-string alist)))))))))))))
-	(:footer :class "page-footer font-small special-color-dark pt-4"
-		 (:div :class "footer-copyright text-center py-3" "Generated on "
-		       (simple-date-time:http-date (simple-date-time:now)) " by version" +rlgl-version+
-		       "   //   (C) 2018-2022" (:a :href "https://linkedin.com/in/green" " Anthony Green"))))
-       (:script :attrs (list :src "https://code.jquery.com/jquery-3.3.1.slim.min.js"
-			     :integrity "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-			     :crossorigin "anonymous"))
-;       (:script :attrs (list :src "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-;			     :integrity "sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-;			     :crossorigin "anonymous"))
-       (:script :attrs (emit-bootstrap.min.js))
-       (:script :attrs (list :src "js/index.js"))))))
+  (markup:write-html-to-stream
+   <page-template title="Red Light Green Light">
+   <div class="row" >
+     <div class="col" >
+       <div style="width:100px" >
+         <div class="rlgl-svg" />
+       </div>
+       <h1 class="mt-5"> ,title </h1>
+       <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
+         ,(format nil "Original Report (sha3-256: ~A)" digest)
+       </a>
+       <table class="fold-table" id="results" >
+         ,(let ((report-columns (if columns columns '(:RESULT :ID))))
+            <tr> ,(dolist (c report-columns)
+                    <th> ,(string c) </th> )
+            </tr>
+            (dolist (item results)
+	      (let ((matcher (car item))
+		    (alist (cdr item)))
+	        <tr class="view" class=(kind matcher) >
+                  ,(dolist (c report-columns)
+                     (case c
+                       (:RESULT <td> ,(kind matcher) </td> )
+                       (:ID <td> <a href=(cdr (assoc :URL alist)) target="_blank"> ,(cdr (assoc :ID alist)) </a> </td> )
+                       (:URL " ")
+                       (otherwise <td> ,(cdr (assoc c alist)) </td> )))
+                </tr>
+		<tr class="fold">
+		  <td colspan=(format nil "~A" (length report-columns)) >
+		    <div class="fold-content" >
+		      ,(when (and matcher (not (eq (kind matcher) :unknown)))
+		        (let ((log-lines (log-entry matcher)))
+  		          <div id="border" >
+                            <a href=(format nil commit-url-format (githash matcher)) target="_blank" >
+			      <pre> ,(str:trim (car log-lines)) </pre>
+                            </a>
+			    <pre> ,(str:trim (format nil "~{~A~%~}" (cdr log-lines))) </pre>
+                          </div> ))
+  	              <div id="border" >
+		        <pre>
+                          ,(cl-json-util:pretty-json (json:encode-json-to-string alist))
+                        </pre>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+            )))
+       </table>
+     </div>
+   </div>
+   </page-template> ))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
