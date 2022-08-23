@@ -740,35 +740,35 @@ token claims and token header"
 		       (reverse unknown))))
   (log:info results)
   (log:info columns)
-  (markup:write-html-to-stream
-   <page-template title="Red Light Green Light">
-   <div class="row" >
-     <div class="col" >
-       <div style="width:100px" >
-         <div class="rlgl-svg" />
-       </div>
-       <h1 class="mt-5" > ,(format nil "~A" title) </h1>
-       <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
-         ,(format nil "Original Report (sha3-256: ~A)" digest)
-       </a>
-       <table class="fold-table" id="results" >
-         ,(let ((report-columns (if columns columns '(:RESULT :ID))))
+  (let ((report-columns (if columns columns '(:RESULT :ID))))
+    (markup:write-html-to-stream
+    <page-template title="Red Light Green Light">
+      <div class="row" >
+        <div class="col" >
+          <div style="width:100px" >
+            <div class="rlgl-svg" />
+          </div>
+          <h1 class="mt-5" > ,(format nil "~A" title) </h1>
+          <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
+            ,(format nil "Original Report (sha3-256: ~A)" digest)
+          </a>
+          <table class="fold-table" id="results" >
             <tr> ,@(mapcar (lambda (c)
                              <th> ,(string c) </th> )
                            report-columns)
-            </tr>
-            (dolist (item results)
-	      (let ((matcher (car item))
-		    (alist (cdr item)))
-	        <tr class="view" class=(kind matcher) >
-                  ,@(mapcar (lambda (c)
-                              (case c
-                                (:RESULT <td> ,(kind matcher) </td> )
-                                (:ID <td> <a href=(cdr (assoc :URL alist)) target="_blank"> ,(cdr (assoc :ID alist)) </a> </td> )
-                                (:URL " ")
-                                (otherwise <td> ,(cdr (assoc c alist)) </td> )))
-                     report-columns)
-                </tr>
+            </tr>)
+            ,@(mapcar (lambda (item)
+            	        (let ((matcher (car item))
+		            (alist (cdr item)))
+	                  <tr class="view" class=(kind matcher) >
+                            ,@(mapcar (lambda (c)
+                                        (case c
+                                          (:RESULT <td> ,(kind matcher) </td> )
+                                          (:ID <td> <a href=(cdr (assoc :URL alist)) target="_blank"> ,(cdr (assoc :ID alist)) </a> </td> )
+                                          (:URL " ")
+                                          (otherwise <td> ,(cdr (assoc c alist)) </td> )))
+                                      report-columns)
+                   </tr>)
 		<tr class="fold">
 		  <td colspan=(format nil "~A" (length report-columns)) >
 		    <div class="fold-content" >
@@ -787,12 +787,12 @@ token claims and token header"
                       </div>
                     </div>
                   </td>
-                </tr>
-            )))
-       </table>
-     </div>
-   </div>
-   </page-template>
+                </tr>)
+                      results)
+          </table>
+        </div>
+      </div>
+    </page-template>
    stream))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
