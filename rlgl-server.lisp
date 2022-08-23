@@ -752,7 +752,8 @@ token claims and token header"
          ,(format nil "Original Report (sha3-256: ~A)" digest)
        </a>
        <table class="fold-table" id="results" >
-         ,(let ((report-columns (if columns columns '(:RESULT :ID))))
+         ,(progn
+          (let ((report-columns (if columns columns '(:RESULT :ID))))
             <tr> ,(dolist (c report-columns)
                     <th> ,(string c) </th> )
             </tr>
@@ -786,7 +787,7 @@ token claims and token header"
                     </div>
                   </td>
                 </tr>
-            )))
+            ))))
        </table>
      </div>
    </div>
