@@ -788,7 +788,8 @@ token claims and token header"
        </table>
      </div>
    </div>
-   </page-template> ))
+   </page-template>
+   stream))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
