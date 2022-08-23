@@ -785,8 +785,8 @@ token claims and token header"
                                   </div>
                                 </div>
                              </td>
-                          </tr> )
-                          results ))
+                          </tr> ))
+                          results )
             </table>
           </div>
         </div>
