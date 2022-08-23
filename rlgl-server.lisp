@@ -757,8 +757,7 @@ token claims and token header"
                                <th> ,(string c) </th> )
                              report-columns)
               </tr>
-              ,@(mapcar
-              (lambda (item)
+              ,@(mapcar (lambda (item)
             	          (let ((matcher (car item))
 		                (alist (cdr item)))
 	                    <tr class="view" class=(kind matcher) >
@@ -769,25 +768,25 @@ token claims and token header"
                                             (:URL " ")
                                             (otherwise <td> ,(cdr (assoc c alist)) </td> )))
                                         report-columns)
-                            </tr> )
-	      <tr class="fold">
-		<td colspan=(format nil "~A" (length report-columns)) >
-		  <div class="fold-content" >
-		   ,(when (and matcher (not (eq (kind matcher) :unknown)))
-		      (let ((log-lines (log-entry matcher)))
-  		         <div id="border" >
-                           <a href=(format nil commit-url-format (githash matcher)) target="_blank" >
-		             <pre> ,(str:trim (car log-lines)) </pre>
-                           </a>
-		           <pre> ,(str:trim (format nil "~{~A~%~}" (cdr log-lines))) </pre>
-                         </div> ))
-  	           <div id="border" >
-		     <pre> ,(cl-json-util:pretty-json (json:encode-json-to-string alist)) </pre>
-                   </div>
-                 </div>
-               </td>
-             </tr> )
-             results )
+                            </tr>
+	                    <tr class="fold">
+		              <td colspan=(format nil "~A" (length report-columns)) >
+		                <div class="fold-content" >
+		                  ,(when (and matcher (not (eq (kind matcher) :unknown)))
+		                  (let ((log-lines (log-entry matcher)))
+  		                  <div id="border" >
+                                    <a href=(format nil commit-url-format (githash matcher)) target="_blank" >
+		                      <pre> ,(str:trim (car log-lines)) </pre>
+                                    </a>
+		                    <pre> ,(str:trim (format nil "~{~A~%~}" (cdr log-lines))) </pre>
+                                  </div> ))
+  	                          <div id="border" >
+		                    <pre> ,(cl-json-util:pretty-json (json:encode-json-to-string alist)) </pre>
+                                  </div>
+                                </div>
+                             </td>
+                          </tr> )
+                          results ))
             </table>
           </div>
         </div>
