@@ -762,7 +762,7 @@ token claims and token header"
             	          (let ((matcher (car item))
 		                (alist (cdr item)))
                             <tbody>
-	                    <tr class=(format nil "view ~A" (kind matcher)) >
+	                    <tr class=(format nil "view ~A" (string-downcase (kind matcher))) >
                               ,@(mapcar (lambda (c)
                                           (case c
                                             (:RESULT <td> ,(kind matcher) </td> )

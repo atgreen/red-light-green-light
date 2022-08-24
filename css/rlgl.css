@@ -94,15 +94,15 @@ table.fold-table > tbody > tr.view:hover {
     background: #aaa;
 }
 
-table.fold-table > tbody > tr.FAIL {
+table.fold-table > tbody > tr.fail {
     background: #ffb3b3
 }
 
-table.fold-table > tbody > tr.XFAIL {
+table.fold-table > tbody > tr.xfail {
     background: #e6f6e6
 }
 
-table.fold-table > tbody > tr.PASS {
+table.fold-table > tbody > tr.pass {
     background: #80ff80
 }
 
