@@ -61,19 +61,19 @@ table th, table td {
     padding: .4em;
 }
 
-table.fold-table > tbody > tbody > tr.view td,
-table.fold-table > tbody > tbody > tr.view th {
+table.fold-table > tbody > tr.view td,
+table.fold-table > tbody > tr.view th {
     cursor: pointer;
 }
 
-table.fold-table > tbody > tbody > tr.view td:first-child,
-table.fold-table > tbody > tbody > tr.view th:first-child {
+table.fold-table > tbody > tr.view td:first-child,
+table.fold-table > tbody > tr.view th:first-child {
     position: relative;
     padding-left: 20px;
 }
 
-table.fold-table > tbody > tbody > tr.view td:first-child:before,
-table.fold-table > tbody > tbody > tr.view th:first-child:before {
+table.fold-table > tbody > tr.view td:first-child:before,
+table.fold-table > tbody > tr.view th:first-child:before {
     position: absolute;
     top: 50%;
     left: 5px;
@@ -86,23 +86,23 @@ table.fold-table > tbody > tbody > tr.view th:first-child:before {
     transition: all .3s ease;
 }
 
-table.fold-table > tbody > tbody > tr.view:nth-child(4n-1) {
+table.fold-table > tbody > tr.view:nth-child(4n-1) {
     background: #eee;
 }
 
-table.fold-table > tbody > tbody > tr.view:hover {
+table.fold-table > tbody > tr.view:hover {
     background: #aaa;
 }
 
-table.fold-table > tbody > tbody > tr.fail {
+tr.fail {
     background: #ffb3b3
 }
 
-table.fold-table > tbody > tbody > tr.xfail {
+tr.xfail {
     background: #e6f6e6
 }
 
-table.fold-table > tbody > tbody> tr.pass {
+tr.pass {
     background: #80ff80
 }
 
@@ -113,16 +113,16 @@ table.fold-table > tbody > tr.view.open {
 }
 */
 
-table.fold-table > tbody > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
+table.fold-table > tbody > tr.view.open td:first-child:before, table.fold-table > tbody > tr.view.open th:first-child:before {
     transform: rotate(-180deg);
     color: #333;
 }
 
-table.fold-table > tbody > tbody > tr.fold {
+table.fold-table > tbody > tr.fold {
     display: none;
 }
 
-table.fold-table > tbody > tbody > tr.fold.open {
+table.fold-table > tbody > tr.fold.open {
     display: table-row;
 }
 

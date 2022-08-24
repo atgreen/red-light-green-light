@@ -740,15 +740,17 @@ token claims and token header"
 		       (reverse unknown)))
     (log:info results)
     (log:info columns)
-    (let ((report-columns (if columns columns '(:RESULT :ID))))
-      (markup:write-html-to-stream
-      <page-template title="Red Light Green Light" >
-        <div class="row" >
-          <div class="col" >
-            <div style="width:100px" >
-              <div class="rlgl-svg" />
-            </div>
-            <h1 class="mt-5" > ,(format nil "~A" title) </h1>
+    (let ((report-columns (if columns columns '(:RESULT :ID)))
+          (html-string
+          (let ((string-stream (make-string-output-stream)))
+          (markup:write-html-to-stream
+          <page-template title="Red Light Green Light" >
+            <div class="row" >
+              <div class="col" >
+                <div style="width:100px" >
+                  <div class="rlgl-svg" />
+                </div>
+                <h1 class="mt-5" > ,(format nil "~A" title) </h1>
             <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
               ,(format nil "Original Report (sha3-256: ~A)" digest)
             </a>
@@ -792,7 +794,8 @@ token claims and token header"
           </div>
         </div>
       </page-template>
-      stream))))
+      string-stream)))
+        (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" string-stream)) stream)))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
