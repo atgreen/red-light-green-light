@@ -760,6 +760,7 @@ token claims and token header"
               ,@(mapcar (lambda (item)
             	          (let ((matcher (car item))
 		                (alist (cdr item)))
+                            <tbody>
 	                    <tr class="view" class=(kind matcher) >
                               ,@(mapcar (lambda (c)
                                           (case c
@@ -785,7 +786,7 @@ token claims and token header"
                                   </div>
                                 </div>
                              </td>
-                          </tr> ))
+              </tr></tbody> ))
                           results )
             </table>
           </div>
