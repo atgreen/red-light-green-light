@@ -741,8 +741,7 @@ token claims and token header"
     (log:info results)
     (log:info columns)
     (let ((report-columns (if columns columns '(:RESULT :ID)))
-          (html-string
-          (let ((string-stream (make-string-output-stream)))
+          (string-stream (make-string-output-stream)))
           (markup:write-html-to-stream
           <page-template title="Red Light Green Light" >
             <div class="row" >
@@ -794,8 +793,8 @@ token claims and token header"
           </div>
         </div>
       </page-template>
-      string-stream))))
-        (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" string-stream)) stream))))
+      string-stream)
+      (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" string-stream)) stream))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
