@@ -794,8 +794,8 @@ token claims and token header"
           </div>
         </div>
       </page-template>
-      string-stream)))
-        (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" string-stream)) stream)))))
+      string-stream))))
+        (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" string-stream)) stream))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
