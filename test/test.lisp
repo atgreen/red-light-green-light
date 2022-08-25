@@ -28,28 +28,38 @@
 (defun test-eval (report)
 
   (print (pathname report))
-    (subtest (format nil "upload ~A" report)
-	     (let* ((params `((file . (,(pathname report)
-                                       :content-type "application/octet-stream"
-                                       :filename ,(pathname report)))))
-                    (upload-ref
-		      (drakma:http-request "http://localhost:8080/upload"
-					   :method :post
-                                           :form-data t
-                                           :parameters params)))
-               (setf *upload-ref* upload-ref)
-	       (like upload-ref "RLGL-[A-Z0-9]+")))
+  (subtest (format nil "upload ~A" report)
+	   (let* ((params `((file . (,(pathname report)
+                                     :content-type "application/octet-stream"
+                                     :filename ,(pathname report)))))
+                  (upload-ref
+		    (drakma:http-request "http://localhost:8080/upload"
+					 :method :post
+                                         :form-data t
+                                         :parameters params)))
+             (setf *upload-ref* upload-ref)
+	     (like upload-ref "RLGL-[A-Z0-9]+")))
 
-    (subtest (format nil "evaluate ~A" report)
-	     (print
-	      (drakma:http-request "http://localhost:8080/evaluate"
-				   :method :post
-				   :content-type "application/json"
-				   :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
-						    (rlgl-util:random-hex-string)
-						    "http://github.com/moxielogic/rlgl-toolchain-policy"
-						    *upload-ref*))))
-    )
+  (subtest (format nil "evaluate ~A" report)
+           (let* ((result (drakma:http-request "http://localhost:8080/evaluate"
+				               :method :post
+				               :content-type "application/json"
+				               :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
+						                (rlgl-util:random-hex-string)
+						                "http://github.com/moxielogic/rlgl-toolchain-policy"
+						                *upload-ref*)))
+                  (json (json:decode-json-from-string result)))
+             (setf *json* json)
+             (like (cdr (assoc :CALLBACK json)) "[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+")))
+
+  (subtest (format nil "callback ~A" report)
+           (let ((result (nth-value 1 (drakma:http-request "http://localhost:8080/callback"
+				                           :method :post
+				                           :content-type "application/json"
+				                           :content (format nil "{ \"id\": \"~A\", \"signature\": \"MGUCMEYUlcrqJlgR+p8AKNP1hOTZqspNbOnXMssK3xDq2q0Z9J/y0owNCaNz5gWu/NTjMAIxAPpztPFIbjtWugP0cyqhe6L3mtrzUjZazLEcTOnThJmEWPni1COga+wIUtqvgN3VxQ==\" }"
+						                            (cdr (assoc :CALLBACK *json*)))))))
+             (is result 200)))
+  )
 
 
 (defun run ()

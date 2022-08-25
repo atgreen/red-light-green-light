@@ -17,7 +17,9 @@ binary:
 
 check: clean
 	openssl genrsa -out /tmp/rlgl-test-key.pem 1024
+	openssl rsa -in /tmp/rlgl-test-key.pem -out /tmp/rlgl-public-test-key.pem -outform PEM -pubout
 	PRIVATE_KEY_FILE=/tmp/rlgl-test-key.pem \
+	PUBLIC_KEY_FILE=/tmp/rlgl-public-test-key.pem \
         sbcl --dynamic-space-size 4096 \
 	     --disable-debugger \
 	     --eval '(ql:quickload :prove)' \
