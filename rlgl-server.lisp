@@ -54,9 +54,9 @@
 (defparameter +default-config-text+
 "storage-driver = \"local\"
 server-uri = \"http://localhost:8080\"
-policy-dir = \"/var/rlgl/policy/\"
+policy-dir = \"/tmp/\"
 db = \"sqlite\"
-sqlite-db-filename = \"/var/rlgl/rlgl.db\"
+sqlite-db-filename = \"/tmp/test-rlgl.db\"
 postgresql-host = \"localhost\"
 postgresql-port = 5432
 private-key-file = \"/etc/rlgl-signer/rlgl-signer-private-key.pem\"
@@ -319,13 +319,13 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let* ((json-string
 	   (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t))
          (json (json:decode-json-from-string json-string))
-         (id (cdr (assoc :ID json)))
+         (id (string (cdr (assoc :ID json))))
          (signature (cdr (assoc :SIGNATURE json))))
     (log:info "callback: ~A ~A" id signature)
     (log:info "   fn: ~A" (gethash id *callbacks*))
     (let ((callback (gethash id *callbacks*)))
-      ;; (remhash id *callbacks*)
-      (funcall (gethash (string id) *callbacks*) signature))))
+      (remhash id *callbacks*)
+      (funcall callback signature))))
 
 (markup:deftag page-template (children &key title)
    <html>
@@ -625,8 +625,6 @@ token claims and token header"
 (defun do-upload ()
   (authorize)
   (track-action "upload")
-  (log:info (hunchentoot:post-parameters*))
-  (print (hunchentoot:post-parameters*))
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
 	     (doc (alexandria:read-file-into-byte-vector
@@ -741,8 +739,6 @@ token claims and token header"
 		       (reverse xfail)
 		       (reverse pass)
 		       (reverse unknown)))
-    (log:info results)
-    (log:info columns)
     (let ((report-columns (if columns columns '(:RESULT :ID)))
           (string-stream (make-string-output-stream)))
           (markup:write-html-to-stream

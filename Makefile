@@ -3,7 +3,7 @@ all:
 binary:
 	buildapp --output rlgl-server \
 		--asdf-tree `pwd`/.. \
-		--asdf-tree `pwd`/local-projects/postmodern-20220220-git \
+		--asdf-tree `pwd`/local-projects/postmodern-20210807-git \
 		--asdf-tree `pwd`/local-projects/cl-json-util \
 		--asdf-tree `pwd`/local-projects/snooze-20210518-git \
 		--asdf-tree `pwd`/parsers \
@@ -16,7 +16,9 @@ binary:
 		--entry "rlgl-server:start-rlgl-server"
 
 check: clean
-	sbcl --dynamic-space-size 4096 \
+	openssl genrsa -out /tmp/rlgl-test-key.pem 1024
+	PRIVATE_KEY_FILE=/tmp/rlgl-test-key.pem \
+        sbcl --dynamic-space-size 4096 \
 	     --disable-debugger \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
@@ -31,6 +33,20 @@ check: clean
 	     --eval '(ql:quickload :test-rlgl-server)' \
 	     --eval '(test-rlgl-server:run)' \
 	     --eval '(sb-ext:quit)'
+
+run: clean
+	openssl genrsa -out /tmp/rlgl-test-key.pem 1024
+	PRIVATE_KEY_FILE=/tmp/rlgl-test-key.pem \
+        sbcl --dynamic-space-size 4096 \
+	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./user") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./util") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./db") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./parsers") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
+	     --eval '(ql:register-local-projects)' \
+	     --eval '(ql:quickload :rlgl-server)' \
+	     --eval '(rlgl-server:start-rlgl-server)'
 
 cover: clean
 	sbcl --disable-debugger \

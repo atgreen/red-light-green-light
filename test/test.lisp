@@ -23,17 +23,22 @@
 (in-package #:test-rlgl-server)
 
 (setf prove:*default-reporter* :fiveam)
+(setf prove:*debug-on-error* t)
 
 (defun test-eval (report)
 
+  (print (pathname report))
     (subtest (format nil "upload ~A" report)
-	     (let ((upload-ref
-		    (drakma:http-request "http://localhost:8080/upload"
-					 :method :post
-					 :content-type "application/octet-stream"
-					 :content (pathname report))))
-	       (like upload-ref "RLGL-[A-Z0-9]+")
-	       (setf *upload-ref* upload-ref)))
+	     (let* ((params `((file . (,(pathname report)
+                                       :content-type "application/octet-stream"
+                                       :filename ,(pathname report)))))
+                    (upload-ref
+		      (drakma:http-request "http://localhost:8080/upload"
+					   :method :post
+                                           :form-data t
+                                           :parameters params)))
+               (setf *upload-ref* upload-ref)
+	       (like upload-ref "RLGL-[A-Z0-9]+")))
 
     (subtest (format nil "evaluate ~A" report)
 	     (print
@@ -41,7 +46,7 @@
 				   :method :post
 				   :content-type "application/json"
 				   :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
-						    (rlgl-util:random-hex-string 7)
+						    (rlgl-util:random-hex-string)
 						    "http://github.com/moxielogic/rlgl-toolchain-policy"
 						    *upload-ref*))))
     )
@@ -61,7 +66,7 @@
 	   (loop for i from 0 to 10
 	      do
 		(let ((id (drakma:http-request "http://localhost:8080/start")))
-		  (is (length id) 7))))
+		  (is (length id) 8))))
 
   (defvar *upload-ref* nil)
 
@@ -70,7 +75,6 @@
   (test-eval "test/mysql-aqua.html")
   (test-eval "test/clair-report.json")
   (test-eval "test/empty-clair-report.json")
-  (test-eval "test/gcc2.sum")
 
   (finalize)
 
