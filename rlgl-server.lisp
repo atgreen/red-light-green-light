@@ -625,6 +625,8 @@ token claims and token header"
 (defun do-upload ()
   (authorize)
   (track-action "upload")
+  (log:info (hunchentoot:post-parameters*))
+  (print (hunchentoot:post-parameters*))
   (handler-case
       (let* ((fpath (car (cdr (car (hunchentoot:post-parameters*)))))
 	     (doc (alexandria:read-file-into-byte-vector
