@@ -25,6 +25,8 @@
 (setf prove:*default-reporter* :fiveam)
 (setf prove:*debug-on-error* t)
 
+(defvar *upload-ref* nil)
+
 (defun test-eval (report)
 
   (print (pathname report))
@@ -78,13 +80,19 @@
 		(let ((id (drakma:http-request "http://localhost:8080/start")))
 		  (is (length id) 8))))
 
-  (defvar *upload-ref* nil)
-
   (test-eval "test/report.html")
   (test-eval "test/sample-junit.xml")
   (test-eval "test/mysql-aqua.html")
   (test-eval "test/clair-report.json")
   (test-eval "test/empty-clair-report.json")
+
+  (let* ((result (nth-value 1 (drakma:http-request "http://localhost:8080/evaluate"
+				                   :method :post
+				                   :content-type "application/json"
+				                   :content (format nil "{ \"id\": \"~A\", \"policy\": \"http://github.com/atgreen/red-light-green-light\", \"ref\": \"~A\" }"
+						                    (rlgl-util:random-hex-string)
+                                                                    *upload-ref*)))))
+    (log:info result))
 
   (finalize)
 

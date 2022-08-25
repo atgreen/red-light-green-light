@@ -29,7 +29,8 @@
   (:use #:cl #:matcher #:cl-fad)
   (:shadow #:package)
   (:export #:*policy-dir* #:make-policy #:apply-policy
-	   #:commit-url-format #:version #:compile-scanners))
+	   #:commit-url-format #:version #:compile-scanners
+           #:policy-repo-error #:policy-repo-error-description))
 
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)

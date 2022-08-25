@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -26,6 +26,11 @@
 
 (defvar *git-log-table* (make-hash-table :test 'equal))
 (defvar *git-commit-table* (make-hash-table :test 'equal))
+
+(define-condition policy-repo-error (error)
+  ((description :reader policy-repo-error-description :initarg :description))
+  (:report (lambda (condition stream)
+             (format stream (policy-repo-error-description condition)))))
 
 (defclass policy ()
   ((version :reader version)
@@ -85,8 +90,8 @@ based on URL."
 
 	  (dolist (file (list xfail-file pass-file fail-file))
 	    (unless (file-exists-p (namestring file))
-              (fad:delete-directory-and-files policy-pathname)
-	      (error (format nil "Policy file \"~A\" missing." file))))
+              (fad:delete-directory-and-files policy-pathname :if-does-not-exist :ignore)
+	      (error 'policy-repo-error :description "Policy repo is missing policy files")))
 
 	  (let ((p (make-instance 'policy)))
 	    (setf (slot-value p 'version)
