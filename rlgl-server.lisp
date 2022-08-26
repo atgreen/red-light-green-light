@@ -737,7 +737,6 @@ token claims and token header"
 		       (reverse pass)
 		       (reverse unknown)))
     (let ((report-columns (if columns columns '(:RESULT :ID)))
-          (string-stream (make-string-output-stream)))
           (markup:write-html-to-stream
           <page-template title="Red Light Green Light" >
             <div class="row" >
@@ -757,7 +756,7 @@ token claims and token header"
               ,@(mapcar (lambda (item)
             	          (let ((matcher (car item))
 		                (alist (cdr item)))
-                            <tbody>
+                            <markup:merge-tag>
 	                    <tr class=(format nil "view ~A" (string-downcase (kind matcher))) >
                               ,@(mapcar (lambda (c)
                                           (case c
@@ -783,14 +782,13 @@ token claims and token header"
                                   </div>
                                 </div>
                              </td>
-              </tr></tbody> ))
+              </tr></markup:merge-tag> ))
                           results )
             </table>
           </div>
         </div>
       </page-template>
-      string-stream)
-      (write-string (str:replace-all "</tbody>" "" (str:replace-all "<tbody>" "" (get-output-stream-string string-stream))) stream))))
+      stream)))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
