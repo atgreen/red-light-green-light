@@ -736,7 +736,7 @@ token claims and token header"
 		       (reverse xfail)
 		       (reverse pass)
 		       (reverse unknown)))
-    (let ((report-columns (if columns columns '(:RESULT :ID)))
+    (let ((report-columns (if columns columns '(:RESULT :ID))))
           (markup:write-html-to-stream
           <page-template title="Red Light Green Light" >
             <div class="row" >
@@ -788,7 +788,7 @@ token claims and token header"
           </div>
         </div>
       </page-template>
-      stream)))))
+      stream))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
