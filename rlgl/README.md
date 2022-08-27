@@ -2,5 +2,4 @@
 
 Sources available at https://github.com/atgreen/red-light-green-light .
 
-Copyright (C) 2018, 2019  Anthony Green <green@moxielogic.com>
-
+Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>

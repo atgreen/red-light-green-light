@@ -1,4 +1,4 @@
-// rlgl.go - Copyright 2018-2021  Anthony Green <green@moxielogic.com>
+// rlgl.go - Copyright 2018-2022  Anthony Green <green@moxielogic.com>
 //
 // This program is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Affero General Public License
@@ -772,7 +772,7 @@ func main() {
 
 	app.Name = "rlgl"
 	app.Version = VERSION
-	app.Copyright = "(c) 2018-2021 Anthony Green"
+	app.Copyright = "(c) 2018-2022 Anthony Green"
 	app.Compiled = time.Now()
 	app.Authors = []*cli.Author{
 		&cli.Author{
