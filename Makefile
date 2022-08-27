@@ -48,7 +48,7 @@ run: clean
 	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
 	     --eval '(ql:register-local-projects)' \
 	     --eval '(ql:quickload :rlgl-server)' \
-	     --eval '(rlgl-server:start-rlgl-server)'
+	     --eval '(rlgl-server:start-rlgl-server t "test/config.ini")'
 
 cover: clean
 	sbcl --disable-debugger \

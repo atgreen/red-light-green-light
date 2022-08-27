@@ -68,7 +68,7 @@
 
   (plan 1)
 
-  (start-rlgl-server t nil "test/config.ini")
+  (start-rlgl-server t "test/config.ini")
 
   ;; ---------------------------------------------------------------------------
   ;; API tests

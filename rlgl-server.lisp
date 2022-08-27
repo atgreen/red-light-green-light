@@ -835,9 +835,9 @@ token claims and token header"
      (let ((exposer (make-instance 'exposer-acceptor :registry *rlgl-registry* :port 9101)))
        (log:info "About to start hunchentoot")
        (setf ,handler (hunchentoot:start (make-instance 'application
-							:document-root #p"./"
-							:port ,port
-							:exposer exposer))))))
+						         :document-root #p"./"
+						         :port ,port
+						         :exposer exposer))))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -853,9 +853,8 @@ token claims and token header"
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
 
-(defun start-rlgl-server (&optional (no-auth? nil) (sleep-forever? nil) (config-ini "/etc/rlgl/config.ini"))
-  "Start the web application and have the main thread sleep forever if
-  SLEEP-FOREVER? is not NIL."
+(defun start-rlgl-server (&optional (no-auth? nil) (config-ini "/etc/rlgl/config.ini"))
+  "Start the web application."
 
   (setf *no-auth* no-auth?)
 
@@ -1006,19 +1005,12 @@ token claims and token header"
 
   (thread-pool:start-pool *thread-pool*)
 
-  (let ((srvr (start-server)))
-    ;; If SLEEP-FOREVER? is NIL, then exit right away.  This is used by the
-    ;; testsuite.
-    (log:info "About to enter sleep loop")
-    (when sleep-forever?
-      (loop
-	 (sleep 3000)))
-    srvr))
+  (start-server))
 
 (defun stop-rlgl-server ()
   "Stop the web application."
-  (thread-pool:stop-pool *thread-pool*)
-  (stop-server))
+  (stop-server)
+  (thread-pool:stop-pool *thread-pool*))
 
 (defmethod hunchentoot:start ((app application))
   (hunchentoot:start (application-metrics-exposer app))
