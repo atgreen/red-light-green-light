@@ -853,7 +853,7 @@ token claims and token header"
       (log:error "Can't initialize policy directory ~A" dir)
       nil)))
 
-(defun start-rlgl-server (&optional (no-auth? nil) (config-ini "/etc/rlgl/config.ini"))
+(defun start-rlgl-server (&optional (no-auth? nil) (config-ini "/etc/rlgl/config.ini") (sleep? nil))
   "Start the web application."
 
   (setf *no-auth* no-auth?)
@@ -1005,7 +1005,10 @@ token claims and token header"
 
   (thread-pool:start-pool *thread-pool*)
 
-  (start-server))
+  (start-server)
+
+  (when sleep?
+    (loop do (sleep 1000)))
 
 (defun stop-rlgl-server ()
   "Stop the web application."
