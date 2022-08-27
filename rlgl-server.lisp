@@ -1008,7 +1008,7 @@ token claims and token header"
   (start-server)
 
   (when sleep?
-    (loop do (sleep 1000)))
+    (loop do (sleep 1000))))
 
 (defun stop-rlgl-server ()
   "Stop the web application."
