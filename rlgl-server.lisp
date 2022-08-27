@@ -553,7 +553,7 @@ token claims and token header"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
 		      *server-uri*
-                      (if (find idp '("github"))
+                      (if (find idp '("github") :test 'equal)
                         (format nil "&kc_idp_hint=~A" idp)
                         ""))))
 	(log:info redirect-url)
