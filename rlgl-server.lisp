@@ -412,7 +412,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      </ul>
      <br/>
      <h4>API Keys</h4>
-     Get your personal API key by <a href="/get-api-key" >clicking here</a>.
+     Get your personal API key by <a href="/get-api-key?idp=github" >clicking here</a>.
      <br/>
      <br/>
      <h4>Public Signing Key</h4>
@@ -510,7 +510,7 @@ token claims and token header"
 	(log:error "~A" c)
 	(format nil "# Could not generate baseline regression policy for ~A~%" id)))))
 
-(snooze:defroute get-api-key (:get :text/html &key code session_state)
+(snooze:defroute get-api-key (:get :text/html &key idp code session_state)
   (declare (ignore session_state))
   (if code
       (progn
@@ -549,10 +549,13 @@ token claims and token header"
 		 <br />
                </page-template>)))))
       (let ((redirect-url
-	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email"
+	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
-		      *server-uri*)))
+		      *server-uri*
+                      (if (find idp '("github"))
+                        (format nil "&kc_idp_hint=~A" idp)
+                        ""))))
 	(log:info redirect-url)
 	(hunchentoot:redirect redirect-url))))
 
