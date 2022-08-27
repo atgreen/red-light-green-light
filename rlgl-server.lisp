@@ -548,8 +548,8 @@ token claims and token header"
 ,(progn (format nil "rlgl login --key ~A ~A" (rlgl.user:user-api-key user) *server-uri*))</pre>
 		 <br />
                </page-template>)))))
-      (let ((redirect-url
-               (progn
+         (let ((redirect-url
+               (let ((idp (string-downcase idp)))
                  (log:info idp)
                  (log:info (find idp '("github") :test 'equal))
 	      (format t "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
