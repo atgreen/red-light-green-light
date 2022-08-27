@@ -495,17 +495,17 @@ token claims and token header"
 		 :external-format :utf-8))
 	      (stream (make-string-output-stream)))
 	  (loop with index = 0
-		for pos = (search "<td>FAIL" doc :start2 index)
+		for pos = (search "<td> FAIL" doc :start2 index)
 		when pos do (setf index (+ 1 pos))
 		when pos do (let ((start (+ 1 (search "{" doc :start2 pos)))
-				  (end (search "}</pre>" doc :start2 pos)))
+				  (end (search "} </pre>" doc :start2 pos)))
 			      (format stream "{ ~A }~%"
 				      (string-trim " "
 						   (cl-ppcre:regex-replace-all
 						    "    "
 						    (substitute #\SPACE #\NEWLINE (subseq doc start end)) ""))))
 		while pos)
-	  (get-output-stream-string stream))
+           (get-output-stream-string stream))
       (error (c)
 	(log:error "~A" c)
 	(format nil "# Could not generate baseline regression policy for ~A~%" id)))))
