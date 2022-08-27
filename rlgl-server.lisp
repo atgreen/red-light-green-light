@@ -549,13 +549,23 @@ token claims and token header"
 		 <br />
                </page-template>)))))
       (let ((redirect-url
+               (progn
+                 (log:info idp)
+                 (log:info (find idp '("github") :test 'equal))
+	      (format t "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
+		      *keycloak-oidc-realm-redirect-uri*
+		      *keycloak-oidc-client-id*
+		      *server-uri*
+                      (if (find idp '("github") :test 'equal)
+                        (format nil "&kc_idp_hint=~A" idp)
+                        ""))
 	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
 		      *server-uri*
                       (if (find idp '("github") :test 'equal)
                         (format nil "&kc_idp_hint=~A" idp)
-                        ""))))
+                        "")))))
 	(log:info redirect-url)
 	(hunchentoot:redirect redirect-url))))
 
