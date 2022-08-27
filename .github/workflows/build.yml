@@ -125,9 +125,17 @@ jobs:
 
           ./.ci/test.sh $ip:8080 || true
 
+          docker logs ci_rlgl-server_1
+
+        else
+
+          ERROR=$?
+          docker logs ci_rlgl-server_1
+          exit $ERROR
+
         fi
 
-        docker logs ci_rlgl-server_1
+
 
     # - name: Rollout to staging environment
     #   uses: actions-hub/kubectl@master
