@@ -114,15 +114,19 @@ jobs:
             err "Container ${cid} has no IP address"
             return 1
         fi
-        timeout -s TERM 45 bash -c \
-          'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
-            do echo "Waiting for ${0}" && sleep 2;\
-           done' http://$ip:8080/healthz
 
-        docker exec -t -e IP=$ip ci_rlgl-server_1 sh -c 'echo -n http://$IP:8080 > /tmp/server-uri'
-        docker exec -t ci_rlgl-server_1 cat /tmp/server-uri
+        if timeout -s TERM 45 bash -c \
+                  'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
+                      do echo "Waiting for ${0}" && sleep 2;\
+                       done' http://$ip:8080/healthz ; then
 
-        ./.ci/test.sh $ip:8080 || true
+          docker exec -t -e IP=$ip ci_rlgl-server_1 sh -c 'echo -n http://$IP:8080 > /tmp/server-uri'
+          docker exec -t ci_rlgl-server_1 cat /tmp/server-uri
+
+          ./.ci/test.sh $ip:8080 || true
+
+        fi
+
         docker logs ci_rlgl-server_1
 
     # - name: Rollout to staging environment
