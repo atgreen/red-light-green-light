@@ -51,13 +51,13 @@ curl -s <%= @ server-uri %>/doc?id=${DOC}.sig | base64 -d > ${SERVER_SIGNATURE}
 curl -s <%= @ server-uri %>/doc?id=${DOC}.csig | base64 -d > ${CLIENT_SIGNATURE}
 
 # ---- Validate the server signature of the document digest -------------------
-echo Checking document signature: $(openssl dgst -sha256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
+echo Checking document server signature: $(openssl dgst -sha256 -verify ${SERVER_PUBKEY} -signature ${SERVER_SIGNATURE} ${DIGEST})
 
 # ---- Checking client signature ----------------------------------------------
 if [ -z "$RLGL_CLIENT_PUBKEY" ]; then
-    echo "Checking client signature  : Set the environment RLGL_CLIENT_PUBKEY to point at your public key"
+    echo "Checking document client signature  : Set the environment RLGL_CLIENT_PUBKEY to point at your public key"
 else
-    echo "Checking client signature  :" $(cat ${DOCUMENT} | openssl dgst -sha3-256 -verify ${RLGL_CLIENT_PUBKEY} -signature ${CLIENT_SIGNATURE})
+    echo "Checking document client signature  :" $(cat ${DOCUMENT} | openssl dgst -sha3-256 -verify ${RLGL_CLIENT_PUBKEY} -signature ${CLIENT_SIGNATURE})
 fi
 
 # ---- Look up this document in rekor and print out the record ----------------
