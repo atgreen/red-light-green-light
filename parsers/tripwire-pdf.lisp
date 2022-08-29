@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2020, 2021, 2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -18,7 +18,7 @@
 
 (in-package :rlgl-parsers)
 
-;;; MVP Tripwire Results report parser
+;;; Tripwire Results report parser
 
 ;; ----------------------------------------------------------------------------
 
@@ -75,21 +75,17 @@
     tests))
 
 (defmethod parse-report ((parser parser/tripwire-pdf) doc)
-  (let* ((base-filename (format nil "/tmp/temp-~A"
-                                (generate-random-string)))
-         (pdf-filename (concatenate 'string base-filename ".pdf"))
-         (txt-filename (concatenate 'string base-filename ".txt")))
-    (unwind-protect
-         (progn
-           (with-open-file (stream pdf-filename
-                                   :direction :output
-                                   :if-exists :supersede
-                                   :if-does-not-exist :create
-                                   :element-type '(unsigned-byte 8))
-             (write-sequence doc stream))
-           (inferior-shell:run
-            (format nil "pdftotext ~A ~A" pdf-filename txt-filename))
-           (parse-tripwire-text (alexandria:read-file-into-string
-                                  txt-filename :external-format :latin-1)))
-      (uiop:delete-file-if-exists pdf-filename)
-      (uiop:delete-file-if-exists txt-filename))))
+  (tmpdir:with-tmpdir (tmpdir)
+    (let* ((base-filename (str:concat tmpdir "/" (generate-random-string)))
+           (pdf-filename (str:concat base-filename ".pdf"))
+           (txt-filename (str:concat base-filename ".txt")))
+      (with-open-file (stream pdf-filename
+                              :direction :output
+                              :if-exists :supersede
+                              :if-does-not-exist :create
+                              :element-type '(unsigned-byte 8))
+        (write-sequence doc stream))
+      (inferior-shell:run
+       (str:concat "pdftotext " pdf-filename " " txt-filename))
+      (parse-tripwire-text (alexandria:read-file-into-string
+                            txt-filename :external-format :latin-1)))))

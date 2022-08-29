@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2021, 2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -33,5 +33,5 @@
                (:file "oscap-xccdf")
                (:file "popeye")
                (:file "tripwire-pdf"))
-  :depends-on (:cl-json :plump :lquery :flexi-streams
+  :depends-on (:cl-json :plump :lquery :flexi-streams :tmpdir
                :str :cxml :quri :cl-csv :rlgl-util :inferior-shell))
