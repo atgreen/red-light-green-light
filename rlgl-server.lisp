@@ -412,7 +412,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      </ul>
      <br/>
      <h4>API Keys</h4>
-     Get your personal API key by <a href="/get-api-key?idp=github" >clicking here</a>.
+     Get your personal API key by signing in through <a href="/get-api-key?idp=github" >GitHub</a> or <a href="/get-api-key?idp=google" >Google</a>.
      <br/>
      <br/>
      <h4>Public Signing Key</h4>
@@ -550,20 +550,11 @@ token claims and token header"
                </page-template>)))))
          (let ((redirect-url
                (let ((idp (string-downcase idp)))
-                 (log:info idp)
-                 (log:info (find idp '("github") :test 'equal))
-	      (format t "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
+	         (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
 		      *keycloak-oidc-realm-redirect-uri*
 		      *keycloak-oidc-client-id*
 		      *server-uri*
-                      (if (find idp '("github") :test 'equal)
-                        (format nil "&kc_idp_hint=~A" idp)
-                        ""))
-	      (format nil "~A/protocol/openid-connect/auth?client_id=~A&redirect_uri=~A/get-api-key&response_type=code&scope=openid%20profile%20email~A"
-		      *keycloak-oidc-realm-redirect-uri*
-		      *keycloak-oidc-client-id*
-		      *server-uri*
-                      (if (find idp '("github") :test 'equal)
+                      (if (find idp '("github" "google") :test 'equal)
                         (format nil "&kc_idp_hint=~A" idp)
                         "")))))
 	(log:info redirect-url)
