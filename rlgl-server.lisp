@@ -652,6 +652,17 @@ token claims and token header"
        (str:substring 0 (- (length id-string) 5) id-string)
        nil)))
 
+(defun missing-doc ()
+  (markup:write-html
+   <page-template title="Red Light Green Light">
+     <div style="width:100px">
+       <div class="rlgl-svg" />
+     </div>
+     <h1 class="mt-5" >This document appears to be missing.</h1>
+     <br/>
+     <br/>
+   </page-template>))
+
 (snooze:defroute doc (:get :text/html &key id)
   "Delete this eventually."
   (track-action "doc" :url (format nil "/doc?id=~A" id))
@@ -667,13 +678,7 @@ token claims and token header"
                                    :external-format :utf-8)
                       (error (c)
                         (log:error "~A" c)
-                        (markup:write-html
-                         <page-template title="Red Light Green Light">
-                           <div style="width:100px">
-                             <div class="rlgl-svg" /> </div>
-                           <h1 class="mt-5">This document appears to be missing.</h1>
-                           <br />
-                         </page-template>)))))
+                        (missing-doc)))))
               (if (str:starts-with? "<" report)
                                        report
                                        (format nil "<html><pre>~A</pre></html>" report)))))))
@@ -685,8 +690,7 @@ token claims and token header"
                  :external-format :utf-8)
     (error (c)
       (log:error "~A" c)
-      (alexandria:read-file-into-string
-       (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))
+      (missing-doc))))
 
 (snooze:defroute doc-text (:get :text/plain &key id)
   (track-action "doc-text" :url (format nil "/doc-text?id=~A" id))
@@ -698,8 +702,7 @@ token claims and token header"
                      :external-format :utf-8)
         (error (c)
           (log:error "~A" c)
-          (alexandria:read-file-into-string
-           (rlgl-util:make-absolute-pathname "missing-doc.html") :external-format :latin-1))))))
+          (missing-doc))))))
 
 (snooze:defroute doc-pdf (:get :application/pdf &key id)
   (track-action "doc-pdf" :url (format nil "/doc-pdf?id=~A" id))
