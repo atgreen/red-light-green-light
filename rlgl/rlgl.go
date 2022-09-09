@@ -295,6 +295,8 @@ func main() {
 	var title string
 	var config Config
 
+        labels := cli.NewStringSlice()
+
 	cfgPath, cfgExists := getConfigPath()
 	if !cfgExists {
 		config.Write(cfgPath)
@@ -640,6 +642,12 @@ func main() {
 					Usage:       "player ID",
 					Destination: &player,
 				},
+				&cli.StringSliceFlag{
+					Name:        "label",
+                                        Value:       labels,
+                                        Aliases:     []string{"l"},
+					Usage:       "set label `KEY=VALUE`",
+				},
 				&cli.StringFlag{
 					Name:        "title",
 					Value:       "",
@@ -649,6 +657,12 @@ func main() {
 			},
 
 			Action: func(c *cli.Context) error {
+
+				labels := make(map[string]string)
+                                for _, s := range c.StringSlice("label") {
+                                    x := strings.Split(s, "=")
+                                    labels[x[0]] = x[1]
+                                    }
 
 				if (config.Host == "") || (config.Key == "") {
 					exitErr(fmt.Errorf("Login to server first"))
@@ -680,7 +694,8 @@ func main() {
 				}
 				defer f.Close()
 
-				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n}
+                                labelsValue, _ := json.Marshal(labels);
+				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n, "labels": string(labelsValue)}
 				if title != "" {
 					values["title"] = title
 				}
