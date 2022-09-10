@@ -447,26 +447,27 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 
 (defun base64-decode (base-64-string)
   "Takes a base64-uri string and return an array of octets"
-  (flet ((round-up-by-4 (n)
-           (let ((r (rem n 4)))
-             (if (> r 0)
-                 (- 4 r)
-                 0))))
-     ;; Re-pad the string, or CL-BASE64 will get confused
-    (let ((s (concatenate 'string
-                          base-64-string
-                          (make-array (round-up-by-4 (length base-64-string))
-                                      :element-type 'character
-                                      :initial-element #\.))))
-      (cl-base64:base64-string-to-usb8-array s :uri t))))
+  (let ((base-64-string (remove #\= base-64-string)))
+    (flet ((round-up-by-4 (n)
+             (let ((r (rem n 4)))
+               (if (> r 0)
+                   (- 4 r)
+                   0))))
+      ;; Re-pad the string, or CL-BASE64 will get confused
+      (let ((s (concatenate 'string
+                             base-64-string
+                             (make-array (round-up-by-4 (length base-64-string))
+                                         :element-type 'character
+                                         :initial-element #\.))))
+        (cl-base64:base64-string-to-usb8-array s :uri t)))))
 
 (snooze:defroute report-log (:get :text/plain &key id labels)
   ;;  (authorize)
   (track-action "log")
-  (log:info labels)
-  (log:info (quri:url-decode labels))
-  (log:info (base64-decode (quri:url-decode labels)))
-  (rlgl.db:report-log *db* *server-uri* id))
+  (rlgl.db:report-log *db* *server-uri* id
+                      (json:decode-json-from-string
+                       (flexi-streams:octets-to-string
+                        (base64-decode (quri:url-decode labels))))))
 
 (defun decode-jwt (jwt-string)
   "Decodes a JSON Web Token. Returns two alists,

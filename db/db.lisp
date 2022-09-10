@@ -55,7 +55,8 @@
         (dbi:do-sql connection (format nil "insert into labels(report, key, value) values ('~A', '~A', '~A');" report
                                        (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
 
-(defmethod report-log ((db db-backend) server-uri player)
+(defmethod report-log ((db db-backend) server-uri player labels)
+  (print labels)
   (let* ((query (dbi:prepare (connect-cached db)
 			     (format nil "select unixtimestamp, colour, version, report, client_signature from log where id = '~A';" player)))
 	 (result (dbi:execute query))
