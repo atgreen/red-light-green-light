@@ -153,5 +153,5 @@
   (dbi:do-sql (connect-cached db)
     (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy))
   (dbi:do-sql (connect-cached db)
-    (format nil "insert into users(user_uuid, created_at) values ('~A', ~A);" api-key (local-time:timestamp-to-unix (local-time:now))))
+    (format nil "insert into users(user_uuid, created_at) values ('~A', ~A) on conflict do nothing;" api-key (local-time:timestamp-to-unix (local-time:now))))
   api-key)
