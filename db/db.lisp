@@ -55,23 +55,54 @@
         (dbi:do-sql connection (format nil "insert into labels(report, key, value) values ('~A', '~A', '~A');" report
                                        (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
 
+#|
+(ql:quickload :fset)
+(defvar s1 (fset:set "A" "B"))
+(defvar s2 (fset:set "B" "D"))
+(defvar s3 (fset:set "X" "B"))
+(fset:reduce #'fset:intersection (list s1 s2 s3))
+(fset:reduce #'fset:intersection (list s1))
+(fset:set '(1 2 3))
+(fset:convert 'fset:set '(1 2 3))
+(ql:quickload :dbi)
+(ql:quickload :local-time)
+|#
+
 (defmethod report-log ((db db-backend) server-uri player labels)
   (print labels)
-  (let* ((query (dbi:prepare (connect-cached db)
-			     (format nil "select unixtimestamp, colour, version, report, client_signature from log where id = '~A';" player)))
-	 (result (dbi:execute query))
-	 (fstr (make-array '(0) :element-type 'base-char
-                           :fill-pointer 0 :adjustable t)))
-      (with-output-to-string (s fstr)
-	(loop for row = (dbi:fetch result)
-	      while row
-	      do (destructuring-bind (j1 time j2 result j3 version j4 report j5 client-signature)
-		     row
-		   (local-time:format-timestring
-		    s (local-time:unix-to-timestamp time)
-		    :format local-time:+rfc-1123-format+)
-		   (format s ": ~A [~5A] ~A/doc?id=~A ~A~%" result version server-uri report client-signature)))
-	fstr)))
+  (let* ((connection (connect-cached db))
+         (report-sets (mapcar (lambda (kv)
+                                (let* ((query (dbi:prepare (connection)
+                                                           (format nil "select report from labels where key = '~A' and value = '~A'"
+                                                                   (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv)))))
+                                       (result (dbi:execute query))
+                                       (reports (loop for row = (dbi:fetch result)
+                                                      while row
+                                                      collect (destructuring-bind (j1 report)
+                                                                  row
+                                                                report))))
+                                  (fset:convert 'fset:set reports)))
+                              labels))
+         (reports (if (eq (length report-sets) 1)
+                      (car report-sets)
+                      (fset:reduce #'fset:intersection report-sets)))
+         (fstr (make-array '(0) :element-type 'base-char
+                                :fill-pointer 0 :adjustable t)))
+
+    (with-output-to-string (s fstr)
+      (fset:do-set (report reports)
+        (let* ((query (dbi:prepare (connect-cached db)
+			           (format nil "select unixtimestamp, colour, version, client_signature from log where report = '~A';" report)))
+	       (result (dbi:execute query)))
+	  (loop for row = (dbi:fetch result)
+	        while row
+	        do (destructuring-bind (j1 time j2 result j3 version j4 client-signature)
+		       row
+		     (local-time:format-timestring
+		      s (local-time:unix-to-timestamp time)
+		      :format local-time:+rfc-1123-format+)
+		     (format s ": ~A [~5A] ~A/doc?id=~A ~A~%" result version server-uri report client-signature))))))
+    fstr))
 
 (defmethod find-signature-by-report ((db db-backend) report)
   (let* ((query (dbi:prepare (connect-cached db)
