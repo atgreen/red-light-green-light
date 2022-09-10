@@ -446,11 +446,23 @@ func main() {
 					Usage:       "player ID",
 					Destination: &player,
 				},
+				&cli.StringSliceFlag{
+					Name:        "label",
+                                        Value:       labels,
+                                        Aliases:     []string{"l"},
+					Usage:       "set label `KEY=VALUE`",
+				},
 			},
 
 			Action: func(c *cli.Context) error {
 
-				if config.Host == "" {
+				labels := make(map[string]string)
+                                for _, s := range c.StringSlice("label") {
+                                    x := strings.Split(s, "=")
+                                    labels[x[0]] = x[1]
+                                    }
+
+                                if config.Host == "" {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
 
@@ -466,7 +478,8 @@ func main() {
 
 				setProxy(config.Proxy, config.ProxyAuth)
 
-				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"", config.Host, player))
+                                labelsValue, _ := json.Marshal(labels);
+				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"&labels=\"%s\"", config.Host, player, base64.StdEncoding.EncodeToString([]byte(string(labelsValue)))))
 
 				if err != nil {
 					exitErr(err)

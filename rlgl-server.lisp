@@ -445,7 +445,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (setq *server-uri* (alexandria:read-file-into-string #p"/tmp/server-uri")))
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
-(snooze:defroute report-log (:get :text/plain &key id)
+(snooze:defroute report-log (:get :text/plain &key id labels)
   ;;  (authorize)
   (track-action "log")
   (rlgl.db:report-log *db* *server-uri* id))
