@@ -445,11 +445,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (setq *server-uri* (alexandria:read-file-into-string #p"/tmp/server-uri")))
   (format nil "rlgl-server connected -- version ~A" +rlgl-version+))
 
-(snooze:defroute report-log (:get :text/plain &key id labels)
-  ;;  (authorize)
-  (track-action "log")
-  (rlgl.db:report-log *db* *server-uri* id))
-
 (defun base64-decode (base-64-string)
   "Takes a base64-uri string and return an array of octets"
   (flet ((round-up-by-4 (n)
@@ -464,6 +459,14 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                       :element-type 'character
                                       :initial-element #\.))))
       (cl-base64:base64-string-to-usb8-array s :uri t))))
+
+(snooze:defroute report-log (:get :text/plain &key id labels)
+  ;;  (authorize)
+  (track-action "log")
+  (log:info labels)
+  (log:info (quri:url-decode labels))
+  (log:info (base64-decode (quri:url-decode labels)))
+  (rlgl.db:report-log *db* *server-uri* id))
 
 (defun decode-jwt (jwt-string)
   "Decodes a JSON Web Token. Returns two alists,

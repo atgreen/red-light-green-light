@@ -479,7 +479,7 @@ func main() {
 				setProxy(config.Proxy, config.ProxyAuth)
 
                                 labelsValue, _ := json.Marshal(labels);
-				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"&labels=\"%s\"", config.Host, player, base64.StdEncoding.EncodeToString([]byte(string(labelsValue)))))
+				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"&labels=\"%s\"", config.Host, player, url.QueryEscape(base64.StdEncoding.EncodeToString([]byte(string(labelsValue))))))
 
 				if err != nil {
 					exitErr(err)
