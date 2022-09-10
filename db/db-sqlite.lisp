@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -29,7 +29,7 @@
     :initform nil
     :reader fresh))
   (:default-initargs
-   :sql-insert-log-statement "insert into log(id, version, colour, report, signature, client_signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', '~A', strftime('%s','now'));"
+   :sql-insert-log-statement "insert into log(version, colour, report, signature, client_signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', '~A', strftime('%s','now'));"
    :filename (error "Must supply a filename.")))
 
 (defmethod initialize-instance :after ((db db/sqlite) &key)

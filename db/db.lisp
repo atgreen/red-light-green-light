@@ -40,19 +40,24 @@
 
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
-	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, client_signature char(140) not null, unixtimestamp integer);"
+	  '("create table if not exists log (version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, client_signature char(140) not null, unixtimestamp integer);"
 	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
-            "create table if not exists labels (report char(13), key varchar(64), value varchar(256));"
-	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
+            "create table if not exists labels (puk integer, report char(13), key varchar(64), value varchar(256));"
+	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))
 
-(defmethod record-log ((db db-backend) version result report signature client-signature labels)
+    ;; Hardcode our first policy bound API key
+    (register-policy-bound-api-key db "0LIBFFI-0LIBFFI-0LIBFFI-0LIBFFI" "https://github.com/libffi/libffi")))
+
+(defmethod record-log ((db db-backend) api-key version result report signature client-signature labels)
   (let ((stmt (format nil (sql-insert-log-statement db)
-		      "XXX" version result report signature client-signature)))
+		      version result report signature client-signature)))
     (log:info stmt)
     (let ((connection (connect-cached db)))
       (dbi:do-sql connection stmt)
       (dolist (kv labels)
-        (dbi:do-sql connection (format nil "insert into labels(report, key, value) values ('~A', '~A', '~A');" report
+        (dbi:do-sql connection (format nil "insert into labels(puk, report, key, value) values ('~A', '~A', '~A', '~A');"
+                                       report
+                                       (find-puk-by-api-key db api-key)
                                        (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
 
 (defmethod report-log ((db db-backend) server-uri labels)
@@ -148,5 +153,6 @@
 
 (defmethod register-policy-bound-api-key ((db db-backend) api-key policy)
   (dbi:do-sql (connect-cached db)
-    (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy))
+    (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy)
+    (format nil "insert into users(api_key, created_at) values ('~A', ~A);" api-key (local-time:timestamp-to-unix (local-time:now))))
   api-key)

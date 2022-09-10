@@ -266,7 +266,9 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
       ;; Make sure that it is a bearer token
       (if (and (equalp token-type "Bearer")
                (rlgl.api-key:authorize-by-api-key *db* token-string))
-          (track-action "authorize" :api-key token-string)
+          (progn
+            (track-action "authorize" :api-key token-string)
+            token-string)
           (error "Authorization error")))))
 
 (defun authorize-policy-bound-api-key (policy-name)
@@ -277,9 +279,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
            (token-type (first token-type-and-value))
            (token-string (second token-type-and-value)))
       ;; Make sure that it is a bearer token
-      (unless (and (equalp token-type "Bearer")
-                   (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
-        (error "Authorization error")))))
+      (if (and (equalp token-type "Bearer")
+               (rlgl.api-key:authorize-by-policy-bound-api-key *db* token-string policy-name))
+          token-string
+          (error "Authorization error")))))
 
 ;; ----------------------------------------------------------------------------
 ;; API routes
@@ -433,10 +436,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <br/>
    </page-template>))
 
-(snooze:defroute start (:get :text/plain)
-  (authorize)
-  (rlgl-util:random-hex-string))
-
 (snooze:defroute login (:get :text/plain)
   (track-action "login" :url "/login")
   ;; Special hack -- reset *server-uri* as this may have changed
@@ -565,8 +564,8 @@ token claims and token header"
 	(hunchentoot:redirect redirect-url))))
 
 (defun do-evaluate ()
-  (authorize)
-  (handler-case
+  (let ((api-key (authorize)))
+    (handler-case
       (let ((json-string
 	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
 	(log:info "evaluate: '~A'" json-string)
@@ -607,7 +606,7 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
- 			                              (rlgl.db:record-log *db* (version policy) red-or-green ref doc-digest-signature signature labels)
+ 			                              (rlgl.db:record-log *db* api-key (version policy) red-or-green ref doc-digest-signature signature labels)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (rekor-envelope doc-digest doc-digest-signature)))
                                        (callback-id (rlgl-util:random-hex-string)))
@@ -623,7 +622,7 @@ token claims and token header"
     (error (c)
       (log:error "~A" c)
       (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
-      (format nil "ERROR: ~A~%" c))))
+      (format nil "ERROR: ~A~%" c)))))
 
 (defun do-upload ()
   (authorize)
@@ -970,6 +969,9 @@ token claims and token header"
 					    (get-config-value "postgresql-password"))
 			      :host (get-config-value "postgresql-host")
 			      :port (get-config-value "postgresql-port"))))))
+
+    ;; Do this once
+    (initialize-instance db)
 
     (log:info "About to initialize storage")
 
