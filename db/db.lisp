@@ -58,7 +58,7 @@
 (defmethod report-log ((db db-backend) server-uri labels)
   (let* ((connection (connect-cached db))
          (report-sets (mapcar (lambda (kv)
-                                (let* ((query (dbi:prepare (connection)
+                                (let* ((query (dbi:prepare connection
                                                            (format nil "select report from labels where key = '~A' and value = '~A'"
                                                                    (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv)))))
                                        (result (dbi:execute query))
