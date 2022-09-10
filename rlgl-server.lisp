@@ -568,6 +568,7 @@ token claims and token header"
 	(log:info "evaluate: '~A'" json-string)
 	(let ((json (json:decode-json-from-string json-string)))
 	  (let ((policy-name (cdr (assoc :POLICY json)))
+                (labels (json:decode-json-from-string (or (cdr (assoc :LABELS json)) "{}")))
 		(player (cdr (assoc :ID json))))
 	    (cond
 	      ((null policy-name)
@@ -605,7 +606,7 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
- 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature signature)
+ 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature signature labels)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (rekor-envelope doc-digest doc-digest-signature)))
                                        (callback-id (rlgl-util:random-hex-string)))

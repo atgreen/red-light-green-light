@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL.DB; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2022  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -35,19 +35,25 @@
 	      (dbi:do-sql dbc command))
 	    '("drop table if exists log;"
 	      "drop table if exists users;"
+              "drop table if exists labels;"
 	      "drop table if exists api_keys;")))
 
     (mapc (lambda (command)
 	    (dbi:do-sql dbc command))
 	  '("create table if not exists log (id char(12), version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, client_signature char(140) not null, unixtimestamp integer);"
 	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
+            "create table if not exists labels (id char(12), key varchar(64), value varchar(256));"
 	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
-(defmethod record-log ((db db-backend) player version result report signature client-signature)
+(defmethod record-log ((db db-backend) player version result report signature client-signature labels)
   (let ((stmt (format nil (sql-insert-log-statement db)
 		      player version result report signature client-signature)))
     (log:info stmt)
-    (dbi:do-sql (connect-cached db) stmt)))
+    (let ((connection (connect-cached db)))
+      (dbi:do-sql connection stmt)
+      (dolist (kv labels)
+        (dbi:do-sql connection "insert into labels(id, key, value) values ('~A', '~A', '~A');" report
+          (str:substring 0 64 (car kv)) (str:substring 0 256 (cdr kv)))))))
 
 (defmethod report-log ((db db-backend) server-uri player)
   (let* ((query (dbi:prepare (connect-cached db)
