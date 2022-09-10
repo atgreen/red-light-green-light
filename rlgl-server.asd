@@ -36,7 +36,7 @@
                :cxml :cl-dbi :cl-date-time-parser :quri
 	       :local-time :cl-csv :prometheus :cl-postgres
 	       :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
-	       :drakma :uuid :cl-base32
+	       :drakma :uuid :cl-base32 :fset
 	       :split-sequence :thread-pool
 	       :prometheus.formats.text
 	       :prometheus.exposers.hunchentoot
