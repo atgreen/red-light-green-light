@@ -153,6 +153,7 @@
 
 (defmethod register-policy-bound-api-key ((db db-backend) api-key policy)
   (dbi:do-sql (connect-cached db)
-    (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy)
+    (format nil "insert into policy_bound_api_keys(api_key, policy) values ('~A', '~A');" api-key policy))
+  (dbi:do-sql (connect-cached db)
     (format nil "insert into users(api_key, created_at) values ('~A', ~A);" api-key (local-time:timestamp-to-unix (local-time:now))))
   api-key)
