@@ -973,6 +973,9 @@ token claims and token header"
     ;; Do this once
     (initialize-instance db)
 
+    ;; Hardcode our first policy bound API key
+    (register-policy-bound-api-key db "0LIBFFI-0LIBFFI-0LIBFFI-0LIBFFI" "https://github.com/libffi/libffi")))
+
     (log:info "About to initialize storage")
 
     ;; Define the storage backend.

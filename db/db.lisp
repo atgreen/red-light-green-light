@@ -43,10 +43,7 @@
 	  '("create table if not exists log (version char(40), colour varchar(6), report varchar(24) not null, signature char(140) not null, client_signature char(140) not null, unixtimestamp integer);"
 	    "create table if not exists policy_bound_api_keys (api_key char(31) not null, policy varchar(256) not null);"
             "create table if not exists labels (puk integer, report char(13), key varchar(64), value varchar(256));"
-	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))
-
-    ;; Hardcode our first policy bound API key
-    (register-policy-bound-api-key db "0LIBFFI-0LIBFFI-0LIBFFI-0LIBFFI" "https://github.com/libffi/libffi")))
+	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
 (defmethod record-log ((db db-backend) api-key version result report signature client-signature labels)
   (let ((stmt (format nil (sql-insert-log-statement db)
