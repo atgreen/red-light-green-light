@@ -461,10 +461,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                                          :initial-element #\.))))
         (cl-base64:base64-string-to-usb8-array s :uri t)))))
 
-(snooze:defroute report-log (:get :text/plain &key id labels)
+(snooze:defroute report-log (:get :text/plain &key labels)
   ;;  (authorize)
   (track-action "log")
-  (rlgl.db:report-log *db* *server-uri* id
+  (rlgl.db:report-log *db* *server-uri*
                       (json:decode-json-from-string
                        (flexi-streams:octets-to-string
                         (base64-decode (quri:url-decode labels))))))
@@ -572,15 +572,12 @@ token claims and token header"
 	(log:info "evaluate: '~A'" json-string)
 	(let ((json (json:decode-json-from-string json-string)))
 	  (let ((policy-name (cdr (assoc :POLICY json)))
-                (labels (json:decode-json-from-string (or (cdr (assoc :LABELS json)) "{}")))
-		(player (cdr (assoc :ID json))))
+                (labels (json:decode-json-from-string (or (cdr (assoc :LABELS json)) "{}"))))
 	    (cond
 	      ((null policy-name)
 	       (error "POLICY missing"))
 	      ((not (rlgl-util:valid-url? policy-name))
 	       (error "POLICY not a valid URL"))
-	      ((null player)
-	       (error "ID missing"))
 	      (t
 	       (authorize-policy-bound-api-key policy-name)
 	       (let* ((policy (make-policy policy-name))
@@ -610,7 +607,7 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
- 			                              (rlgl.db:record-log *db* player (version policy) red-or-green ref doc-digest-signature signature labels)
+ 			                              (rlgl.db:record-log *db* (version policy) red-or-green ref doc-digest-signature signature labels)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (rekor-envelope doc-digest doc-digest-signature)))
                                        (callback-id (rlgl-util:random-hex-string)))

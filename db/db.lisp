@@ -45,9 +45,9 @@
             "create table if not exists labels (report char(13), key varchar(64), value varchar(256));"
 	    "create table if not exists api_keys (puk integer, api_key char(31) not null);"))))
 
-(defmethod record-log ((db db-backend) player version result report signature client-signature labels)
+(defmethod record-log ((db db-backend) version result report signature client-signature labels)
   (let ((stmt (format nil (sql-insert-log-statement db)
-		      player version result report signature client-signature)))
+		      "XXX" version result report signature client-signature)))
     (log:info stmt)
     (let ((connection (connect-cached db)))
       (dbi:do-sql connection stmt)
@@ -55,21 +55,7 @@
         (dbi:do-sql connection (format nil "insert into labels(report, key, value) values ('~A', '~A', '~A');" report
                                        (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
 
-#|
-(ql:quickload :fset)
-(defvar s1 (fset:set "A" "B"))
-(defvar s2 (fset:set "B" "D"))
-(defvar s3 (fset:set "X" "B"))
-(fset:reduce #'fset:intersection (list s1 s2 s3))
-(fset:reduce #'fset:intersection (list s1))
-(fset:set '(1 2 3))
-(fset:convert 'fset:set '(1 2 3))
-(ql:quickload :dbi)
-(ql:quickload :local-time)
-|#
-
-(defmethod report-log ((db db-backend) server-uri player labels)
-  (print labels)
+(defmethod report-log ((db db-backend) server-uri labels)
   (let* ((connection (connect-cached db))
          (report-sets (mapcar (lambda (kv)
                                 (let* ((query (dbi:prepare (connection)

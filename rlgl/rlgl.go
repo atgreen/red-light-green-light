@@ -287,7 +287,6 @@ func loadPrivateKey(cfgdir string) (*ecdsa.PrivateKey, error) {
 
 func main() {
 	var policy string
-	var player string
 	var key string
 	var proxy string
 	var proxyauth string
@@ -399,53 +398,9 @@ func main() {
 			},
 		},
 		{
-			Name:    "start",
-			Aliases: []string{"s"},
-			Usage:   "create a Player ID",
-			Action: func(c *cli.Context) error {
-
-				if (config.Host == "") || (config.Key == "") {
-					exitErr(fmt.Errorf("Login to server first"))
-				}
-
-				setProxy(config.Proxy, config.ProxyAuth)
-
-				var bearer = "Bearer " + config.Key
-
-				req, err := http.NewRequest("GET", fmt.Sprintf("%s/start", config.Host), nil)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				req.Header.Add("Authorization", bearer)
-
-				// Send req using http Client
-				client := &http.Client{}
-				resp, err := client.Do(req)
-				if err != nil {
-					exitErr(err)
-				} else {
-					defer resp.Body.Close()
-					responseData, err := ioutil.ReadAll(resp.Body)
-					if err != nil {
-						log.Fatal(err)
-					}
-					fmt.Println(string(responseData))
-				}
-
-				return nil
-			},
-		},
-		{
 			Name:  "log",
 			Usage: "log evaluations",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:        "id",
-					Value:       "",
-					Usage:       "player ID",
-					Destination: &player,
-				},
 				&cli.StringSliceFlag{
 					Name:        "label",
                                         Value:       labels,
@@ -466,12 +421,6 @@ func main() {
 					exitErr(fmt.Errorf("Login to server first"))
 				}
 
-				if player == "" {
-					exitErr(fmt.Errorf("Missing player ID"))
-				}
-
-				// TODO: validate ID is a hex number
-
 				if c.NArg() != 0 {
 					exitErr(fmt.Errorf("Too many arguments"))
 				}
@@ -479,7 +428,7 @@ func main() {
 				setProxy(config.Proxy, config.ProxyAuth)
 
                                 labelsValue, _ := json.Marshal(labels);
-				response, err := http.Get(fmt.Sprintf("%s/report-log?id=\"%s\"&labels=\"%s\"", config.Host, player, url.QueryEscape(base64.StdEncoding.EncodeToString([]byte(string(labelsValue))))))
+				response, err := http.Get(fmt.Sprintf("%s/report-log?labels=\"%s\"", config.Host, url.QueryEscape(base64.StdEncoding.EncodeToString([]byte(string(labelsValue))))))
 
 				if err != nil {
 					exitErr(err)
@@ -649,12 +598,6 @@ func main() {
 					Usage:       "evaluation policy",
 					Destination: &policy,
 				},
-				&cli.StringFlag{
-					Name:        "id",
-					Value:       "",
-					Usage:       "player ID",
-					Destination: &player,
-				},
 				&cli.StringSliceFlag{
 					Name:        "label",
                                         Value:       labels,
@@ -685,10 +628,6 @@ func main() {
 					exitErr(fmt.Errorf("Missing policy"))
 				}
 
-				if player == "" {
-					exitErr(fmt.Errorf("Missing player ID"))
-				}
-
 				if c.NArg() == 0 {
 					exitErr(fmt.Errorf("Missing report"))
 				}
@@ -708,7 +647,7 @@ func main() {
 				defer f.Close()
 
                                 labelsValue, _ := json.Marshal(labels);
-				values := map[string]string{"policy": policy, "id": player, "name": name, "ref": n, "labels": string(labelsValue)}
+				values := map[string]string{"policy": policy, "name": name, "ref": n, "labels": string(labelsValue)}
 				if title != "" {
 					values["title"] = title
 				}
