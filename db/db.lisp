@@ -52,8 +52,8 @@
     (let ((connection (connect-cached db)))
       (dbi:do-sql connection stmt)
       (dolist (kv labels)
-        (dbi:do-sql connection "insert into labels(id, key, value) values ('~A', '~A', '~A');" report
-          (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv)))))))
+        (dbi:do-sql connection (format nil "insert into labels(id, key, value) values ('~A', '~A', '~A');" report
+                                       (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
 
 (defmethod report-log ((db db-backend) server-uri player)
   (let* ((query (dbi:prepare (connect-cached db)
