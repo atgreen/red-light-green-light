@@ -975,7 +975,7 @@ token claims and token header"
 
     ;; Hardcode our first policy bound API key
     (rlgl.db:register-policy-bound-api-key
-     *db* "0LIBFFI-0LIBFFI-0LIBFFI-0LIBFFI" "https://github.com/libffi/libffi")
+     *db* "0LIBFFI-0LIBFFI-0LIBFFI-0LIBFFI" "https://github.com/libffi/rlgl-policy")
 
     (log:info "About to initialize storage")
 
