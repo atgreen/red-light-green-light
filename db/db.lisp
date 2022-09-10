@@ -36,6 +36,7 @@
 	    '("drop table if exists log;"
 	      "drop table if exists users;"
               "drop table if exists labels;"
+              "drop table if exists policy_bound_api_keys;"
 	      "drop table if exists api_keys;")))
 
     (mapc (lambda (command)
