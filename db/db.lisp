@@ -54,9 +54,10 @@
       (dbi:do-sql connection stmt)
       (dolist (kv labels)
         (dbi:do-sql connection (format nil "insert into labels(puk, report, key, value) values ('~A', '~A', '~A', '~A');"
-                                       report
                                        (find-puk-by-api-key db api-key)
-                                       (str:substring 0 64 (string (car kv))) (str:substring 0 256 (cdr kv))))))))
+                                       report
+                                       (str:substring 0 64 (string (car kv)))
+                                       (str:substring 0 256 (cdr kv))))))))
 
 (defmethod report-log ((db db-backend) server-uri labels)
   (let* ((connection (connect-cached db))

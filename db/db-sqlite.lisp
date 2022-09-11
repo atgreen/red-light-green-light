@@ -29,7 +29,7 @@
     :initform nil
     :reader fresh))
   (:default-initargs
-   :sql-insert-log-statement "insert into log(version, colour, report, signature, client_signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', '~A', strftime('%s','now'));"
+   :sql-insert-log-statement "insert into log(version, colour, report, signature, client_signature, unixtimestamp) values ('~A', '~A', '~A', '~A', '~A', strftime('%s','now'));"
    :filename (error "Must supply a filename.")))
 
 (defmethod initialize-instance :after ((db db/sqlite) &key)
