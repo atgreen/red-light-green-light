@@ -600,7 +600,8 @@ token claims and token header"
                                      (cdr (assoc :REF json)) processed-results
 			             (rlgl-parsers:title parser)
 			             (commit-url-format policy)
-                                     (rlgl-parsers:columns parser))
+                                     (rlgl-parsers:columns parser)
+                                     labels)
 		             (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
                                     (ref (store-document *storage-driver* doc-oc))
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
@@ -717,7 +718,7 @@ token claims and token header"
 (defparameter *unknown-matcher*
   (make-policy-matcher :kind :unknown))
 
-(defun render (stream doctype digest report-ref results title commit-url-format columns)
+(defun render (stream doctype digest report-ref results title commit-url-format columns labels)
   ;; We need to sort the results in order FAIL, XFAIL, and PASS, but
   ;; preserve order otherwise.
   (let ((fail nil)
@@ -756,6 +757,11 @@ token claims and token header"
             <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
               ,(format nil "Original Report (sha3-256: ~A)" digest)
             </a>
+            ,@(when labels
+                <table >
+                  ,@(dolist (label labels)
+                      <tr><td> ,(string (car label)) </td><td> ,(cdr label) </td></tr> )
+                </table > )
             <table class="fold-table" id="results" >
               <tr> ,@(mapcar (lambda (c)
                                <th> ,(string c) </th> )
