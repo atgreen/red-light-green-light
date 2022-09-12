@@ -759,8 +759,10 @@ token claims and token header"
             </a>
             ,@(when labels
                 <table >
+                  <markup:merge-tag>
                   ,@(dolist (label labels)
                       <tr><td> ,(string (car label)) </td><td> ,(cdr label) </td></tr> )
+                  </markup:merge-tag>
                 </table > )
             <table class="fold-table" id="results" >
               <tr> ,@(mapcar (lambda (c)
