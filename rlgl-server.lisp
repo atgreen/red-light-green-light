@@ -762,7 +762,7 @@ token claims and token header"
                <table>
                  <markup:merge-tag>
                  ,@(mapcar (lambda (label)
-                             <tr><td> ,(string (car label)) </td><td> ,(cdr label) </td></tr> )
+                             <tr><td> ,(json:lisp-to-camel-case (string (car label))) </td><td> ,(cdr label) </td></tr> )
                              labels)
                  </markup:merge-tag>
                </table> )
