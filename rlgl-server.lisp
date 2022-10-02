@@ -758,13 +758,14 @@ token claims and token header"
             <a href=(format nil "~A/doc-~A?id=~A" *server-uri* doctype report-ref) target="_blank" >
               ,(format nil "Original Report (sha3-256: ~A)" digest)
             </a>
-            ,@(when labels
-                <table>
-                  <markup:merge-tag>
-                  ,@(dolist (label labels)
-                      <tr><td> ,(string (car label)) </td><td> ,(cdr label) </td></tr> )
-                  </markup:merge-tag>
-                </table> )
+            ,(when labels
+               <table>
+                 <markup:merge-tag>
+                 ,@(mapcar (lambda (label)
+                             <tr><td> ,(string (car label)) </td><td> ,(cdr label) </td></tr> )
+                             labels)
+                 </markup:merge-tag>
+               </table> )
             <table class="fold-table" id="results" >
               <tr> ,@(mapcar (lambda (c)
                                <th> ,(string c) </th> )
