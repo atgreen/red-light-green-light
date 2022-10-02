@@ -607,6 +607,7 @@ token claims and token header"
                                     (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
                                (let ((doc-digest-signature (make-string-signature doc-digest)))
                                  (let ((callback-fn (lambda (signature)
+                                                      (log:info "About to record log")
  			                              (rlgl.db:record-log *db* api-key (version policy) red-or-green ref doc-digest-signature signature labels)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (rekor-envelope doc-digest doc-digest-signature)))
