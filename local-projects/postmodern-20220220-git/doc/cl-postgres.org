@@ -1,0 +1,764 @@
+#+TITLE: Cl-Postgres Reference Manual
+#+OPTIONS: num:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style.css" />
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
+#+OPTIONS: ^:nil
+
+The CL-postgres module implements a rather low-level interface for
+communicating with a PostgreSQL database server. It is part of the Postmodern
+library, but can be used separately.
+
+* Connecting
+  :PROPERTIES:
+  :CUSTOM_ID: connecting
+  :END:
+** class database-connection
+   :PROPERTIES:
+   :CUSTOM_ID: class-database-connection
+   :END:
+
+Representation of a database connection. Contains login information in order to be able to automatically re-establish a connection when it is somehow closed.
+#+begin_src lisp
+  (defclass database-connection ()
+    ((host :initarg :host :reader connection-host)
+     (port :initarg :port :reader connection-port)
+     (database :initarg :db :reader connection-db)
+     (user :initarg :user :reader connection-user)
+     (password :initarg :password :reader connection-password)
+     (use-ssl :initarg :ssl :reader connection-use-ssl)
+     (use-binary :initarg :binary :accessor connection-use-binary :initform nil)
+     (service :initarg :service :accessor connection-service)
+     (application-name :initarg :application-name :accessor connection-application-name)
+     (socket :initarg :socket :accessor connection-socket)
+     (meta :initform nil)
+     (available :initform t :accessor connection-available)
+     (parameters :accessor connection-parameters)
+     (timestamp-format :accessor connection-timestamp-format)))
+#+end_src
+
+** function open-database (database user password host &optional (port 5432) (use-ssl :no) (service "postgres")(application-name "") use-binary)
+   :PROPERTIES:
+   :CUSTOM_ID: function-open-databasec
+   :END:
+→ database-connection
+
+Create and open a connection for the specified server, database, and user.
+use-ssl may be :no, :try, :require, :yes, or :full
+- :try means if the server supports it
+- :require means use provided ssl certificate with no verification
+- :yes means verify that the server cert is issued by a trusted CA, but does not verify the server hostname
+- :full means expect a CA-signed cert for the supplied hostname and verify the server hostname
+
+If you set it to anything other than :no be sure to also load the CL+SSL library.
+When it is anything but :no, you must have the CL+SSL package loaded to initiate the connection.
+
+On SBCL and Clozure CL, the value :unix may be passed for host, in order to
+connect using a Unix domain socket instead of a TCP socket.
+
+Service defaults to "postgres".
+
+Application-name defaults to a blank string. If provided, Postgresl can use it to track applications with multiple connections.
+
+Use-binary defaults to nil. This relates to how Postmodern passes the parameters to Postgresql prepared queries. If you want to have cl-postgres pass integer, float or boolean parameters to Postgresql in binary format, then set this optional parameter to t.
+
+If a query to Postgresql does not have a table column which would allow Postgresql to determine the correct datatype and you do not specify differently, Postgresql will treat the parameters passed with a prepared query as text. The default cl-postgres connection will have results like the following examples:
+#+begin_src lisp
+  (defparameter *connect-spec* '("database_name" "user_name" "user_password" "localhost" 5432 :no "postgres" "some_app_name" nil))
+  (defmacro connect-now (&body body)
+    `(let ((connection (apply 'open-database *connect-spec*)))
+       (unwind-protect (progn ,@body)
+         (close-database connection))))
+
+  (connect-now
+   (prepare-query connection "test4" "select $1")
+   (exec-prepared connection "test4" '(42) 'list-row-reader))
+  (("42"))
+
+  (connect-now
+   (prepare-query connection "test4" "select $1")
+   (exec-prepared connection "test4" '(T) 'list-row-reader))
+  (("true"))
+
+  (connect-now
+   (prepare-query connection "test4" "select $1")
+   (exec-prepared connection "test4" '(nil) 'list-row-reader))
+  (("false"))
+#+end_src
+Still in the default setting, you can specify parameter type as so:
+#+begin_src lisp
+  (connect-now
+    (prepare-query connection "test1" "select $1::integer")
+    (exec-prepared connection "test1" '(42) 'list-row-reader))
+  ((42))
+
+  (connect-now
+    (prepare-query connection "test1" "select $1::float")
+    (exec-prepared connection "test1" '(42.53) 'list-row-reader))
+  ((42.53d0))
+
+  (connect-now
+    (prepare-query connection "test1" "select $1::boolean")
+    (exec-prepared connection "test1" '(T) 'list-row-reader))
+  ((T))
+
+  (connect-now
+    (prepare-query connection "test1" "select $1::boolean")
+    (exec-prepared connection "test1" '(nil) 'list-row-reader))
+  ((NIL))
+#+end_src
+Setting the use-binary slot in the database connection object to t (the last optional parameter) will allow you to pass parameters as binary BUT Postgresql insists on knowing the type of parameters you will be passing in a prepared query. If you do not pass a list of sample parameters, Postgresql will treat all parameters passed in the exec-prepared function required to be text and will throw an error, typically insufficient data left in message. Unlike Postmodern, cl-postgres does not keep a copy of prepared statements in the database connection object. Thus any error checking would require making a second call to Postgresql to find out what it has in the way of prepared statement parameters will lose any efficiency which would otherwise be gained by passing parameters in binary form.
+#+begin_src lisp
+    (setf *connect-spec* '("database_name" "user-name" "user-password" "localhost" 5432 :no "postgres" "some-app-name" t))
+
+  (connect-now
+   (prepare-query connection "test6" "select $1, $2, $3" '(1 nil 1.0))
+   (exec-prepared connection "test6" '(42 T 127.89) 'list-row-reader))
+((42 T 127.89))
+#+end_src
+The default for cl-postgres/Postmodern is to continue to pass parameters to Postgresql as text (not in binary format) in order to avoid breaking existing user code. If you want to pass parameters to Postgresql in binary format and want to set that up when you are making the database connection, the following examples may help. We continue the difference in the signatures (cl-postgres using optional parameters and postmodern using keyword parameters) because of the expected downstream breakage if we shifted cl-postgres:open-database to using keyword parameters.
+
+** function close-database (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-close-database
+   :END:
+
+Close a database connection. It is advisable to call this on connections when
+you are done with them. Otherwise the open socket will stick around until it
+is garbage collected, and no one will tell the database server that we are done
+with it.
+
+** function reopen-database (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-reopen-database
+   :END:
+
+Re-establish a database connection for a previously closed connection object.
+(Calling this on a connection that is still open is harmless.)
+
+** function database-open-p (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-open-p
+   :END:
+→ boolean
+
+Returns a boolean indicating whether the given connection is currently connected.
+
+** method connection-meta (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: method-conection-meta
+   :END:
+→ hash-table
+
+This method provides access to a hash table that is associated with the
+current database connection, and is used to store information about the
+prepared statements that have been parsed for this connection.
+
+** method connection-parameters (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: method-connection-parameters
+   :END:
+→ hash-table
+
+This method returns a mapping (string to string) containing all the
+configuration parameters for the connection.
+
+** variable =*unix-socket-dir*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-unix-socket-dir
+   :END:
+
+Directory where the Unix domain socket for PostgreSQL be found.
+
+On SBCL, when using the :unix keyword as host argument when creating a
+connection, this variable determines the directory in which CL-Postgres
+will look for the socket file.
+
+** variable =*ssl-certificate-file*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-ssl-certificate-file
+   :END:
+** variable =*ssl-key-file*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-ssl-key-files
+   :END:
+
+When using SSL (see open-database), these can be used to provide client key
+and certificate files. They can be either NIL, for no file, or a pathname.
+
+** variable =*on-evidence-of-man-in-the-middle-attack*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-on-evidence-of-man-in-the-middle-attack
+   :END:
+
+When establishing an SSL connection, Postmodern will check to see if unexpected extra data was received prior to the connection being encrypted. Unexpected extra data may indicate an attempted man-in-the-middle attack. By default, this variable is set to :error. You can set the response to be a simple warning (by setting this to :warn) or you can set this to :ignore.
+
+** variable =*retry-connect-times*= (5)
+   :PROPERTIES:
+   :CUSTOM_ID: variable-retry-connect-times
+   :END:
+
+How many times do we try to connect again. Borrowed from pgloader
+
+** variable =*retry-connect-delay*= (0.5)
+   :PROPERTIES:
+   :CUSTOM_ID: variable-retry-connect-delay
+   :END:
+
+How many seconds to wait before trying to connect again. Borrowed from pgloader
+
+** function wait-for-notification (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-wait-for-notification
+   :END:
+
+This function blocks until asynchronous notification is received on the connection. Retrun the channel string, the payload and notifying pid as multiple values. The PostgreSQL LISTEN command must be used to enable listening for notifications.
+
+** function get-postgresql-version (database-connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-postgresql-version
+   :END:
+This function returns the version of the connected postgresql instance as a string.
+
+** function postgresql-version-at-least (desired-version connection)
+   :PROPERTIES:
+   :CUSTOM_ID: function-postgresql-version-at-least
+   :END:
+
+Takes a postgresql version number which should be a string with the major and minor versions separated by a period e.g. '12.2' or '9.6.17'. Checks against the connection understanding of the running postgresql version and returns t if the running version is the requested version or newer.
+* Querying
+  :PROPERTIES:
+  :CUSTOM_ID: querying
+  :END:
+** function exec-query (database-connection query &optional (row-reader 'ignore-row-reader))
+   :PROPERTIES:
+   :CUSTOM_ID: function-exec-query
+   :END:
+→ result
+
+Sends the given query to the given connection, and interprets the results (if
+there are any) with the given row-reader. If the database returns information
+about the amount of rows affected, this is returned as a second value.
+
+Example:
+#+begin_src lisp
+  (exec-query connection "select 1" 'list-row-reader)
+  '((1))
+
+  (exec-query connection "select name from employees where id=3" 'list-row-reader)
+#+end_src
+
+** function prepare-query (database-connection name query)
+   :PROPERTIES:
+   :CUSTOM_ID: function-prepare-query
+   :END:
+
+Parse and plan the given query, and store it under the given name. Note that
+prepared statements are per-connection, so they can only be executed through
+the same connection that prepared them. Also note that while the Postmodern package
+will also stored the prepared query in the connection-meta slot of the connection, but
+cl-postgres prepare-query does not. If the name is an empty string, Postgresql will not
+store it as a reusable query.
+
+If parameters are not passed, Postgresql will assume the parameters will be text. In order to pass integer, float or boolean parameters as binary even when the database-connection is set to use binary parameters, you need to pass a list of parameters with the same
+type as you will be using when you call (exec-prepared).
+
+The following example shows preparing and executing a query that will accept a boolean parameter:
+#+begin_src lisp
+  (prepare-query connection "test-bool" "select $1" '(t))
+  (exec-prepared connection "test-bool" '(nil) 'list-row-reader)
+
+'((nil))
+#+end_src
+See also the discussion under open database with respect to the use-binary parameter.
+
+** function exec-prepared (database-connection name parameters &optional (row-reader 'ignore-row-reader))
+   :PROPERTIES:
+   :CUSTOM_ID: function-exec-prepared
+   :END:
+→ result
+
+Execute the prepared statement by the given name. Parameters should be given
+as a list. Each value in this list should be of a type that to-sql-string has
+been specialised on. (Byte arrays will be passed in their binary form,
+without being put through to-sql-string.) The result of the executing the
+statement, if any, is interpreted by the given row reader, and returned.
+Again, the number or affected rows is optionally returned as a second value.
+
+The following example shows preparing and executing a query that will accept an integer and a float in that order:
+#+begin_src lisp
+  (prepare-query connection "test-prepl" "select $1" '(10 7.4))
+  (exec-prepared connection "test-prep1" '(12 4.2) 'list-row-reader)
+
+'((nil))
+#+end_src
+
+** function unprepare-query (database-connection name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-unprepare-query
+   :END:
+
+Close the prepared query given by name by closing the session connection.
+Note: This is not the same as keeping the connection open and sending Postgresql query to deallocate the named prepared query. That can be done with the postmodern package's function:
+#+begin_src lisp
+(drop-prepared-statement (name &key (location :both) (database *database*)
+                                       (remove-function t))
+#+end_src
+
+** method to-sql-string (value)
+   :PROPERTIES:
+   :CUSTOM_ID: method-to-sql-string
+   :END:
+→ (values string needs-escaping)
+
+Convert a Lisp value to its textual unescaped SQL representation. Returns a
+second value indicating whether this value should be escaped if it is to be
+put directly into a query. Generally any string is going to be designated to be escaped.
+
+You can define to-sql-string methods for your own datatypes if you want to be
+able to pass them to exec-prepared. When a non-NIL second value is returned,
+this may be T to indicate that the first value should simply be escaped as a
+string, or a second string providing a type prefix for the value. (This is
+used by S-SQL.)
+
+** variable =*silently-truncate-ratios*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-silently-truncate-ratios
+   :END:
+
+Given a ratio, a stream and a digital-length-limit, if =*silently-truncate-ratios*= is true,
+will return a potentially truncated ratio. If false and the digital-length-limit is reached,
+it will throw an error noting the loss of precision and offering to continue or reset
+=*silently-truncate-ratios*= to true. Code contributed by Attila Lendvai.
+
+** variable =*query-log*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-query-log
+   :END:
+
+When debugging, it can be helpful to inspect the queries that are being sent
+to the database. Set this variable to an output stream value (=*standard-output*=,
+for example) to have CL-postgres log every query it makes.
+
+** variable =*query-callback*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-query-callback
+   :END:
+
+When profiling or debugging, the =*query-log*= may not give enough information,
+or reparsing its output may not be feasible. This variable may be set to a
+designator of function taking two arguments. This function will be then called
+after every query, and receive query string and internal time units (as in
+(CL:GET-INTERNAL-REAL-TIME)) spent in query as its arguments.
+
+Default value of this variable is 'LOG-QUERY, which takes care of =*QUERY-LOG*=
+processing. If you provide custom query callback and wish to keep =*QUERY-LOG*=
+functionality, you will have to call LOG-QUERY from your callback function
+
+** function log-query (query internal-time)
+   :PROPERTIES:
+   :CUSTOM_ID: function-log-query
+   :END:
+
+This function is default value of =*QUERY-CALLBACK*= and logs queries
+to =*QUERY-LOG*= if it is not NIL.
+
+* Reading values
+  :PROPERTIES:
+  :CUSTOM_ID: reading-values
+  :END:
+CL-postgres knows how to convert commonly used PostgreSQL data types to Lisp
+values. This table shows the mapping:
+
+| PostgreSQL	     | Lisp                       |
+| smallint	       | integer                    |
+| integer          | 	integer                  |
+| bigint	         | integer                    |
+| numeric	        | ratio                      |
+| real	           | float                      |
+| double precision | 	double-float             |
+| boolean	        | boolean                    |
+| varchar          | 	string                   |
+| text	           | string                     |
+| bytea	          | (vector (unsigned-byte 8)) |
+| array            | array                      |
+The mapping from PostgreSQL types (identified by OID numbers) to the functions
+that interpret them is kept in so-called SQL readtables. All types for which
+no reader is defined will be returned as string values containing their
+PostgreSQL representation.
+
+variable =*sql-readtable*=
+
+The exported special var holding the current read table, a hash
+mapping OIDs to instances of the type-interpreter class that contain
+functions for retreiving values from the database in text, and
+possible binary, form.
+
+For simple use, you will not have to touch this, but it is possible that code within a Lisp image
+requires different readers in different situations, in which case you can create separate read tables.
+
+** function copy-sql-readtable (table)
+   :PROPERTIES:
+   :CUSTOM_ID: function-copy-sql-readtable
+   :END:
+→ readtable
+
+Copies a given readtable.
+
+** function default-sql-readtable ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-default-sql-readtable
+   :END:
+→ readtable
+
+Returns the default readtable, containing only the readers defined by
+CL-postgres itself.
+
+** function set-sql-reader (oid function &key table binary-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-set-sql-reader
+   :END:
+
+Define a new reader for a given type. table defaults to =*sql-readtable*=.
+The reader function should take a single argument, a string, and transform
+that into some kind of equivalent Lisp value. When binary-p is true, the reader
+function is supposed to directly read the binary representation of the value.
+In most cases this is not recommended, but if you want to use it: provide a
+function that takes a binary input stream and an integer (the size of the
+value, in bytes), and reads the value from that stream. Note that reading
+less or more bytes than the given size will horribly break your connection.
+
+** function set-sql-datetime-readers (&key date timestamp timestamp-with-timezone time interval table)
+   :PROPERTIES:
+   :CUSTOM_ID: function-set-sql-datetime-readers
+   :END:
+
+Since there is no widely recognised standard way of representing dates and
+times in Common Lisp, and reading these from string representation is clunky
+and slow, this function provides a way to easily plug in binary readers for
+the date, time, timestamp, and interval types. It should be given functions
+with the following signatures:
+
+- :date (days)
+
+Where days is the amount of days since January 1st, 2000.
+
+- :timestamp (useconds)
+
+Timestamps have a microsecond resolution. Again, the zero point is the start
+of the year 2000, UTC.
+
+- :timestamp-with-timezone
+
+Like :timestamp, but for values of the 'timestamp with time zone' type (which
+PostgreSQL internally stores exactly the same as regular timestamps).
+
+- :time (useconds)
+
+Refers to a time of day, counting from midnight.
+
+- :interval (months days useconds)
+
+An interval is represented as several separate components. The reason that days
+and microseconds are separated is that you might want to take leap seconds into
+account.
+
+* Row readers
+  :PROPERTIES:
+  :CUSTOM_ID: row-readers
+  :END:
+Row readers are a way to read and group the results of queries. Roughly, they
+are functions that perform the iteration over the rows and cells in the
+result, and do something with the returned values.
+
+** macro row-reader ((fields) &body body)
+   :PROPERTIES:
+   :CUSTOM_ID: macro-row-reader
+   :END:
+→ function
+
+Creates a row-reader, using the given name for the variable. Inside the body
+this variable refers to a vector of field descriptions. On top of that, two
+local functions are bound, next-row and next-field. The first will start
+reading the next row in the result, and returns a boolean indicating whether
+there is another row. The second will read and return one field, and should
+be passed the corresponding field description from the fields argument as a
+parameter.
+
+A row reader should take care to iterate over all the rows in a result, and
+within each row iterate over all the fields. This means it should contain
+an outer loop that calls next-row, and every time next-row returns T it
+should iterate over the fields vector and call next-field for every field.
+
+The definition of list-row-reader should give you an idea what a row reader
+looks like:
+#+BEGIN_SRC lisp
+(row-reader (fields)
+  (loop :while (next-row)
+        :collect (loop :for field :across fields
+                       :collect (next-field field))))
+#+END_SRC
+
+Obviously, row readers should not do things with the database connection
+like, say, close it or start a new query, since it still reading out the
+results from the current query.
+
+** macro def-row-reader (name (fields) &body body)
+   :PROPERTIES:
+   :CUSTOM_ID: macro-def-row-reader
+   :END:
+
+The defun-like variant of row-reader: creates a row reader and gives it a
+top-level function name.
+
+** method field-name (field)
+   :PROPERTIES:
+   :CUSTOM_ID: method-field-name
+   :END:
+→ string
+
+This can be used to get information about the fields read by a row reader.
+Given a field description, it returns the name the database associated with
+this column.
+
+** method field-type (field)
+   :PROPERTIES:
+   :CUSTOM_ID: method-field-type
+   :END:
+→ oid
+
+This extracts the PostgreSQL OID associated with this column. You can, if
+you really want to, query the pg_types table to find out more about the
+types denoted by OIDs.
+
+** function list-row-reader (socket fields)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-row-reader
+   :END:
+→ list
+
+A row reader that builds a list of lists from the query results.
+
+** function alist-row-reader (socket fields)
+   :PROPERTIES:
+   :CUSTOM_ID: function-alist-row-reader
+   :END:
+→ alist
+
+A row reader that returns a list of alists, which associate column names with
+values.
+
+** function ignore-row-reader (socket fields)
+   :PROPERTIES:
+   :CUSTOM_ID: function-ignore-row-reader
+   :END:
+
+A row reader that completely ignores the result of a query.
+
+* Bulk Copying
+  :PROPERTIES:
+  :CUSTOM_ID: bulk-copying
+  :END:
+When loading large amounts of data into PostgreSQL, it can be done
+significantly faster using the bulk copying feature. The drawback to this
+approach is that you don't find out about data integrity errors until the
+entire batch is completed but sometimes the speed is worth it
+
+** function open-db-writer (db table &optional columns)
+   :PROPERTIES:
+   :CUSTOM_ID: function-open-db-writer
+   :END:
+
+Opens a table stream into which rows can be written one at a time using
+db-write-row. db is either a connection object or a list of arguments that
+could be passed to open-database. table is the name of an existing table
+into which this writer will write rows. If you don't have data for all
+columns, use columns to indicate those that you do.
+
+** function close-db-writer (writer &key abort)
+   :PROPERTIES:
+   :CUSTOM_ID: function-close-db-writer
+   :END:
+
+Closes a bulk writer opened by open-db-writer. Will close the associated
+database connection when it was created for this copier, or abort is true.
+
+** function db-write-row (writer row-data)
+   :PROPERTIES:
+   :CUSTOM_ID: function-db-write-row
+   :END:
+
+Writes row-data into the table and columns referenced by the writer.
+row-data is a list of Lisp objects, one for each column included when
+opening the writer. Arrays (the elements of which must all be the same type)
+will be serialized into their PostgreSQL representation before being written
+into the DB.
+* Normalization
+  :PROPERTIES:
+  :CUSTOM_ID: normalization
+  :END:
+** function saslprep-normalize (str &optional form)
+   :PROPERTIES:
+   :CUSTOM_ID: function-saslprep-normalize
+   :END:
+→ string
+
+Scans string. If any character should be mapped to nothing, it eliminates that character. If any character is not printable ascii, it returns nil. If every character remaining after eliminations is printable ascii, it returns the printable-ascii string. It then calls (uax-15:normalize str form) to normalize the string based on the provided unicode form, defaulting to :nfkc.
+
+** function string-mapped-to-nothing (str)
+   :PROPERTIES:
+   :CUSTOM_ID:  function-string-mapped-to-nothing
+   :END:
+→ string
+
+Reads a string and removes any character that should be mapped to nothing per RFC 3454 and RFC 4013.
+
+** function string-mapped-to-space (str)
+   :PROPERTIES:
+   :CUSTOM_ID: function-string-mapped-to-space
+   :END:
+→ string
+
+Reads a string and converts any character which should be mapped to a space per RFC 3454 and RFC 4013 to a space.
+
+** function string-printable-ascii-p (str)
+   :PROPERTIES:
+   :CUSTOM_ID: function-string-printable-ascii-p
+   :END:
+→ boolean
+
+Returns t if every character in the string is printable ascii.
+* Conditions
+  :PROPERTIES:
+  :CUSTOM_ID: conditions
+  :END:
+Opening or querying a database may raise errors. CL-postgres will wrap the
+errors that the server returns in a lisp condition, and raise conditions of
+the same type when it detects some problem itself. Socket errors are let
+through as they are.
+
+** condition database-error
+   :PROPERTIES:
+   :CUSTOM_ID: condition-database-error
+   :END:
+
+This is the condition type that will be used to signal virtually all database-related errors \(though in some cases
+socket errors may be raised when a connection fails on the IP level). For errors that you may want to catch by type, the cl-postgres-error package defines a bucket of subtypes used for specific errors. See the cl-postgres/package.lisp file for a list.
+
+** method database-error-message (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: method-database-error-message
+   :END:
+→ string
+
+The primary human-readable error message. This should be accurate but terse (typically one line). Always present.
+
+** method database-error-detail (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: method-database-error-detail
+   :END:
+→ string
+
+Detail: an optional secondary error message carrying more detail about the problem. Might run to multiple lines or NIL if none is available.
+
+** method database-error-code (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: method-database-error-code
+   :END:
+→ string
+
+Code: the Postgresql SQLSTATE code for the error (see the Postgresql Manual Appendix A for their meaning). Not localizable. Always present.
+
+** method database-error-query (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: method-database-error-query
+   :END:
+→ string
+
+The query that led to this error, or NIL if no query was involved.
+
+** method database-error-cause (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: method-database-error-cause
+   :END:
+→ condition
+
+The condition that caused this error, or NIL when it was not caused by another condition.
+
+** function database-error-constraint-name (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-error-constraint-name
+   :END:
+→ string
+
+For integrity-violation error, given a database-error for an integrity violation, will attempt to
+extract and return the constraint name (or nil if no constraint was found).
+
+** function database-error-extract-name (database-error)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-error-extract-name
+   :END:
+→ string
+
+For various errors, returns the name provided by the error message
+ (or nil if no such name was found.)
+
+** condition database-connection-error
+   :PROPERTIES:
+   :CUSTOM_ID: condition-database-connection-error
+   :END:
+
+Subtype of database-error. An error of this type (or one of its subclasses)
+is signaled when a query is attempted with a connection object that is no
+longer connected, or a database connection becomes invalid during a query.
+Always provides a :reconnect restart, which will cause the library to make an
+attempt to restore the connection and re-try the query.
+
+The following shows an example use of this feature, a way to ensure that the
+first connection error causes a reconnect attempt, while others pass through
+as normal. A variation on this theme could continue trying to reconnect, with
+successively longer pauses.
+#+BEGIN_SRC lisp
+(defun call-with-single-reconnect (fun)
+  (let ((reconnected nil))
+    (handler-bind
+        ((database-connection-error
+          (lambda (err)
+            (when (not reconnected)
+              (setf reconnected t)
+              (invoke-restart :reconnect)))))
+      (funcall fun))))
+#+END_SRC
+
+** condition postgresql-notification
+   :PROPERTIES:
+   :CUSTOM_ID: condition-postgresql-notification
+   :END:
+
+The condition that is signalled when a notification message is received from
+the PostgreSQL server. This is a WARNING condition which is caught by the
+WAIT-FOR-NOTIFICATION function that implements synchronous waiting for
+notifications.
+
+** method postgresql-notification-channel (postgresql-notification)
+   :PROPERTIES:
+   :CUSTOM_ID: method-postgresql-notification-channel
+   :END:
+→ string
+
+The channel string of this notification.
+
+** method postgresql-notification-payload (postgresql-notification)
+   :PROPERTIES:
+   :CUSTOM_ID: method-postgresql-notification-payload
+   :END:
+→ string
+
+The payload of this notification.
+
+** method postgresql-notification-pid (postgresql-notification)
+   :PROPERTIES:
+   :CUSTOM_ID: method-postgresql-notification-pid
+   :END:
+→ integer
+
+The process ID of the process that sent the notification.

@@ -1,0 +1,4150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 2022-01-21 Fri 15:02 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Postmodern Reference Manual</title>
+<meta name="generator" content="Org mode">
+<meta name="author" content="Sabra Crolleton">
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="style.css" />
+<style>pre.src{background:#343131;color:white;} </style>
+<script type="text/javascript">
+// @license magnet:?xt=urn:btih:e95b018ef3580986a04669f1b5879592219e2a7a&dn=public-domain.txt Public Domain
+<!--/*--><![CDATA[/*><!--*/
+     function CodeHighlightOn(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.add("code-highlighted");
+         target.classList.add("code-highlighted");
+       }
+     }
+     function CodeHighlightOff(elem, id)
+     {
+       var target = document.getElementById(id);
+       if(null != target) {
+         elem.classList.remove("code-highlighted");
+         target.classList.remove("code-highlighted");
+       }
+     }
+    /*]]>*///-->
+// @license-end
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">Postmodern Reference Manual</h1>
+</header><nav id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#connecting">Connecting</a>
+<ul>
+<li><a href="#class-database-connection">class database-connection</a></li>
+<li><a href="#function-connection">function connect (database user-name password host &amp;key (port 5432) pooled-p use-ssl service application-name use-binary)</a></li>
+<li><a href="#variable-default-use-ssl">variable <code>*default-use-ssl*</code></a></li>
+<li><a href="#method-disconnect">method disconnect (database-connection)</a></li>
+<li><a href="#function-connected-p">function connected-p (database-connection)</a></li>
+<li><a href="#method-reconnect">method reconnect (database-connection)</a></li>
+<li><a href="#variable-database">variable <code>*database*</code></a></li>
+<li><a href="#macro-with-connection">macro with-connection (spec &amp;body body)</a></li>
+<li><a href="#macro-call-with-connection">macro call-with-connection (spec thunk)</a></li>
+<li><a href="#function-connect-toplevel">function connect-toplevel (database user-name password host &amp;key (port 5432) (use-ssl <b>default-use-ssl</b>) (application-name "") use-binary)</a></li>
+<li><a href="#function-disconnect-toplevel">function disconnect-toplevel ()</a></li>
+<li><a href="#function-clear-connection-pool">function clear-connection-pool ()</a></li>
+<li><a href="#variable-max-pool-size">variable <code>*max-pool-size*</code></a></li>
+<li><a href="#function-list-connections">function list-connections ()</a></li>
+<li><a href="#function-use-binary-parameters">function use-binary-parameters (database-connection param)</a></li>
+</ul>
+</li>
+<li><a href="#querying">Querying</a>
+<ul>
+<li><a href="#macro-query">macro query (query &amp;rest args/format)</a></li>
+<li><a href="#macro-execute">macro execute (query &amp;rest args)</a></li>
+<li><a href="#macro-doquery">macro doquery (query (&amp;rest names) &amp;body body)</a></li>
+<li><a href="#macro-prepare">macro prepare (query &amp;optional (format :rows))</a></li>
+<li><a href="#macro-def-prepared">macro defprepared (name query &amp;optional (format :rows))</a></li>
+<li><a href="#macro-defprepared-with-names">macro defprepared-with-names (name (&amp;rest args) (query &amp;rest query-args) &amp;optional (format :rows))</a></li>
+<li><a href="#macro-with-transaction">macro with-transaction ((&amp;optional name isolation-level) &amp;body body)</a></li>
+<li><a href="#function-commit-transaction">function commit-transaction (transaction)</a></li>
+<li><a href="#function-abort-transaction">function abort-transaction (transaction)</a></li>
+<li><a href="#function-rollback-transaction">function rollback-transaction (transaction)</a></li>
+<li><a href="#macro-savepoint">macro with-savepoint (name &amp;body body)</a></li>
+<li><a href="#function-release-savepoint">function release-savepoint (savepoint)</a></li>
+<li><a href="#function-rollback-savepoint">function rollback-savepoint (savepoint)</a></li>
+<li><a href="#method-commit-hooks">method commit-hooks (transaction-or-savepoint), setf (commit-hooks transaction-or-savepoint)</a></li>
+<li><a href="#method-abort-hooks">function abort-hooks (transaction-or-savepoint), setf (abort-hooks transaction-or-savepoint)</a></li>
+<li><a href="#variable-isolation-levels">variable <code>*isolation-level*</code></a></li>
+<li><a href="#macro-with-logical-transaction">macro with-logical-transaction ((&amp;optional name isolation-level) &amp;body body)</a></li>
+<li><a href="#function-abort-logical-transaction">function abort-logical-transaction (transaction-or-savepoint)</a></li>
+<li><a href="#function-commit-logical-transaction">function commit-logical-transaction (transaction-or-savepoint)</a></li>
+<li><a href="#variable-current-logical-transaction">variable <code>*current-logical-transaction*</code></a></li>
+<li><a href="#macro-ensure-transaction">macro ensure-transaction (&amp;body body)</a></li>
+<li><a href="#macro-ensure-transaction-with-isolation-level">macro ensure-transaction-with-isolation-level (isolation-level &amp;body body)</a></li>
+</ul>
+</li>
+<li><a href="#prepared-statement-helper-functions">Helper functions for Prepared Statements</a>
+<ul>
+<li><a href="#variable-allow-overwriting-prepared-statements">defparameter <b>allow-overwriting-prepared-statements</b></a></li>
+<li><a href="#function-prepared-statement-exists-p">function prepared-statement-exists-p (name)</a></li>
+<li><a href="#function-list-prepared-statements">function list-prepared-statements (&amp;optional (names-only nil))</a></li>
+<li><a href="#function-drop-prepared-statement">function drop-prepared-statement (statement-name &amp;key (location :both) (database <code>*database*</code>))</a></li>
+<li><a href="#function-list-postmodern-prepared-statements">function list-postmodern-prepared-statements (&amp;optional (names-only nil))</a></li>
+<li><a href="#function-find-postgresql-prepared-statement">function find-postgresql-prepared-statement (name)</a></li>
+<li><a href="#function-find-postmodern-prepared-statement">function find-postmodern-prepared-statement (name)</a></li>
+<li><a href="#function-reset-prepared-statement">function reset-prepared-statement (condition)</a></li>
+<li><a href="#function-get-pid">function get-pid ()</a></li>
+<li><a href="#function-get-pid-from-postmodern">function get-pid-from-postmodern ()</a></li>
+<li><a href="#function-cancel-backend">function cancel-backend (pid)</a></li>
+<li><a href="#function-terminate-backend">function terminate-backend (pid)</a></li>
+</ul>
+</li>
+<li><a href="#database-management">Database Management</a>
+<ul>
+<li><a href="#function-create-database">function create-database (database-name &amp;key (encoding "UTF8") (connection-limit -1) owner limit-public-access comment collation template)</a></li>
+<li><a href="#function-drop-database">function drop-database (database)</a></li>
+</ul>
+</li>
+<li><a href="#table-definition">Table definition and creation using a dao</a></li>
+<li><a href="#roles">Roles</a>
+<ul>
+<li><a href="#function-role-exists-p">function role-exists-p (role-name)</a></li>
+<li><a href="#function-create-role">function create-role</a></li>
+<li><a href="#function-drop-role">function drop-role (role-name &amp;optional (new-owner "postgres") (database :all))</a></li>
+<li><a href="#function-alter-role">function alter-role-search-path (role search-path)</a></li>
+<li><a href="#function-change-password">function change-password (role password &amp;optional expiration-date)</a></li>
+<li><a href="#function-grant-role-permissions">function grant-role-permissions (role-type name &amp;key (schema :public) (tables :all) (databases :all))</a></li>
+<li><a href="#function-grant-readonly-permissions">function grant-readonly-permissions (schema-name role-name &amp;optional (table-name nil))</a></li>
+<li><a href="#function-grant-editor-permissions">function grant-editor-permissions (schema-name role-name &amp;optional (table-name nil))</a></li>
+<li><a href="#function-grant-admin-permissions">function grant-admin-permissions (schema-name role-name &amp;optional (table-name nil))</a></li>
+<li><a href="#function-revoke-all-on-table">function revoke-all-on-table (table-name role-name)</a></li>
+<li><a href="#function-list-role-accessible-databases">function list-role-accessible-databases (role-name)</a></li>
+<li><a href="#function-list-roles">function list-roles (&amp;optional (lt nil))</a></li>
+<li><a href="#function-list-role-permissions">function list-role-permissions (&amp;optional role)</a></li>
+</ul>
+</li>
+<li><a href="#database-information">Database Information</a>
+<ul>
+<li><a href="#funciton-add-comment">function add-comment (type name comment &amp;optional (second-name ""))</a></li>
+<li><a href="#function-find-comments">find-comments (type identifier)</a></li>
+<li><a href="#function-get-database-comment">function get-database-comment (database-name)</a></li>
+<li><a href="#function-postgresql-version">function postgresql-version ()</a></li>
+<li><a href="#function-database-version">function database-version ()</a></li>
+<li><a href="#function-current-databse">function current-database ()</a></li>
+<li><a href="#function-database-exists-p">function database-exists-p (database-name)</a></li>
+<li><a href="#function-database-size">function database-size (&amp;optional database-name)</a></li>
+<li><a href="#function-num-records-in-database">function num-records-in-database ()</a></li>
+<li><a href="#function-list-databases">function list-databases (&amp;key (order-by-size nil) (size t))</a></li>
+<li><a href="#list-database-functions">function list-database-functions ()</a></li>
+<li><a href="#function-list-databse-users">function list-database-users ()</a></li>
+<li><a href="#function-list-database-access-rights">function list-database-access-rights (&amp;optional database-name)</a></li>
+<li><a href="#function-list-available-types">function list-available-types ()</a></li>
+<li><a href="#function-list-available-collations">function list-available-collations ()</a></li>
+<li><a href="#list-available-extensions">function list-available-extensions ()</a></li>
+<li><a href="#function-list-installed-extensions">function list-installed-extensions ()</a></li>
+<li><a href="#function-load-uuid-extensin">function load-uuid-extension ()</a></li>
+<li><a href="#function-list-templates">function list-templates ()</a></li>
+<li><a href="#function-change-toplevel-database">function change-toplevel-database (new-database user password host)</a></li>
+<li><a href="#function-cache-hit-ratio">function cache-hit-ratio ()</a></li>
+<li><a href="#function-bloat-measurement">function bloat-measurement ()</a></li>
+<li><a href="#function-unused-indexes">function unused-indexes ()</a></li>
+<li><a href="#function-check-query-performance">function check-query-performance (&amp;optional (ob nil) (num-calls 100) (limit 20))</a></li>
+</ul>
+</li>
+<li><a href="#constraints">Constraints</a>
+<ul>
+<li><a href="#function-list-unique-or-primary-constraints">function list-unique-or-primary-constraints (table-name)</a></li>
+<li><a href="#function-list-all-constraints">function list-all-constraints (table-name)</a></li>
+<li><a href="#function-describe-constraint">function describe-constraint (table-name constraint-name)</a></li>
+<li><a href="#function-describe-foreign-key-constraints">function describe-foreign-key-constraints ()</a></li>
+</ul>
+</li>
+<li><a href="#indexes">Indexes/Indices</a>
+<ul>
+<li><a href="#function-create-index">function create-index (name  &amp;key unique if-not-exists concurrently on using fields)</a></li>
+<li><a href="#function-drop-index">function drop-index (name &amp;key concurrently if-exists cascade)</a></li>
+<li><a href="#function-list-indices">function list-indices (&amp;optional strings-p)</a></li>
+<li><a href="#function-list-table-indices">function list-table-indices (table-name &amp;optional strings-p)</a></li>
+<li><a href="#function-index-exists-p">function index-exists-p (name)</a></li>
+<li><a href="#function-list-indexed-column-and-attribute">function list-indexed-column-and-attributes (table-name)</a></li>
+<li><a href="#function-list-index-definitions">function list-index-definitions (table-name)</a></li>
+</ul>
+</li>
+<li><a href="#keys">Keys</a>
+<ul>
+<li><a href="#function-find-primary-key-info">function find-primary-key-info (table-name &amp;optional (just-key nil))</a></li>
+<li><a href="#function-list-foreign-keys">function list-foreign-keys (table-name)</a></li>
+</ul>
+</li>
+<li><a href="#schema">Schema/Schemata</a>
+<ul>
+<li><a href="#macro-with-schema">macro with-schema ((namespace &amp;key :strict t :if-not-exist :create :drop-after) &amp;body body)</a></li>
+<li><a href="#function-list-schemata">function list-schemata ()</a></li>
+<li><a href="#function-list-schemas">function list-schemas ()</a></li>
+<li><a href="#function-schema-exists-p">function schema-exists-p (schema)</a></li>
+<li><a href="#function-create-schema">function create-schema (schema)</a></li>
+<li><a href="#function-drop-schema">function drop-schema (schema &amp;key (if-exists nil) (cascade nil))</a></li>
+<li><a href="#function-get-search-path">function get-search-path ()</a></li>
+<li><a href="#function-set-search-path">function set-search-path (path)</a></li>
+<li><a href="#function-split-fully-qualified-tablename">function split-fully-qualified-tablename (name)</a></li>
+<li><a href="#function-get-schema-comment">function get-schema-comment (schema-name)</a></li>
+</ul>
+</li>
+<li><a href="#sequences">Sequences</a>
+<ul>
+<li><a href="#function-create-sequence">function create-sequence (name &amp;key temp if-not-exists increment min-value max-value start cache)</a></li>
+<li><a href="#function-sequence-next">function sequence-next (sequence)</a></li>
+<li><a href="#function-drop-sequence">function drop-sequence (name &amp;key if-exists cascade)</a></li>
+<li><a href="#function-list-sequences">function list-sequences (&amp;optional strings-p)</a></li>
+<li><a href="#function-sequence-exists-p">function sequence-exists-p (name)</a></li>
+</ul>
+</li>
+<li><a href="#tables">Tables</a>
+<ul>
+<li><a href="#function-list-tables">function list-tables (&amp;optional strings-p)</a></li>
+<li><a href="#function-list-all-tables">function list-all-tables (&amp;optional (fully-qualified-names-only nil))</a></li>
+<li><a href="#function-list-tables-in-schema">function list-tables-in-schema (&amp;optional (schema-name "public") (strings-p nil))</a></li>
+<li><a href="#function-list-table-sizes">function list-table-sizes (&amp;key (schema "public") (order-by-size nil) (size t))</a></li>
+<li><a href="#function-table-exists-p">function table-exists-p (name)</a></li>
+<li><a href="#function-table-size">function table-size (table-name)</a></li>
+<li><a href="#function-table-descriptions">function table-description (name &amp;optional schema-name)</a></li>
+<li><a href="#function-table-description-plus">function table-description-plus (table-name)</a></li>
+<li><a href="#function-table-description-menu">function table-description-menu (see below)</a></li>
+<li><a href="#function-list-check-constraints">function list-check-constraints (table-name)</a></li>
+<li><a href="#function-list-columns">function list-columns (table-name)</a></li>
+<li><a href="#function-list-columns-with-types">function list-columns-with-types (table-name)</a></li>
+<li><a href="#function-column-exists-p">function column-exists-p (table-name column-name &amp;optional schema-name)</a></li>
+<li><a href="#function-get-table-oid">function get-table-oid (table-name &amp;optional schema-name)</a></li>
+<li><a href="#function-get-table-comment">function get-table-comment (table-name &amp;optional schema-name)</a></li>
+<li><a href="#function-get-column-comments">function get-column-comments (database schema table)</a></li>
+<li><a href="#rename-table">function rename-table (old-name new-name)</a></li>
+<li><a href="#function-rename-column">function rename-column (table-name old-name new-name)</a></li>
+</ul>
+</li>
+<li><a href="#tablespaces">Tablespaces</a>
+<ul>
+<li><a href="#function-list-tablespaces">function list-tablespaces ()</a></li>
+</ul>
+</li>
+<li><a href="#triggers">Triggers</a>
+<ul>
+<li><a href="#function-describe-triggers">function describe-triggers ()</a></li>
+<li><a href="#function-list-triggers">function list-triggers (&amp;optional table-name)</a></li>
+<li><a href="#function-list-detailed-triggers">function list-detailed-triggers ()</a></li>
+</ul>
+</li>
+<li><a href="#views">Views</a>
+<ul>
+<li><a href="#function-list-views">function list-views (&amp;optional strings-p)</a></li>
+<li><a href="#function-view-exists-p">function view-exists-p (name)</a></li>
+<li><a href="#function-describe-views">function describe-views (&amp;optional (schema "public")</a></li>
+</ul>
+</li>
+<li><a href="#misc-utility-functions">Miscellaneous Utility Functions</a>
+<ul>
+<li><a href="#function-coalesce">function coalesce (&amp;rest arguments)</a></li>
+<li><a href="#function-execute-file">function execute-file (filename &amp;optional (print nil))</a></li>
+<li><a href="#function-postgres-array-string-to-list">function postgres-array-string-to-list (str)</a></li>
+<li><a href="#function-postgres-array-string-to-array">function postgres-array-string-to-array (str)</a></li>
+</ul>
+</li>
+<li><a href="#imported-from-s-sql">Imported From s-sql</a>
+<ul>
+<li><a href="#macro-sql">macro sql (form)</a></li>
+<li><a href="#function-sql-compile">function sql-compile (form)</a></li>
+<li><a href="#deftype-smallint">deftype smallint ()</a></li>
+<li><a href="#deftype-bigint">deftype bigint ()</a></li>
+<li><a href="#deftype-numeric">deftype numeric (&amp;optional precision/scale scale)</a></li>
+<li><a href="#deftype-double-precision">deftype double-precision ()</a></li>
+<li><a href="#deftype-bytea">deftype bytea ()</a></li>
+<li><a href="#deftype-text">deftype text ()</a></li>
+<li><a href="#deftype-varchar">deftype varchar (length)</a></li>
+<li><a href="#deftype-serial">deftype serial ()</a></li>
+<li><a href="#deftype-serial8">deftype serial8 ()</a></li>
+<li><a href="#deftype-db-null">deftype db-null ()</a></li>
+<li><a href="#function-from-sql-name">function from-sql-name (str)</a></li>
+<li><a href="#function-parse-queries">function parse-queries (file-content)</a></li>
+<li><a href="#function-read-queries">function read-queries (filename)</a></li>
+<li><a href="#function-sql-escape-string">function sql-escape-string (string)</a></li>
+<li><a href="#method-sql-escape">method sql-escape (arg)</a></li>
+<li><a href="#macro-register-sql-operators">macro register-sql-operators (arity &amp;rest names)</a></li>
+<li><a href="#variable-escape-sql-names-p">variable <code>*escape-sql-names-p*</code></a></li>
+<li><a href="#function-to-sql-name">function to-sql-name (name &amp;optional (escape-p <code>*escape-sql-names-p*</code>) (ignore-reserved-words nil))</a></li>
+<li><a href="#condition-sql-error">condition sql-error</a></li>
+</ul>
+</li>
+<li><a href="#conditions-imported-from-cl-postgres">Conditions Imported From cl-postgres</a>
+<ul>
+<li><a href="#condition-database-connection-error">condition database-connection-error</a></li>
+<li><a href="#condition-database-error">condition database-error</a></li>
+<li><a href="#function-database-error-constraint-name">function database-error-constraint-name (err)</a></li>
+<li><a href="#function-database-error-extract-name">function database-error-extract-name (err)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+
+<div id="outline-container-overview" class="outline-2">
+<h2 id="overview">Overview</h2>
+<div class="outline-text-2" id="text-overview">
+<p>
+This is the reference manual for the component named postmodern, which is part
+of a library of the same name.
+</p>
+
+<p>
+Note that this package also exports the database-connection and database-error
+types from CL-postgres and a few operators from S-SQL.
+</p>
+
+<p>
+query, execute, and any other function that would logically need to communicate
+with the database will raise a condition of the type database-error when
+something goes wrong. As a special case, errors that break the connection
+(socket errors, database shutdowns) will be raised as subtypes of
+database-connection-error, providing a :reconnect restart to re-try the
+operation that encountered to the error.
+</p>
+
+<p>
+Some specific topics in more detail
+</p>
+
+<ul class="org-ul">
+<li><a href="array-notes.html">Array-Notes</a></li>
+<li><a href="create-tables.html">Creating Tables</a> (sql, s-sql and using dao classes)</li>
+<li><a href="dao-classes.html#table-definition">Creating Tables using dao classes</a></li>
+<li><a href="dynamic-queries.html">Dynamic Queries</a></li>
+<li><a href="interval-notes.html">Interval Notes</a></li>
+<li><a href="isolation-notes.html">Isolation Notes</a></li>
+<li><a href="json-from-postgres.html">Json From Postgresql/Postmodern</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-connecting" class="outline-2">
+<h2 id="connecting">Connecting</h2>
+<div class="outline-text-2" id="text-connecting">
+</div>
+<div id="outline-container-class-database-connection" class="outline-3">
+<h3 id="class-database-connection">class database-connection</h3>
+<div class="outline-text-3" id="text-class-database-connection">
+<p>
+Representation of a database connection. Contains login information in order to
+be able to automatically re-establish a connection when it is somehow closed.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-connection" class="outline-3">
+<h3 id="function-connection">function connect (database user-name password host &amp;key (port 5432) pooled-p use-ssl service application-name use-binary)</h3>
+<div class="outline-text-3" id="text-function-connection">
+<p>
+→ database-connection
+</p>
+
+<p>
+Create a new database connection for the given user and the database. Port will
+default to 5432, which is where most PostgreSQL servers are running. If
+pooled-p is T, a connection will be taken from a pool of connections of this
+type, if one is available there, and when the connection is disconnected it will
+be put back into this pool instead. use-ssl can be :no, :try, :require, :yes, or :full
+and defaults to the value of <code>*default-use-ssl*</code>
+</p>
+
+<ul class="org-ul">
+<li>:try means if the server supports it</li>
+<li>:require means use provided ssl certificate with no verification</li>
+<li>:yes means verify that the server cert is issued by a trusted CA, but does not verify the server hostname</li>
+<li>:full means expect a CA-signed cert for the supplied hostname and verify the server hostname</li>
+</ul>
+<p>
+If you set it to anything other than :no be sure to also load the CL+SSL library.
+</p>
+
+<p>
+Service defaults to "postgres".
+</p>
+
+<p>
+Application-name defaults to a blank string. If provided, Postgresl can use it to track applications with multiple connections.
+</p>
+
+<p>
+Use-binary defaults to nil. If set to T, then Postmodern will pass integer, float, double-float (except clisp) and boolean parameters to Postgresql in binary rather than text.
+</p>
+
+<p>
+The following example connects to a database named test-db running on a server at the ip
+address 192.168.5.223 with the non-standard port 5434 using a pooled connection, trying to use ssh if the server accepts that and falling back to an unencrypted connection if not, with an application name of "test-app".
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(connect <span style="color: #e67128;">"test_db"</span> <span style="color: #e67128;">"test-user"</span> <span style="color: #e67128;">"test-password"</span> <span style="color: #e67128;">"192.168.5.223"</span>
+         <span style="color: #23d7d7;">:port</span> 5434 <span style="color: #23d7d7;">:pooled-p</span> t <span style="color: #23d7d7;">:use-ssl</span> <span style="color: #23d7d7;">:try</span> <span style="color: #23d7d7;">:application-name</span> <span style="color: #e67128;">"test-app"</span> <span style="color: #23d7d7;">:use-binary</span> t)
+</pre>
+</div>
+<p>
+Postmodern as of version 1.33.0 provides the ability to pass parameters to Postgresql in binary format IF that format is available for that datatype. Currently this means int2, int4, int8, float, double-float (except clisp) and boolean. Rational numbers continue to be passed as text.
+</p>
+
+<p>
+The flag is set in the database connection object. This means it can be set either in the initial connection to the database  with <code>:use-binary t</code> as noted above or using the <code>(use-binary-parameters t)</code> function to set it after the initial connection has been established. If you are using multiple connections, some can be set to use binary parameters, some not.
+</p>
+
+<p>
+If a query to Postgresql does not have a table column which would allow Postgresql to determine the correct datatype and you do not specify differently, Postgresql will treat the parameters passed with the query as text. The default text setting with results:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query <span style="color: #e67128;">"select $1"</span> 1 <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"1"</span>
+(query <span style="color: #e67128;">"select $1"</span> 1.5 <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"1.5"</span>
+(query <span style="color: #e67128;">"select $1"</span> T <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"true"</span>
+(query <span style="color: #e67128;">"select $1"</span> nil <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"false"</span>
+(query <span style="color: #e67128;">"select $1"</span> <span style="color: #23d7d7;">:NULL</span> <span style="color: #23d7d7;">:single</span>)
+<span style="color: #23d7d7;">:NULL</span>
+</pre>
+</div>
+<p>
+You can specify parameter type as so:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query <span style="color: #e67128;">"select $1::integer"</span> 1 <span style="color: #23d7d7;">:single</span>)
+1
+</pre>
+</div>
+<p>
+Setting the use-binary slot in the database connection object to t has the following results:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query <span style="color: #e67128;">"select $1"</span> 1 <span style="color: #23d7d7;">:single</span>)
+1
+(query <span style="color: #e67128;">"select $1"</span> 1.5 <span style="color: #23d7d7;">:single</span>)
+1.5
+(query <span style="color: #e67128;">"select $1"</span> T <span style="color: #23d7d7;">:single</span>)
+T
+(query <span style="color: #e67128;">"select $1"</span> nil <span style="color: #23d7d7;">:single</span>)
+NIL
+(query <span style="color: #e67128;">"select $1"</span> <span style="color: #23d7d7;">:NULL</span> <span style="color: #23d7d7;">:single</span>)
+<span style="color: #23d7d7;">:NULL</span>
+</pre>
+</div>
+<p>
+The default for Postmodern is to continue to pass parameters to Postgresql as text (not in binary format) in order to avoid breaking existing user code. If you want to pass parameters to Postgresql in binary format and want to set that up when you are making the database connection, the following examples may help. We continue the difference in the signatures (cl-postgres uses optional parameters and postmodern uses keyword parameters) because of the expected downstream breakage if we shifted cl-postgres:open-database to using keyword parameters.
+</p>
+
+<p>
+In postmodern you have the connect function or you can use the with-connection macro:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">defmacro</span> <span style="color: #00ede1; font-weight: bold;">with-connection</span> (spec <span style="color: #34cae2;">&amp;body</span> body)
+  `(<span style="color: #ffad29; font-weight: bold;">let</span> ((*database* (apply #'connect ,spec)))
+     (<span style="color: #ffad29; font-weight: bold;">unwind-protect</span> (<span style="color: #ffad29; font-weight: bold;">progn</span> ,@body)
+       (disconnect *database*))))
+</pre>
+</div>
+<p>
+So often you would connect something like this:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">with-connection</span> '(<span style="color: #e67128;">"database_name"</span> <span style="color: #e67128;">"user-name"</span> <span style="color: #e67128;">"user-password"</span> <span style="color: #e67128;">"localhost or IP address"</span>
+                   <span style="color: #23d7d7;">:use-binary</span> t)
+  ...)
+</pre>
+</div>
+
+<p>
+You can also change the flag after the connection is established with the <code>use-binary-parameters</code> function, passing T to use binary parameters or nil to use text parameters:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(use-binary-parameters *database* t)
+</pre>
+</div>
+<p>
+Using binary parameters does tighten type checking when using prepared queries. You will not be able to use prepared queries with varying formats. In other words, if you have a prepared query that you pass an integer as the first parameter and a string as the second parameter the first time it is used, any subsequent uses of that prepared query during that session will also have to pass an integer as the first parameter and a string as the second parameter.
+</p>
+
+<p>
+Benchmarking does indicate a slight speed and consing benefit to passing parameters as binary, but your mileage will vary depending on your use case.
+</p>
+</div>
+</div>
+
+<div id="outline-container-variable-default-use-ssl" class="outline-3">
+<h3 id="variable-default-use-ssl">variable <code>*default-use-ssl*</code></h3>
+<div class="outline-text-3" id="text-variable-default-use-ssl">
+<p>
+The default for connect's use-ssl argument.
+Valid settings are :no, :try, :require, :yes, or :full
+</p>
+
+<p>
+:try means if the server supports it
+</p>
+
+<p>
+:require means use provided ssl certificate with no verification
+</p>
+
+<p>
+:yes means verify that the server cert is issued by a trusted CA, but does not verify the server hostname
+</p>
+
+<p>
+:full means expect a CA-signed cert for the supplied hostname and verify the server hostname
+</p>
+
+<p>
+If you set it to anything other than :no be sure to also load the CL+SSL library.
+</p>
+</div>
+</div>
+
+<div id="outline-container-method-disconnect" class="outline-3">
+<h3 id="method-disconnect">method disconnect (database-connection)</h3>
+<div class="outline-text-3" id="text-method-disconnect">
+<p>
+Disconnects a normal database connection, or moves a pooled connection into the
+pool.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-connected-p" class="outline-3">
+<h3 id="function-connected-p">function connected-p (database-connection)</h3>
+<div class="outline-text-3" id="text-function-connected-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Returns a boolean indicating whether the given connection is still connected to
+the server.
+</p>
+</div>
+</div>
+
+<div id="outline-container-method-reconnect" class="outline-3">
+<h3 id="method-reconnect">method reconnect (database-connection)</h3>
+<div class="outline-text-3" id="text-method-reconnect">
+<p>
+Reconnect a disconnected database connection. This is not allowed for pooled
+connections ― after they are disconnected they might be in use by some other
+process, and should no longer be used.
+</p>
+</div>
+</div>
+
+<div id="outline-container-variable-database" class="outline-3">
+<h3 id="variable-database">variable <code>*database*</code></h3>
+<div class="outline-text-3" id="text-variable-database">
+<p>
+Special variable holding the current database connection information. Most
+functions and macros operating on a database assume this binds to a connected
+database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-macro-with-connection" class="outline-3">
+<h3 id="macro-with-connection">macro with-connection (spec &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-with-connection">
+<p>
+Evaluates the body with <code>*database*</code> bound to a connection as specified by spec,
+which should be list that connect can be applied to.
+</p>
+
+<p>
+Examples:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">with-connection</span> '(<span style="color: #e67128;">"test_database"</span> <span style="color: #e67128;">"sabra"</span> <span style="color: #e67128;">"some_strange_password_here"</span> <span style="color: #e67128;">"localhost"</span>)
+  (list-tables))
+
+(<span style="color: #ffad29; font-weight: bold;">with-connection</span> '(<span style="color: #e67128;">"test_db"</span> <span style="color: #e67128;">"test-user"</span> <span style="color: #e67128;">"test-password"</span> <span style="color: #e67128;">"192.168.5.223"</span>
+                   <span style="color: #23d7d7;">:port</span> 5434 <span style="color: #23d7d7;">:pooled-p</span> t <span style="color: #23d7d7;">:use-ssl</span> try <span style="color: #23d7d7;">:application-name</span> <span style="color: #e67128;">"test-app"</span>)
+  (list-tables))
+
+(<span style="color: #ffad29; font-weight: bold;">with-connection</span> '(<span style="color: #e67128;">"test_db"</span> <span style="color: #e67128;">"test-user"</span> <span style="color: #e67128;">"test-password"</span> <span style="color: #e67128;">"192.168.5.223"</span>
+                   <span style="color: #23d7d7;">:port</span> 5434 <span style="color: #23d7d7;">:pooled-p</span> t <span style="color: #23d7d7;">:use-ssl</span> try <span style="color: #23d7d7;">:application-name</span> <span style="color: #e67128;">"test-app"</span>
+                   <span style="color: #23d7d7;">:use-binary</span> t)
+  (list-tables))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-call-with-connection" class="outline-3">
+<h3 id="macro-call-with-connection">macro call-with-connection (spec thunk)</h3>
+<div class="outline-text-3" id="text-macro-call-with-connection">
+<p>
+The functional backend to with-connection. Binds <code>*database*</code> to a new connection
+as specified by spec, which should be a list that connect can be applied to, and
+runs the zero-argument function given as second argument in the new environment.
+When the function returns or throws, the new connection is disconnected.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-connect-toplevel" class="outline-3">
+<h3 id="function-connect-toplevel">function connect-toplevel (database user-name password host &amp;key (port 5432) (use-ssl <b>default-use-ssl</b>) (application-name "") use-binary)</h3>
+<div class="outline-text-3" id="text-function-connect-toplevel">
+<p>
+Bind the <code>*database*</code> to a new connection. Use this if you only need one
+long running connection. For example, you want a connection for debugging from the REPL.
+It will still allow you to use with-connection to create a separate shorter-term
+connection if you want.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-disconnect-toplevel" class="outline-3">
+<h3 id="function-disconnect-toplevel">function disconnect-toplevel ()</h3>
+<div class="outline-text-3" id="text-function-disconnect-toplevel">
+<p>
+Disconnect the <code>*database*</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-clear-connection-pool" class="outline-3">
+<h3 id="function-clear-connection-pool">function clear-connection-pool ()</h3>
+<div class="outline-text-3" id="text-function-clear-connection-pool">
+<p>
+Disconnect and remove all connections from the connection pools.
+</p>
+</div>
+</div>
+
+<div id="outline-container-variable-max-pool-size" class="outline-3">
+<h3 id="variable-max-pool-size">variable <code>*max-pool-size*</code></h3>
+<div class="outline-text-3" id="text-variable-max-pool-size">
+<p>
+Set the maximum amount of connections kept in a single connection pool, where a
+pool consists of all the stored connections with the exact same connect
+arguments. Defaults to NIL, which means there is no maximum.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-connections" class="outline-3">
+<h3 id="function-list-connections">function list-connections ()</h3>
+<div class="outline-text-3" id="text-function-list-connections">
+<p>
+→ list
+</p>
+
+<p>
+List the current postgresql connections to the currently connected database. It
+does this by returning info from pg_stat_activity on open connections.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-use-binary-parameters" class="outline-3">
+<h3 id="function-use-binary-parameters">function use-binary-parameters (database-connection param)</h3>
+<div class="outline-text-3" id="text-function-use-binary-parameters">
+<p>
+You can set the flag for Postmodern to pass parameters in binary form to Postgresql after the connection is established with the use-binary-parameters function. You need to provide the database connection object and then either t (to use binary parameters) or nil (to pass parameters as text).
+</p>
+
+<p>
+(pomo:use-binary-parameters <b>database</b> t)
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-querying" class="outline-2">
+<h2 id="querying">Querying</h2>
+<div class="outline-text-2" id="text-querying">
+<p>
+For queries involving dao-classes, see <a href="dao-classes.html#query-and-selection">Dao Query and Selection</a>
+</p>
+</div>
+<div id="outline-container-macro-query" class="outline-3">
+<h3 id="macro-query">macro query (query &amp;rest args/format)</h3>
+<div class="outline-text-3" id="text-macro-query">
+<p>
+→ result
+</p>
+
+<p>
+Execute the given query, which can be either a string or an S-SQL form
+(list starting with a keyword). If the query contains placeholders ($1, $2, etc)
+their values can be given as extra arguments. If one of these arguments
+is a keyword occurring in the table below, it will not be used as a query
+argument, but will determine the format in which the results are returned
+instead. Any of the following formats can be used, with the default being :rows:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left">
+
+<col  class="org-left">
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">:none</td>
+<td class="org-left">Ignore the result values.</td>
+</tr>
+
+<tr>
+<td class="org-left">:lists, :rows</td>
+<td class="org-left">Return a list of lists, each list containing the values for a row.</td>
+</tr>
+
+<tr>
+<td class="org-left">:list, :row</td>
+<td class="org-left">Return a single row as a list.</td>
+</tr>
+
+<tr>
+<td class="org-left">:alists</td>
+<td class="org-left">Return a list of alists which map column names to values, with the names represented as keywords.</td>
+</tr>
+
+<tr>
+<td class="org-left">:alist</td>
+<td class="org-left">Return a single row as an alist.</td>
+</tr>
+
+<tr>
+<td class="org-left">:str-alists</td>
+<td class="org-left">Like :alists, but use the original column names.</td>
+</tr>
+
+<tr>
+<td class="org-left">:str-alist</td>
+<td class="org-left">Return a single row as an alist, with strings for names.</td>
+</tr>
+
+<tr>
+<td class="org-left">:plists</td>
+<td class="org-left">Return a list of plists which map column names to values,with the names represented as keywords.</td>
+</tr>
+
+<tr>
+<td class="org-left">:plist</td>
+<td class="org-left">Return a single row as a plist.</td>
+</tr>
+
+<tr>
+<td class="org-left">:column</td>
+<td class="org-left">Return a single column as a list.</td>
+</tr>
+
+<tr>
+<td class="org-left">:single</td>
+<td class="org-left">Return a single value. Will raise an error if the query returns more than one field. If the query returns more than one row, it returns the first row.</td>
+</tr>
+
+<tr>
+<td class="org-left">:single!</td>
+<td class="org-left">Like :single except that it will throw an error when the number of selected rows is not equal to 1.</td>
+</tr>
+
+<tr>
+<td class="org-left">:vectors</td>
+<td class="org-left">Return a vector of vectors, each vector containing the values for a row. (This is only the plural)</td>
+</tr>
+
+<tr>
+<td class="org-left">:array-hash</td>
+<td class="org-left">Return an array of hashtables which map column names to hash table keys</td>
+</tr>
+
+<tr>
+<td class="org-left">:json-strs</td>
+<td class="org-left">Return a list of strings where each row is a json object expressed as a string</td>
+</tr>
+
+<tr>
+<td class="org-left">:json-str</td>
+<td class="org-left">Return a single string where the row returned is a json object expressed as a string</td>
+</tr>
+
+<tr>
+<td class="org-left">:json-array-str</td>
+<td class="org-left">Return a string containing a json array, each element in the array is a selected row expressed as a json object</td>
+</tr>
+
+<tr>
+<td class="org-left">(:dao type)</td>
+<td class="org-left">Return a list of DAOs of the given type. The names of the fields returned by the query must match slots in the DAO class the same way as with query-dao.</td>
+</tr>
+
+<tr>
+<td class="org-left">(:dao type :single)</td>
+<td class="org-left">Return a single DAO of the given type.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Some Examples:
+</p>
+</div>
+<div id="outline-container-default" class="outline-4">
+<h4 id="default">Default</h4>
+<div class="outline-text-4" id="text-default">
+<p>
+The default is :lists
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)))
+((1 2147483645 <span style="color: #e67128;">"text one"</span>) (2 0 <span style="color: #e67128;">"text two"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-single" class="outline-4">
+<h4 id="single">Single</h4>
+<div class="outline-text-4" id="text-single">
+<p>
+Returns a single field. Will throw an error if the queries returns more than one field or more than one row
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:single</span>)
+<span style="color: #e67128;">"text three"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-list" class="outline-4">
+<h4 id="list">List</h4>
+<div class="outline-text-4" id="text-list">
+<p>
+Returns a list containing the selected fields. Will throw an error if the query returns more than one row
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:list</span>)
+(3 3 <span style="color: #e67128;">"text three"</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-lists" class="outline-4">
+<h4 id="lists">Lists</h4>
+<div class="outline-text-4" id="text-lists">
+<p>
+This is the default
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:lists</span>)
+((1 2147483645 <span style="color: #e67128;">"text one"</span>) (2 0 <span style="color: #e67128;">"text two"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-alist" class="outline-4">
+<h4 id="alist">Alist</h4>
+<div class="outline-text-4" id="text-alist">
+<p>
+Returns an alist containing the field name as a keyword and the selected fields. Will throw an error if the query returns more than one row.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'test-data <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:alist</span>)
+((<span style="color: #23d7d7;">:ID</span> . 3) (<span style="color: #23d7d7;">:INT4</span> . 3) (<span style="color: #23d7d7;">:TEXT</span> . <span style="color: #e67128;">"text three"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-str-alist" class="outline-4">
+<h4 id="str-alist">Str-alist</h4>
+<div class="outline-text-4" id="text-str-alist">
+<p>
+Returns an alist containing the field name as a lower case string and the selected fields. Will throw an error if the query returns more than one row.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:str-alist</span>)
+((<span style="color: #e67128;">"id"</span> . 3) (<span style="color: #e67128;">"int4"</span> . 3) (<span style="color: #e67128;">"text"</span> . <span style="color: #e67128;">"text three"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-alists" class="outline-4">
+<h4 id="alists">Alists</h4>
+<div class="outline-text-4" id="text-alists">
+<p>
+Returns a list of alists containing the field name as a keyword and the selected fields.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:alists</span>)
+(((<span style="color: #23d7d7;">:ID</span> . 1) (<span style="color: #23d7d7;">:INT4</span> . 2147483645) (<span style="color: #23d7d7;">:TEXT</span> . <span style="color: #e67128;">"text one"</span>))
+ ((<span style="color: #23d7d7;">:ID</span> . 2) (<span style="color: #23d7d7;">:INT4</span> . 0) (<span style="color: #23d7d7;">:TEXT</span> . <span style="color: #e67128;">"text two"</span>)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-str-alists" class="outline-4">
+<h4 id="str-alists">Str-alists</h4>
+<div class="outline-text-4" id="text-str-alists">
+<p>
+Returns a list of alists containing the field name as a lower case string and the selected fields.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:str-alists</span>)
+(((<span style="color: #e67128;">"id"</span> . 1) (<span style="color: #e67128;">"int4"</span> . 2147483645) (<span style="color: #e67128;">"text"</span> . <span style="color: #e67128;">"text one"</span>))
+ ((<span style="color: #e67128;">"id"</span> . 2) (<span style="color: #e67128;">"int4"</span> . 0) (<span style="color: #e67128;">"text"</span> . <span style="color: #e67128;">"text two"</span>)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-plist" class="outline-4">
+<h4 id="plist">Plist</h4>
+<div class="outline-text-4" id="text-plist">
+<p>
+Returns a plist containing the field name as a keyword and the selected fields. Will throw an error if the query returns more than one row.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:plist</span>)
+(<span style="color: #23d7d7;">:ID</span> 3 <span style="color: #23d7d7;">:INT4</span> 3 <span style="color: #23d7d7;">:TEXT</span> <span style="color: #e67128;">"text three"</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-plists" class="outline-4">
+<h4 id="plists">Plists</h4>
+<div class="outline-text-4" id="text-plists">
+<p>
+Returns a list of plists containing the field name as a keyword and the selected fields.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:plists</span>)
+((<span style="color: #23d7d7;">:ID</span> 1 <span style="color: #23d7d7;">:INT4</span> 2147483645 <span style="color: #23d7d7;">:TEXT</span> <span style="color: #e67128;">"text one"</span>) (<span style="color: #23d7d7;">:ID</span> 2 <span style="color: #23d7d7;">:INT4</span> 0 <span style="color: #23d7d7;">:TEXT</span> <span style="color: #e67128;">"text two"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-vectors" class="outline-4">
+<h4 id="vectors">Vectors</h4>
+<div class="outline-text-4" id="text-vectors">
+<p>
+Returns a vector of vectors where each internal vector is a returned row from the query. The field names are not included. NOTE: It will return an empty vector instead of NIL if there is no result.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'test-data)
+       <span style="color: #23d7d7;">:vectors</span>)
+#(#(1 2147483645 <span style="color: #e67128;">"text one"</span>)
+  #(2 0 <span style="color: #e67128;">"text two"</span>)
+  #(3 3 <span style="color: #e67128;">"text three"</span>))
+
+(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'test-data <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 1))
+       <span style="color: #23d7d7;">:vectors</span>)
+#()
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-array-hash" class="outline-4">
+<h4 id="array-hash">Array-hash</h4>
+<div class="outline-text-4" id="text-array-hash">
+<p>
+Returns a vector of hashtables where each hash table is a returned row from the query with field name as the key expressed as a lower case string.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:array-hash</span>)
+#(#&lt;HASH-TABLE <span style="color: #23d7d7;">:TEST</span> EQUAL <span style="color: #23d7d7;">:COUNT</span> 3 {100D982B53}&gt;
+  #&lt;HASH-TABLE <span style="color: #23d7d7;">:TEST</span> EQUAL <span style="color: #23d7d7;">:COUNT</span> 3 {100D982ED3}&gt;)
+
+(alexandria:hash-table-alist
+ (aref
+  (query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:array-hash</span>)
+  1))
+((<span style="color: #e67128;">"text"</span> . <span style="color: #e67128;">"text two"</span>) (<span style="color: #e67128;">"int4"</span> . 0) (<span style="color: #e67128;">"id"</span> . 2))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-dao-results" class="outline-4">
+<h4 id="dao-results">Dao</h4>
+<div class="outline-text-4" id="text-dao-results">
+<p>
+Returns a list of daos of the type specified
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country) (<span style="color: #23d7d7;">:dao</span> country))
+(#&lt;COUNTRY {1010464023}&gt; #&lt;COUNTRY {1010465CB3}&gt;)
+
+(query (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'name <span style="color: #e67128;">"Croatia"</span>)) (<span style="color: #23d7d7;">:dao</span> country))
+(#&lt;COUNTRY {1010688943}&gt;)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-column-results" class="outline-4">
+<h4 id="column-results">Column</h4>
+<div class="outline-text-4" id="text-column-results">
+<p>
+Returns a list of field values of a single field. Will throw an error if more than one field is selected
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:column</span>)
+(1 2)
+
+(query (<span style="color: #23d7d7;">:select</span> 'id <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:column</span>)
+(3)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-json-strs" class="outline-4">
+<h4 id="json-strs">Json-strs</h4>
+<div class="outline-text-4" id="text-json-strs">
+<p>
+Return a list of strings where the row returned is a json object expressed as a string
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:json-strs</span>)
+(<span style="color: #e67128;">"{\"id\":1,\"int4\":2147483645,\"text\":\"text one\"}"</span>
+ <span style="color: #e67128;">"{\"id\":2,\"int4\":0,\"text\":\"text two\"}"</span>)
+</pre>
+</div>
+<p>
+This will also handle local-time timestamps and simple-date timestamps,
+time-of-day and date. E.g. (with a local-time timestamp)
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'timestamp-with-time-zone
+        <span style="color: #23d7d7;">:from</span> 'test-data
+        <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3))
+       <span style="color: #23d7d7;">:json-strs</span>)
+
+'(<span style="color: #e67128;">"{\"timestampWithTimeZone\":\"{2019-12-30T13:30:54.000000-05:00}\"}"</span>
+  <span style="color: #e67128;">"{\"timestampWithTimeZone\":\"{1919-12-30T13:30:54.000000-05:00}\"}"</span>)
+</pre>
+</div>
+
+<p>
+The following is an example with a simple-date timestamp.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'timestamp-with-time-zone
+        <span style="color: #23d7d7;">:from</span> 'test-data
+        <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:json-strs</span>)
+'(<span style="color: #e67128;">"{\"timestampWithTimeZone\":\"2019-12-30 18:30:54:0\"}"</span>
+  <span style="color: #e67128;">"{\"timestampWithTimeZone\":\"1919-12-30 18:30:54:0\"}"</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-json-str" class="outline-4">
+<h4 id="json-str">Json-str</h4>
+<div class="outline-text-4" id="text-json-str">
+<p>
+Return a single string where the row returned is a json object expressed as a string
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'id 3)) <span style="color: #23d7d7;">:json-str</span>)
+<span style="color: #e67128;">"{\"id\":3,\"int4\":3,\"text\":\"text three\"}"</span>
+</pre>
+</div>
+<p>
+As with :json-strs, this will also work for either simple-date or local-time timestamps
+</p>
+</div>
+</div>
+
+<div id="outline-container-json-array-str" class="outline-4">
+<h4 id="json-array-str">Json-array-str</h4>
+<div class="outline-text-4" id="text-json-array-str">
+<p>
+Return a string containing a json array, each element in the array is a selected row expressed as a json object. NOTE: If there is no result, this will return a string with an empty json array.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'short-data-type-tests <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 3)) <span style="color: #23d7d7;">:json-array-str</span>)
+<span style="color: #e67128;">"[{\"id\":1,\"int4\":2147483645,\"text\":\"text one\"}, {\"id\":2,\"int4\":0,\"text\":\"text two\"}]"</span>
+
+(query (<span style="color: #23d7d7;">:select</span> 'id 'int4 'text <span style="color: #23d7d7;">:from</span> 'test-data <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&lt;</span> 'id 1)) <span style="color: #23d7d7;">:json-array-str</span>)
+<span style="color: #e67128;">"[]"</span>
+</pre>
+</div>
+<p>
+As with :json-strs, this will also work for either simple-date or local-time timestamps
+</p>
+</div>
+</div>
+<div id="outline-container-second-value-returned" class="outline-4">
+<h4 id="second-value-returned">Second value returned</h4>
+<div class="outline-text-4" id="text-second-value-returned">
+<p>
+If the database returns information about the amount rows that were affected,
+such as with updating or deleting queries, this is returned as a second value.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-execute" class="outline-3">
+<h3 id="macro-execute">macro execute (query &amp;rest args)</h3>
+<div class="outline-text-3" id="text-macro-execute">
+<p>
+Execute a query, ignore the results. So, in effect, Like a query called with
+format :none. Returns the amount of affected rows as its first returned value.
+(Also returns this amount as the second returned value, but use of this is
+deprecated.)
+</p>
+</div>
+</div>
+
+<div id="outline-container-macro-doquery" class="outline-3">
+<h3 id="macro-doquery">macro doquery (query (&amp;rest names) &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-doquery">
+<p>
+Execute the given query (a string or a list starting with a keyword), iterating
+over the rows in the result. The body will be executed with the values in the
+row bound to the symbols given in names. To iterate over a parameterised query,
+one can specify a list whose car is the query, and whose cdr contains the
+arguments.
+</p>
+
+<p>
+An example using s-sql:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(doquery (<span style="color: #23d7d7;">:select</span> 'name 'score <span style="color: #23d7d7;">:from</span> 'scores) (n s)
+  (incf (gethash n scores) s))
+
+(doquery ((<span style="color: #23d7d7;">:select</span> 'name <span style="color: #23d7d7;">:from</span> 'scores <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&gt;</span> 'score '$1)) 100) (name)
+  (print name))
+</pre>
+</div>
+<p>
+The same examples using plain sql:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(doquery <span style="color: #e67128;">"select name, score from scores"</span> (n s)
+  (incf (gethash n scores) s))
+
+(doquery ((<span style="color: #23d7d7;">:select</span> 'name <span style="color: #23d7d7;">:from</span> 'scores <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:&gt;</span> 'score '$1)) 100) (name)
+  (print name))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-prepare" class="outline-3">
+<h3 id="macro-prepare">macro prepare (query &amp;optional (format :rows))</h3>
+<div class="outline-text-3" id="text-macro-prepare">
+<p>
+→ function
+</p>
+
+<p>
+Wraps a query into a function that can be used as the interface to a prepared
+statement. The given query (either a string or an S-SQL form) may contain
+placeholders, which look like $1, $2, etc. The resulting function takes one
+argument for every placeholder in the query, executes the prepared query, and
+returns the result in the format specified. (Allowed formats are the same as for
+query.)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">let</span> ((select-two (prepare (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:type</span> '$1 'integer) (<span style="color: #23d7d7;">:type</span> '$2 'string)))))
+  (funcall select-two 1 <span style="color: #e67128;">"a"</span>))
+
+(<span style="color: #ffad29; font-weight: bold;">let</span> ((getpid (prepare <span style="color: #e67128;">"select pg_backend_oid()"</span> <span style="color: #23d7d7;">:single</span>)))
+  (funcall getpid))
+</pre>
+</div>
+
+<p>
+For queries that have to be run very often, especially when they are complex,
+it may help performance since the server only has to plan them once. See the <a href="http://www.postgresql.org/docs/current/static/sql-prepare.html">
+PostgreSQL manual</a> for details.
+</p>
+
+<p>
+In some cases, the server will complain about not being able to deduce the type
+of the arguments in a statement. In that case you should add type declarations
+(either with the PostgreSQL's CAST SQL-conforming syntax or
+historical :: syntax, or with S-SQL's :type construct) to help it out.
+</p>
+
+<p>
+Note that it will attempt to automatically reconnect if
+database-connection-error, or admin-shutdown. It will reset prepared statements
+triggering an invalid-sql-statement-name error. It will overwrite old prepared
+statements triggering a duplicate-prepared-statement error.
+</p>
+
+<p>
+Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">let</span> ((select-int (prepare (<span style="color: #23d7d7;">:select</span> (<span style="color: #23d7d7;">:type</span> '$1 integer)) <span style="color: #23d7d7;">:single</span>)))
+  (funcall select-int 10))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-def-prepared" class="outline-3">
+<h3 id="macro-def-prepared">macro defprepared (name query &amp;optional (format :rows))</h3>
+<div class="outline-text-3" id="text-macro-def-prepared">
+<p>
+→ function
+</p>
+
+<p>
+This is a macro-style variant of prepare. It is like prepare, but gives the
+function a name which now becomes a top-level function for the prepared
+statement. The name should not a string but may be quoted.
+</p>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(defprepared 'select1 <span style="color: #e67128;">"select a from test_data where c = $1"</span> <span style="color: #23d7d7;">:single</span>)
+
+(funcall 'select1 <span style="color: #e67128;">"foobar"</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-defprepared-with-names" class="outline-3">
+<h3 id="macro-defprepared-with-names">macro defprepared-with-names (name (&amp;rest args) (query &amp;rest query-args) &amp;optional (format :rows))</h3>
+<div class="outline-text-3" id="text-macro-defprepared-with-names">
+<p>
+Like defprepared, but allows to specify names of the function arguments in a
+lambda list as well as arguments supplied to the query.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(defprepared-with-names user-messages (user <span style="color: #34cae2;">&amp;key</span> (limit 10))
+  (<span style="color: #e67128;">"select * from messages</span>
+<span style="color: #e67128;">    where user_id = $1</span>
+<span style="color: #e67128;">    order by date desc</span>
+<span style="color: #e67128;">    limit $2"</span> (user-id user) limit)
+  <span style="color: #23d7d7;">:plists</span>)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-macro-with-transaction" class="outline-3">
+<h3 id="macro-with-transaction">macro with-transaction ((&amp;optional name isolation-level) &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-with-transaction">
+<p>
+Execute the given body within a database transaction, committing it when the
+body exits normally, and aborting otherwise. An optional name and/or
+isolation-level can be given to the transaction. The name can be used to
+force a commit or abort before the body unwinds. The isolation-level
+will set the isolation-level used by the transaction.
+</p>
+
+<p>
+You can specify the following isolation levels in postmodern transactions:
+</p>
+
+<ul class="org-ul">
+<li>:read-committed-rw (read committed with read and write)</li>
+<li>:read-committed-ro (read committed with read only)</li>
+<li>:repeatable-read-rw (repeatable read with read and write)</li>
+<li>:repeatable-read-ro (repeatable read with read only)</li>
+<li>:serializable (serializable with reand and write)</li>
+</ul>
+
+<p>
+Sample usage where "george" is just the name given to the transaction (not
+quoted or a string) and &#x2026; simply indicates other statements would be
+expected here:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">with-transaction</span> ()
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 77))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-transaction</span> (george)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 22))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-transaction</span> (george <span style="color: #23d7d7;">:read-committed-rw</span>)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 33))
+  (query (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'test-data))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-transaction</span> (<span style="color: #23d7d7;">:serializable</span>)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 44))
+  ...)
+</pre>
+</div>
+
+<p>
+Further discussion of transactions and isolation levels can found at
+<a href="isolation-notes.html">isolation-notes.html</a> in the doc directory.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-commit-transaction" class="outline-3">
+<h3 id="function-commit-transaction">function commit-transaction (transaction)</h3>
+<div class="outline-text-3" id="text-function-commit-transaction">
+<p>
+Immediately commit an open transaction.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-abort-transaction" class="outline-3">
+<h3 id="function-abort-transaction">function abort-transaction (transaction)</h3>
+<div class="outline-text-3" id="text-function-abort-transaction">
+<p>
+Roll back the given transaction, but the transaction
+block is still active. Thus calling abort-transaction in the middle of a
+transaction does not end the transaction. Any subsequent statements will still
+be executed. Per the Postgresql documentation: ABORT rolls back the current
+transaction and causes all the updates made by the transaction to be discarded.
+This command is identical in behavior to the standard SQL command ROLLBACK, and
+is present only for historical reasons..
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-rollback-transaction" class="outline-3">
+<h3 id="function-rollback-transaction">function rollback-transaction (transaction)</h3>
+<div class="outline-text-3" id="text-function-rollback-transaction">
+<p>
+Roll back the given transaction, but the transaction
+block is still active. Thus calling abort-transaction in the middle of a
+transaction does not end the transaction. Any subsequent statements will still
+be executed. Per the Postgresql documentation: this rolls back the current
+transaction and causes all the updates made by the transaction to be discarded.
+</p>
+</div>
+</div>
+
+<div id="outline-container-macro-savepoint" class="outline-3">
+<h3 id="macro-savepoint">macro with-savepoint (name &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-savepoint">
+<p>
+Can only be used within a transaction. Establishes a savepoint with the given
+name at the start of body, and binds the same name to a handle for that
+savepoint. The body is executed and, at the end of body, the savepoint is
+released, unless a condition is thrown, in which case it is rolled back.
+Execute the body within a savepoint, releasing savepoint when the body exits
+normally, and rolling back otherwise. NAME is both the variable that can be
+used to release or rolled back before the body unwinds, and the SQL name of the
+savepoint.
+</p>
+
+<p>
+The following example demonstrates with-savepoint, rollback-savepoint and
+release-savepoint.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(execute (<span style="color: #23d7d7;">:create-table</span> test-data ((value <span style="color: #23d7d7;">:type</span> integer))))
+
+(<span style="color: #ffad29; font-weight: bold;">defun</span> <span style="color: #00ede1; font-weight: bold;">test12</span> (x <span style="color: #34cae2;">&amp;optional</span> (y nil))
+  (<span style="color: #ffad29; font-weight: bold;">with-logical-transaction</span> (lt1 <span style="color: #23d7d7;">:read-committed-rw</span>)
+    (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 0))
+    (<span style="color: #ffad29; font-weight: bold;">with-savepoint</span> sp1
+      (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 1))
+      (format t <span style="color: #e67128;">"1-1. ~a Savepoint-name ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)
+              (pomo::savepoint-name sp1))
+      (<span style="color: #ffad29; font-weight: bold;">if</span> (&lt; x 0)
+          (rollback-savepoint sp1)
+          (release-savepoint sp1))
+      (format t <span style="color: #e67128;">"1-2. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)))
+    (<span style="color: #ffad29; font-weight: bold;">with-savepoint</span> sp2
+      (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 2))
+      (format t <span style="color: #e67128;">"2-1. ~a Savepoint-name ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)
+              (pomo::savepoint-name sp2))
+      (<span style="color: #ffad29; font-weight: bold;">with-savepoint</span> sp3
+        (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 3))
+        (format t <span style="color: #e67128;">"3-1. ~a Savepoint-name ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)
+                (pomo::savepoint-name sp3))
+        (<span style="color: #ffad29; font-weight: bold;">if</span> (&gt; x 0)
+            (rollback-savepoint sp3)
+            (release-savepoint sp3))
+        (format t <span style="color: #e67128;">"3-2. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>))
+        (<span style="color: #ffad29; font-weight: bold;">when</span> y (rollback-savepoint sp2))
+        (format t <span style="color: #e67128;">"3-3. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)))
+      (<span style="color: #ffad29; font-weight: bold;">if</span> (= x 0)
+          (rollback-savepoint sp2)
+          (release-savepoint sp2))
+      (format t <span style="color: #e67128;">"2-2. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>)))
+    (format t <span style="color: #e67128;">"4. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>))
+    (<span style="color: #ffad29; font-weight: bold;">when</span> (string= y <span style="color: #e67128;">"abrt"</span>)
+      (abort-transaction lt1))
+    (format t <span style="color: #e67128;">"5. ~a~%"</span> (query <span style="color: #e67128;">"select * from test_data"</span>))))
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-function-release-savepoint" class="outline-3">
+<h3 id="function-release-savepoint">function release-savepoint (savepoint)</h3>
+<div class="outline-text-3" id="text-function-release-savepoint">
+<p>
+Immediately release a savepoint, commiting its results.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-rollback-savepoint" class="outline-3">
+<h3 id="function-rollback-savepoint">function rollback-savepoint (savepoint)</h3>
+<div class="outline-text-3" id="text-function-rollback-savepoint">
+<p>
+Immediately roll back a savepoint, aborting the results.
+</p>
+</div>
+</div>
+
+<div id="outline-container-method-commit-hooks" class="outline-3">
+<h3 id="method-commit-hooks">method commit-hooks (transaction-or-savepoint), setf (commit-hooks transaction-or-savepoint)</h3>
+<div class="outline-text-3" id="text-method-commit-hooks">
+<p>
+An accessor for the transaction or savepoint's list of commit hooks, each of
+which should be a function with no required arguments. These functions will be
+executed when a transaction is committed or a savepoint released.
+</p>
+</div>
+</div>
+
+<div id="outline-container-method-abort-hooks" class="outline-3">
+<h3 id="method-abort-hooks">function abort-hooks (transaction-or-savepoint), setf (abort-hooks transaction-or-savepoint)</h3>
+<div class="outline-text-3" id="text-method-abort-hooks">
+<p>
+An accessor for the transaction or savepoint's list of abort hooks, each of
+which should be a function with no required arguments. These functions will be
+executed when a transaction is aborted or a savepoint rolled back (whether via a
+non-local transfer of control or explicitly by either abort-transaction or
+rollback-savepoint).
+</p>
+</div>
+</div>
+
+<div id="outline-container-variable-isolation-levels" class="outline-3">
+<h3 id="variable-isolation-levels">variable <code>*isolation-level*</code></h3>
+<div class="outline-text-3" id="text-variable-isolation-levels">
+<p>
+The transaction isolation level currently in use. Defaults to :read-committed-rw
+</p>
+
+<p>
+You can specify the following isolation levels in postmodern transactions:
+</p>
+
+<ul class="org-ul">
+<li>:read-committed-rw (read committed with read and write)</li>
+<li>:read-committed-ro (read committed with read only)</li>
+<li>:repeatable-read-rw (repeatable read with read and write)</li>
+<li>:repeatable-read-ro (repeatable read with read only)</li>
+<li>:serializable (serializable with reand and write)</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-macro-with-logical-transaction" class="outline-3">
+<h3 id="macro-with-logical-transaction">macro with-logical-transaction ((&amp;optional name isolation-level) &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-with-logical-transaction">
+<p>
+Executes body within a with-transaction form if no transaction is currently
+in progress, otherwise simulates a nested transaction by executing it
+within a with-savepoint form. The transaction or savepoint is bound to name
+if one is supplied. The isolation-level will set the isolation-level used by the
+transaction.
+</p>
+
+<p>
+You can specify the following isolation levels in postmodern transactions:
+</p>
+
+<ul class="org-ul">
+<li>:read-committed-rw (read committed with read and write)</li>
+<li>:read-committed-ro (read committed with read only)</li>
+<li>:repeatable-read-rw (repeatable read with read and write)</li>
+<li>:repeatable-read-ro (repeatable read with read only)</li>
+<li>:serializable (serializable with reand and write)</li>
+</ul>
+
+<p>
+For more information see <a href="isolation-notes.html">isolation-notes</a>
+</p>
+
+<p>
+Sample usage where "george" is just the name given to the transaction (not
+quoted or a string) and &#x2026; simply indicates other statements would be
+expected here:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #ffad29; font-weight: bold;">with-logical-transaction</span> ()
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 77))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-logical-transaction</span> (george)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 22))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-logical-transaction</span> (george <span style="color: #23d7d7;">:read-committed-rw</span>)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 33))
+  ...)
+
+(<span style="color: #ffad29; font-weight: bold;">with-logical-transaction</span> (<span style="color: #23d7d7;">:serializable</span>)
+  (execute (<span style="color: #23d7d7;">:insert-into</span> 'test-data <span style="color: #23d7d7;">:set</span> 'value 44))
+  ...)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-function-abort-logical-transaction" class="outline-3">
+<h3 id="function-abort-logical-transaction">function abort-logical-transaction (transaction-or-savepoint)</h3>
+<div class="outline-text-3" id="text-function-abort-logical-transaction">
+<p>
+Roll back the given logical transaction, regardless of whether it is an actual
+transaction or a savepoint.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-commit-logical-transaction" class="outline-3">
+<h3 id="function-commit-logical-transaction">function commit-logical-transaction (transaction-or-savepoint)</h3>
+<div class="outline-text-3" id="text-function-commit-logical-transaction">
+<p>
+Commit the given logical transaction, regardless of whether it is an actual
+transaction or a savepoint.
+</p>
+</div>
+</div>
+
+<div id="outline-container-variable-current-logical-transaction" class="outline-3">
+<h3 id="variable-current-logical-transaction">variable <code>*current-logical-transaction*</code></h3>
+<div class="outline-text-3" id="text-variable-current-logical-transaction">
+<p>
+This is bound to the current transaction-handle or savepoint-handle instance
+representing the innermost open logical transaction.
+</p>
+</div>
+</div>
+
+<div id="outline-container-macro-ensure-transaction" class="outline-3">
+<h3 id="macro-ensure-transaction">macro ensure-transaction (&amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-ensure-transaction">
+<p>
+Ensures that body is executed within a transaction, but does not begin a new
+transaction if one is already in progress.
+</p>
+</div>
+</div>
+
+<div id="outline-container-macro-ensure-transaction-with-isolation-level" class="outline-3">
+<h3 id="macro-ensure-transaction-with-isolation-level">macro ensure-transaction-with-isolation-level (isolation-level &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-ensure-transaction-with-isolation-level">
+<p>
+Executes body within a with-transaction form if and only if no transaction is
+already in progress. This adds the ability to specify an isolation level other
+than the current default
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-prepared-statement-helper-functions" class="outline-2">
+<h2 id="prepared-statement-helper-functions">Helper functions for Prepared Statements</h2>
+<div class="outline-text-2" id="text-prepared-statement-helper-functions">
+</div>
+
+<div id="outline-container-variable-allow-overwriting-prepared-statements" class="outline-3">
+<h3 id="variable-allow-overwriting-prepared-statements">defparameter <b>allow-overwriting-prepared-statements</b></h3>
+<div class="outline-text-3" id="text-variable-allow-overwriting-prepared-statements">
+<p>
+When set to t, ensured-prepared will overwrite prepared statements having the
+same name if the query statement itself in the postmodern meta connection is
+different than the query statement provided to ensure-prepared.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-prepared-statement-exists-p" class="outline-3">
+<h3 id="function-prepared-statement-exists-p">function prepared-statement-exists-p (name)</h3>
+<div class="outline-text-3" id="text-function-prepared-statement-exists-p">
+<p>
+→ boolean
+This returns t if the prepared statement exists in the current postgresql
+session, otherwise nil.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-prepared-statements" class="outline-3">
+<h3 id="function-list-prepared-statements">function list-prepared-statements (&amp;optional (names-only nil))</h3>
+<div class="outline-text-3" id="text-function-list-prepared-statements">
+<p>
+→ list
+</p>
+
+<p>
+This is syntactic sugar. It runs a query that lists the prepared statements in
+the session in which the function is run. If the names-only parameter is set
+to t, it will only return a list of the names of the prepared statements.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-drop-prepared-statement" class="outline-3">
+<h3 id="function-drop-prepared-statement">function drop-prepared-statement (statement-name &amp;key (location :both) (database <code>*database*</code>))</h3>
+<div class="outline-text-3" id="text-function-drop-prepared-statement">
+<p>
+The statement name can be a string or quoted symbol.
+</p>
+
+<p>
+Prepared statements are stored both in the meta slot in the postmodern
+connection and in postgresql session information. In the case of prepared
+statements generated with defprepared, there is also a lisp function with
+the same name.
+</p>
+
+<p>
+If you know the prepared statement name, you can delete the prepared statement
+from both locations (the default behavior), just from postmodern by passing
+:postmodern to the location key parameter or just from postgresql by passing
+:postgresql to the location key parameter.
+</p>
+
+<p>
+If you pass the name 'All' as the statement name, it will
+delete all prepared statements.
+</p>
+
+<p>
+The default behavior is to also remove any lisp function of the same name.
+This behavior is controlled by the remove-function key parameter.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-postmodern-prepared-statements" class="outline-3">
+<h3 id="function-list-postmodern-prepared-statements">function list-postmodern-prepared-statements (&amp;optional (names-only nil))</h3>
+<div class="outline-text-3" id="text-function-list-postmodern-prepared-statements">
+<p>
+→ list
+</p>
+
+<p>
+List the prepared statements that postmodern has put in the meta slot in the
+connection. It will return a list of alists of form:
+((:NAME . \"SNY24\")
+(:STATEMENT . \"(SELECT name, salary FROM employee WHERE (city = $1))\")
+(:PREPARE-TIME . #&lt;TIMESTAMP 25-11-2018T15:36:43,385&gt;)
+(:PARAMETER-TYPES . \"{text}\") (:FROM-SQL)
+</p>
+
+<p>
+If the names-only parameter is set to t, it will only return a list of
+the names of the prepared statements.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-find-postgresql-prepared-statement" class="outline-3">
+<h3 id="function-find-postgresql-prepared-statement">function find-postgresql-prepared-statement (name)</h3>
+<div class="outline-text-3" id="text-function-find-postgresql-prepared-statement">
+<p>
+→ string
+</p>
+
+<p>
+Returns the specified named prepared statement (if any) that postgresql has for
+this session and placed in the meta slot in the connection.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-find-postmodern-prepared-statement" class="outline-3">
+<h3 id="function-find-postmodern-prepared-statement">function find-postmodern-prepared-statement (name)</h3>
+<div class="outline-text-3" id="text-function-find-postmodern-prepared-statement">
+<p>
+→ string
+</p>
+
+<p>
+Returns the specified named prepared statement (if any) that postmodern has put
+in the meta slot in the connection. Note that this is the statement itself, not
+the name.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-reset-prepared-statement" class="outline-3">
+<h3 id="function-reset-prepared-statement">function reset-prepared-statement (condition)</h3>
+<div class="outline-text-3" id="text-function-reset-prepared-statement">
+<p>
+→ restart
+</p>
+
+<p>
+If you have received an invalid-prepared-statement error but the prepared
+statement is still in the meta slot in the postmodern connection, this will try
+to regenerate the prepared statement at the database connection level and
+restart the connection.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-get-pid" class="outline-3">
+<h3 id="function-get-pid">function get-pid ()</h3>
+<div class="outline-text-3" id="text-function-get-pid">
+<p>
+→ integer
+</p>
+
+<p>
+Get the process id used by postgresql for this connection.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-get-pid-from-postmodern" class="outline-3">
+<h3 id="function-get-pid-from-postmodern">function get-pid-from-postmodern ()</h3>
+<div class="outline-text-3" id="text-function-get-pid-from-postmodern">
+<p>
+→ integer
+</p>
+
+<p>
+Get the process id used by postgresql for this connection, but get it from the
+postmodern connection parameters.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-cancel-backend" class="outline-3">
+<h3 id="function-cancel-backend">function cancel-backend (pid)</h3>
+<div class="outline-text-3" id="text-function-cancel-backend">
+<p>
+Polite way of terminating a query at the database (as opposed to calling
+close-database). This is slower than (terminate-backend pid) and does not
+always work.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-terminate-backend" class="outline-3">
+<h3 id="function-terminate-backend">function terminate-backend (pid)</h3>
+<div class="outline-text-3" id="text-function-terminate-backend">
+<p>
+Less polite way of terminating at the database (as opposed to calling
+close-database). Faster than (cancel-backend pid) and more reliable.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-database-management" class="outline-2">
+<h2 id="database-management">Database Management</h2>
+<div class="outline-text-2" id="text-database-management">
+</div>
+
+<div id="outline-container-function-create-database" class="outline-3">
+<h3 id="function-create-database">function create-database (database-name &amp;key (encoding "UTF8") (connection-limit -1) owner limit-public-access comment collation template)</h3>
+<div class="outline-text-3" id="text-function-create-database">
+<p>
+Creates a basic database. Besides the obvious database-name parameter, you
+can also use key parameters to set encoding (defaults to UTF8), owner,
+connection-limit (defaults to no limit)). If limit-public-access is set to t,
+then only superuser roles or roles with explicit access to this database will
+be able to access it. See <a href="#roles">Roles</a>.
+</p>
+
+<p>
+If collation is set, the assumption is that template0 needs to be used as the base
+of the database rather than template1 which may contain encoding specific or locale
+specific data.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(create-database 'testdb <span style="color: #23d7d7;">:limit-public-access</span> t
+                         <span style="color: #23d7d7;">:comment</span> <span style="color: #e67128;">"This database is for testing silly theories"</span>)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-function-drop-database" class="outline-3">
+<h3 id="function-drop-database">function drop-database (database)</h3>
+<div class="outline-text-3" id="text-function-drop-database">
+<p>
+Drop the specified database. The database parameter can be a string or a
+symbol. Note: Only the owner of a database (or superuser) can drop a database
+and there cannot be any current connections to the database.
+[[#database-information][See Database information below for information specific functions]
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-table-definition" class="outline-2">
+<h2 id="table-definition">Table definition and creation using a dao</h2>
+<div class="outline-text-2" id="text-table-definition">
+<p>
+See: <a href="dao-classes.html#table-definition">Creating Tables using dao classes</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-roles" class="outline-2">
+<h2 id="roles">Roles</h2>
+<div class="outline-text-2" id="text-roles">
+<p>
+Every connection is specific to a particular database. However, creating roles
+or users is global to the entire cluster (the running postgresql server). You
+can create policies for any individual database, schema or table, but you need
+to ensure that those policies also apply to any subsequently created database,
+schema or table. Note that each user is automatically a member of the public
+group, so you need to change those policies for public as well.
+</p>
+
+<p>
+Per the Postgresql Documentation, CREATE ROLE adds a new role to a PostgreSQL
+database cluster. A role is an entity that can own database objects and have
+database privileges; a role can be considered a “user”, a “group”, or both
+depending on how it is used.
+<a href="https://www.postgresql.org/docs/current/sql-createrole.html">https://www.postgresql.org/docs/current/sql-createrole.html</a>. The only real
+difference between "create role" and "create user" is that create user
+defaults to having a login attribute and create role defaults to not having
+a login attribute.
+</p>
+
+<p>
+Often applications will have their own concept of users and the application
+will itself have one or more types of roles to which the application user is
+assigned. So, for example, the application may have two roles - reader and
+editor with which it interacts with postgresql and then there are many
+application users registered with the application and probably listed in some
+type of user table in postgresql that the application manages. When users 1,2
+or 3 log in to the application, the application might connect to the postgresql
+cluster using a role that only has read (select) permissions. When users 4 or 5
+log in to the application, the applicatin might connect to the postgresql cluster
+using a role that has read, insert, update and delete permission. Postmodern
+provides a simplified create-role system allowing easy creation of roles that
+have readonly, editor or superuser type permissions. Further, those
+permissions can be limited to individual databases, schemas or tables.
+</p>
+
+<p>
+We suggest that you separate application users from roles. Make it easy to
+drop application users. Dropping roles requires going through every database,
+reassigning ownership of any objects that role might own or have privileges
+on, then dropping ownership of objects, then dropping the role itself.
+</p>
+</div>
+
+<div id="outline-container-function-role-exists-p" class="outline-3">
+<h3 id="function-role-exists-p">function role-exists-p (role-name)</h3>
+<div class="outline-text-3" id="text-function-role-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Does the named role exist in this database cluster? Returns t or nil.
+</p>
+</div>
+</div>
+<div id="outline-container-function-create-role" class="outline-3">
+<h3 id="function-create-role">function create-role</h3>
+<div class="outline-text-3" id="text-function-create-role">
+<p>
+(name password &amp;key (base-role :readonly) (schema :public)
+                                    (tables :all) (databases :current)
+                                    (allow-whitespace nil)
+                                    (allow-utf8 nil)
+                                    (allow-disallowed-names nil) (comment nil))
+</p>
+
+<p>
+Keyword parameters: Base-role. Base-role should be one of :readonly, :editor,
+:admin, :standard or :superuser. A readonly user can only select existing data in the
+specified tables or databases. An editor has the ability to insert, update,
+delete or select data. An admin has all privileges on a database, but cannot
+create new databases, roles, or replicate the system. A standard user has no
+particular privileges other than connecting to databases.
+</p>
+
+<p>
+ :schema defaults to :public but can be a list of schemas. User will not have
+access to any schemas not in the list.
+</p>
+
+<p>
+ :tables defaults to :all but can be a list of tables. User will not have access
+to any tables not in the list.
+</p>
+
+<p>
+ :databases defaults to :current but can be a list of databases. User will not
+have access to any databases not in the list.
+</p>
+
+<p>
+ :allow-whitespace - Whitespace in either the name or password is not allowed by
+default.
+</p>
+
+<p>
+ :allow-utf8 defaults to nil. If t, the name and password will be normalized. If
+nil, the name and password are limited to printable ascii characters. For fun
+reading on utf8 user names see
+<a href="https://labs.spotify.com/2013/06/18/creative-usernames">https://labs.spotify.com/2013/06/18/creative-usernames</a>. Also interesting reading
+is <a href="https://github.com/flurdy/bad_usernames">https://github.com/flurdy/bad_usernames</a> and <a href="https://github.com/dsignr/disallowed-usernames/blob/master/disallowed%20usernames.csv">https://github.com/dsignr/disallowed-usernames/blob/master/disallowed%20usernames.csv</a>,
+and <a href="https://www.b-list.org/weblog/2018/feb/11/usernames/">https://www.b-list.org/weblog/2018/feb/11/usernames/</a>
+</p>
+
+<p>
+ :allow-disallowed-names defaults to nil. If nil, the user name will be checked
+against <code>*disallowed-role-names*</code>.
+</p>
+
+<p>
+ As an aside, if allowing utf8 in names, you might want to think about whether
+you should second copy of the username in the original casing and normalized as
+NFC for display purposes as opposed to normalizing to NFKC. It might be viewed
+as culturally insensitive to change the display of the name.
+</p>
+</div>
+</div>
+<div id="outline-container-function-drop-role" class="outline-3">
+<h3 id="function-drop-role">function drop-role (role-name &amp;optional (new-owner "postgres") (database :all))</h3>
+<div class="outline-text-3" id="text-function-drop-role">
+<p>
+→ boolean
+</p>
+
+<p>
+The role-name and optional new-owner name should be strings. If they are
+symbols, they will be converted to string and hyphens will be converted to
+underscores.
+</p>
+
+<p>
+Before dropping the role, you must drop all the objects it owns (or reassign
+their ownership) and revoke any privileges the role has been granted on other
+objects. If database is :all, drop-role will loop through all databases in
+the cluster ensuring that the role has no privileges or owned objects in
+every database. Otherwise drop-role will drop objects owned by a role in the
+current database.
+</p>
+
+<p>
+We will reassign ownership of the objects to the postgres role
+unless otherwise specified in the optional second parameter. Returns t if
+successful. Will not drop the postgres role.
+</p>
+</div>
+</div>
+<div id="outline-container-function-alter-role" class="outline-3">
+<h3 id="function-alter-role">function alter-role-search-path (role search-path)</h3>
+<div class="outline-text-3" id="text-function-alter-role">
+<p>
+Changes the priority of where a role looks for tables (which schema first,
+second, etc. Role should be a string or symbol. Search-path could be a list of schema
+names either as strings or symbols.
+</p>
+</div>
+</div>
+<div id="outline-container-function-change-password" class="outline-3">
+<h3 id="function-change-password">function change-password (role password &amp;optional expiration-date)</h3>
+<div class="outline-text-3" id="text-function-change-password">
+<p>
+Alters a role's password. If the optional expiration-date parameter is provided,
+the password will expire at the stated date. A sample expiration date would be
+'December 31, 2020'. If the expiration date is 'infinity', it will never expire.
+The password will be encrypted in the system catalogs. This is
+automatic with postgresql versions 10 and above.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-grant-role-permissions" class="outline-3">
+<h3 id="function-grant-role-permissions">function grant-role-permissions (role-type name &amp;key (schema :public) (tables :all) (databases :all))</h3>
+<div class="outline-text-3" id="text-function-grant-role-permissions">
+<p>
+Grant-role-permissions assumes that a role has already been created, but
+permissions need to be granted or revoked on a particular database.
+</p>
+
+<p>
+   A  :superuser can create databases, roles, replication, etc. Returns nil.
+   A  :standard user has no particular privileges or restrictions. Returns nil.
+   An :admin user can edit existing data, insert new data and create new tables
+in the specified databases/schemas/tables.
+   An :editor user can update fields or insert new records but cannot create new
+tables in the specified tables or databases.
+   A  :readonly role can only read existing data in the specified schemas,
+tables or databases. Schema, tables or databases can be :all or a list of
+schemas, tables or databases to be granted permission.
+</p>
+
+<p>
+Granting :all provides access to all future items of that type as well.
+</p>
+
+<p>
+  Note that the schema and table rights and revocations granted are limited to
+the connected database at the time of execution of this function.
+</p>
+</div>
+</div>
+<div id="outline-container-function-grant-readonly-permissions" class="outline-3">
+<h3 id="function-grant-readonly-permissions">function grant-readonly-permissions (schema-name role-name &amp;optional (table-name nil))</h3>
+<div class="outline-text-3" id="text-function-grant-readonly-permissions">
+<p>
+Grants select privileges to a role for the named schema. If the optional
+table-name parameter is provided, the privileges are only granted with respect
+to that table. Note that we are giving some function execute permissions if
+table-name is nil, but if the table-name is specified, those are not provided.
+Your mileage may vary on how many privileges you want to provide to a
+read-only role with access to only a limited number of tables.
+</p>
+</div>
+</div>
+<div id="outline-container-function-grant-editor-permissions" class="outline-3">
+<h3 id="function-grant-editor-permissions">function grant-editor-permissions (schema-name role-name &amp;optional (table-name nil))</h3>
+<div class="outline-text-3" id="text-function-grant-editor-permissions">
+<p>
+Grants select, insert, update and delete privileges to a role for the named
+schema. If the optional table-name parameter is provided, the privileges are only
+granted with respect to that table. Note that we are giving some function execute
+permissions if table-name is nil, but if the table-name is specified, those are
+not provided. Your mileage may vary on how many privileges you want to provide
+to a editor role with access to only a limited number of tables.
+</p>
+</div>
+</div>
+<div id="outline-container-function-grant-admin-permissions" class="outline-3">
+<h3 id="function-grant-admin-permissions">function grant-admin-permissions (schema-name role-name &amp;optional (table-name nil))</h3>
+<div class="outline-text-3" id="text-function-grant-admin-permissions">
+<p>
+Grants all privileges to a role for the named schema. If the optional table-name
+parameter is provided, the privileges are only granted with respect to that table.
+</p>
+</div>
+</div>
+<div id="outline-container-function-revoke-all-on-table" class="outline-3">
+<h3 id="function-revoke-all-on-table">function revoke-all-on-table (table-name role-name)</h3>
+<div class="outline-text-3" id="text-function-revoke-all-on-table">
+<p>
+Takes a table-name which could be a string, symbol or list of strings or
+symbols of tables names, a role name and revokes all privileges that
+role-name may have with that/those tables. This is limited to the currently
+connected database and can only revoke the privileges granted by the caller
+of the function.
+</p>
+</div>
+</div>
+<div id="outline-container-function-list-role-accessible-databases" class="outline-3">
+<h3 id="function-list-role-accessible-databases">function list-role-accessible-databases (role-name)</h3>
+<div class="outline-text-3" id="text-function-list-role-accessible-databases">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of the databases to which the specified role can connect.
+</p>
+</div>
+</div>
+<div id="outline-container-function-list-roles" class="outline-3">
+<h3 id="function-list-roles">function list-roles (&amp;optional (lt nil))</h3>
+<div class="outline-text-3" id="text-function-list-roles">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of alists of rolenames, role attributes and membership in roles.
+See <a href="https://www.postgresql.org/docs/current/role-membership.html">https://www.postgresql.org/docs/current/role-membership.html</a> for an
+explanation. Optionally passing :alists or :plists can be used to set the return
+list types to :alists or :plists. This is the same as the psql function \du.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-role-permissions" class="outline-3">
+<h3 id="function-list-role-permissions">function list-role-permissions (&amp;optional role)</h3>
+<div class="outline-text-3" id="text-function-list-role-permissions">
+<p>
+→ list
+</p>
+
+<p>
+This returns a list of sublists of the permissions granted  within the
+currently connected database. If an optional role is provided, the result is
+limited to that role. The sublist returned will be in the form of role-name,
+schema-name, table-name and then a string containing all the rights of that role
+on that table in that schema.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-database-information" class="outline-2">
+<h2 id="database-information">Database Information</h2>
+<div class="outline-text-2" id="text-database-information">
+</div>
+<div id="outline-container-funciton-add-comment" class="outline-3">
+<h3 id="funciton-add-comment">function add-comment (type name comment &amp;optional (second-name ""))</h3>
+<div class="outline-text-3" id="text-funciton-add-comment">
+<p>
+Attempts to add a comment to a particular database object. The first parameter is a keyword for the type of database object. The second parameter is the name of the object. The third parameter is the comment itself. Some objects require an additional identifier. The names can be strings or symbols.
+</p>
+
+<p>
+Example usage would be:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(add-comment <span style="color: #23d7d7;">:database</span> 'my-database-name <span style="color: #e67128;">"Does anyone actually use this database?"</span>)
+
+(add-comment <span style="color: #23d7d7;">:column</span> 'country-locations.name <span style="color: #e67128;">"Is what it looks like - the name of a country"</span>)
+
+(add-comment <span style="color: #23d7d7;">:column</span> <span style="color: #e67128;">"country_locations.name"</span> <span style="color: #e67128;">"Is what it looks like - the name of a country"</span>)
+</pre>
+</div>
+
+<p>
+Example usage where two identifiers are required would be constraints:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(add-comment <span style="color: #23d7d7;">:constraint</span> 'constraint1  <span style="color: #e67128;">"Some kind of constraint descriptions here"</span>
+             'country-locations)
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-function-find-comments" class="outline-3">
+<h3 id="function-find-comments">find-comments (type identifier)</h3>
+<div class="outline-text-3" id="text-function-find-comments">
+<p>
+Returns the comments attached to a particular database object. The allowed
+types are :database :schema :table :columns (all the columns in a table)
+:column (for a single column).
+</p>
+
+<p>
+An example would be (find-comments :table 's2.employees) where the table employees
+is in the s2 schema.
+</p>
+</div>
+</div>
+<div id="outline-container-function-get-database-comment" class="outline-3">
+<h3 id="function-get-database-comment">function get-database-comment (database-name)</h3>
+<div class="outline-text-3" id="text-function-get-database-comment">
+<p>
+→ string
+</p>
+
+<p>
+Returns the comment, if any, attached to a database. See also get-schema-comment,
+get-column-comments and get-database-comment.
+</p>
+</div>
+</div>
+<div id="outline-container-function-postgresql-version" class="outline-3">
+<h3 id="function-postgresql-version">function postgresql-version ()</h3>
+<div class="outline-text-3" id="text-function-postgresql-version">
+<p>
+→ string
+</p>
+
+<p>
+Returns the version string provided by postgresql of the current postgresql
+server. E.g. "PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc
+(Arch Linux 9.3.0-1) 9.3.0, 64-bit". If you want just the postgresql version
+number, use (cl-postgres:get-postgresql-version).
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-database-version" class="outline-3">
+<h3 id="function-database-version">function database-version ()</h3>
+<div class="outline-text-3" id="text-function-database-version">
+<p>
+→ string
+</p>
+
+<p>
+DEPRECATED. This returns the postgresql server version number, not a version
+number from the currently connected database. The format of the return string
+is determined by the current postgresql server.
+E.g. "PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc
+(Arch Linux 9.3.0-1) 9.3.0, 64-bit".
+</p>
+
+<p>
+If you want just the postgresql version
+number, use (cl-postgres:get-postgresql-version).
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-current-databse" class="outline-3">
+<h3 id="function-current-databse">function current-database ()</h3>
+<div class="outline-text-3" id="text-function-current-databse">
+<p>
+→ string
+</p>
+
+<p>
+Returns the string name of the current database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-database-exists-p" class="outline-3">
+<h3 id="function-database-exists-p">function database-exists-p (database-name)</h3>
+<div class="outline-text-3" id="text-function-database-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Checks to see if a particular database exists. Returns T if true, nil if not.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-database-size" class="outline-3">
+<h3 id="function-database-size">function database-size (&amp;optional database-name)</h3>
+<div class="outline-text-3" id="text-function-database-size">
+<p>
+→ list
+</p>
+
+<p>
+Given the name of a database, will return the name, a pretty-print string of
+the size of the database and the size in bytes. If a database name is not
+provided, it will return the result for the currently connected database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-num-records-in-database" class="outline-3">
+<h3 id="function-num-records-in-database">function num-records-in-database ()</h3>
+<div class="outline-text-3" id="text-function-num-records-in-database">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of lists with schema, table name and approximate number of
+records in the currently connected database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-databases" class="outline-3">
+<h3 id="function-list-databases">function list-databases (&amp;key (order-by-size nil) (size t))</h3>
+<div class="outline-text-3" id="text-function-list-databases">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of lists where each sub-list contains the name of the database,
+a pretty-print string of the size of that database and the size in bytes. The
+default order is by database name. Pass t as a parameter to :order-by-size
+for order by size. Setting size to nil will return just the database names
+in a single list ordered by name. This function excludes the template databases
+</p>
+</div>
+</div>
+
+<div id="outline-container-list-database-functions" class="outline-3">
+<h3 id="list-database-functions">function list-database-functions ()</h3>
+<div class="outline-text-3" id="text-list-database-functions">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of the functions in the database from the information_schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-databse-users" class="outline-3">
+<h3 id="function-list-databse-users">function list-database-users ()</h3>
+<div class="outline-text-3" id="text-function-list-databse-users">
+<p>
+→ list
+</p>
+
+<p>
+List database users (actually 'roles' in Postgresql terminology).
+</p>
+</div>
+</div>
+<div id="outline-container-function-list-database-access-rights" class="outline-3">
+<h3 id="function-list-database-access-rights">function list-database-access-rights (&amp;optional database-name)</h3>
+<div class="outline-text-3" id="text-function-list-database-access-rights">
+<p>
+→ list
+</p>
+
+<p>
+If the database parameter is specifed, this returns an list of lists where
+each sublist is a role name and whether they have access rights (t or nil) to that
+particular database. If the database-name is not provided, the sublist is
+a database name, a role name and whether they have access rights (t or nil). This
+excludes the template databases.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-available-types" class="outline-3">
+<h3 id="function-list-available-types">function list-available-types ()</h3>
+<div class="outline-text-3" id="text-function-list-available-types">
+<p>
+→ list
+</p>
+
+<p>
+List the available data types in the connected postgresql version, It returns a
+list of lists, each sublist containing the oid (object identifier number) and
+the name of the data types. E.g. (21 "smallint")
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-available-collations" class="outline-3">
+<h3 id="function-list-available-collations">function list-available-collations ()</h3>
+<div class="outline-text-3" id="text-function-list-available-collations">
+<p>
+→ list
+</p>
+
+<p>
+Get a list of the collations available from the current database cluster.
+Collations are a mess as different operating systems provide different
+collations. We might get some sanity if Postgresql can use ICU as the default.
+See <a href="https://wiki.postgresql.org/wiki/Collations">https://wiki.postgresql.org/wiki/Collations</a>.
+</p>
+</div>
+</div>
+<div id="outline-container-list-available-extensions" class="outline-3">
+<h3 id="list-available-extensions">function list-available-extensions ()</h3>
+<div class="outline-text-3" id="text-list-available-extensions">
+<p>
+→ list
+</p>
+
+<p>
+List the postgresql extensions which are available in the system to the
+currently connected database. The extensions may or may not be installed.
+</p>
+</div>
+</div>
+<div id="outline-container-function-list-installed-extensions" class="outline-3">
+<h3 id="function-list-installed-extensions">function list-installed-extensions ()</h3>
+<div class="outline-text-3" id="text-function-list-installed-extensions">
+<p>
+→ list
+</p>
+
+<p>
+List the postgresql extensions which are installed in the currently connected
+database.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-load-uuid-extensin" class="outline-3">
+<h3 id="function-load-uuid-extensin">function load-uuid-extension ()</h3>
+<div class="outline-text-3" id="text-function-load-uuid-extensin">
+<p>
+Loads the Postgresql uuid-ossp contrib module. Once loaded, you can call uuid
+generation functions such as uuid_generate_v4 within a query. E.g.
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(query <span style="color: #e67128;">"select uuid_generate_v4()"</span>)
+</pre>
+</div>
+<p>
+It will be skipped if it is already loaded. See Postgresql documentation at <a href="https://www.postgresql.org/docs/current/uuid-ossp.htmlList">https://www.postgresql.org/docs/current/uuid-ossp.htmlList</a> for more details.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-templates" class="outline-3">
+<h3 id="function-list-templates">function list-templates ()</h3>
+<div class="outline-text-3" id="text-function-list-templates">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of existing database template names.
+</p>
+</div>
+</div>
+<div id="outline-container-function-change-toplevel-database" class="outline-3">
+<h3 id="function-change-toplevel-database">function change-toplevel-database (new-database user password host)</h3>
+<div class="outline-text-3" id="text-function-change-toplevel-database">
+<p>
+→ string
+</p>
+
+<p>
+Just changes the database assuming you are using a toplevel connection.
+Recommended only for development work. Returns the name of the newly connected
+database as a string.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-cache-hit-ratio" class="outline-3">
+<h3 id="function-cache-hit-ratio">function cache-hit-ratio ()</h3>
+<div class="outline-text-3" id="text-function-cache-hit-ratio">
+<p>
+→ list
+</p>
+
+<p>
+The cache hit ratio shows data on serving the data from memory compared to how
+often you have to go to disk. This function returns a list of heapblocks read
+from disk, heapblocks hit from memory and the ratio of heapblocks hit from
+memory / total heapblocks hit. Borrowed from: <a href="https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/">https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-bloat-measurement" class="outline-3">
+<h3 id="function-bloat-measurement">function bloat-measurement ()</h3>
+<div class="outline-text-3" id="text-function-bloat-measurement">
+<p>
+→ list
+</p>
+
+<p>
+Bloat measurement of unvacuumed dead tuples.
+Borrowed from: <a href="https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/">https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/</a> who
+borrowed it from <a href="https://github.com/heroku/heroku-pg-extras/tree/master/commands">https://github.com/heroku/heroku-pg-extras/tree/master/commands</a>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-unused-indexes" class="outline-3">
+<h3 id="function-unused-indexes">function unused-indexes ()</h3>
+<div class="outline-text-3" id="text-function-unused-indexes">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of lists showing schema.table, indexname, index_size and number
+of scans. The code was borrowed from: <a href="https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/">https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/</a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-check-query-performance" class="outline-3">
+<h3 id="function-check-query-performance">function check-query-performance (&amp;optional (ob nil) (num-calls 100) (limit 20))</h3>
+<div class="outline-text-3" id="text-function-check-query-performance">
+<p>
+→ list
+</p>
+
+<p>
+This function requires that postgresql extension pg_stat_statements must be
+loaded via shared_preload_libraries. It is borrowed from <a href="https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/">https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/</a>.
+Optional parameters:
+</p>
+
+<p>
+ OB allow order-by to be 'calls', 'total-time', 'rows-per'
+or 'time-per', defaulting to time-per.
+</p>
+
+<p>
+num-calls to require that the number of calls exceeds a certain threshold, and
+limit to limit the number of rows returned. It returns a list of lists, each
+row containing the query, number of calls, total_time, total_time/calls,
+stddev_time, rows, rows/calls and the cache hit percentage.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-constraints" class="outline-2">
+<h2 id="constraints">Constraints</h2>
+<div class="outline-text-2" id="text-constraints">
+</div>
+<div id="outline-container-function-list-unique-or-primary-constraints" class="outline-3">
+<h3 id="function-list-unique-or-primary-constraints">function list-unique-or-primary-constraints (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-unique-or-primary-constraints">
+<p>
+→ list
+</p>
+
+<p>
+List constraints on a table. Table-name can be either a string or quoted. Turns
+constraints into keywords if strings-p is not true.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-all-constraints" class="outline-3">
+<h3 id="function-list-all-constraints">function list-all-constraints (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-all-constraints">
+<p>
+→ list
+</p>
+
+<p>
+Users information_schema to list all the constraints in a table. Table-name can
+be either a string or quoted. Turns constraints into keywords if strings-p is
+not true.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-describe-constraint" class="outline-3">
+<h3 id="function-describe-constraint">function describe-constraint (table-name constraint-name)</h3>
+<div class="outline-text-3" id="text-function-describe-constraint">
+<p>
+→ list
+</p>
+
+<p>
+Return a list of alists of the descriptions a particular constraint given the
+table-name and the constraint name using the information_schema table.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-describe-foreign-key-constraints" class="outline-3">
+<h3 id="function-describe-foreign-key-constraints">function describe-foreign-key-constraints ()</h3>
+<div class="outline-text-3" id="text-function-describe-foreign-key-constraints">
+<p>
+→ list
+</p>
+
+<p>
+Generates a list of lists of information on the foreign key constraints
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-indexes" class="outline-2">
+<h2 id="indexes">Indexes/Indices</h2>
+<div class="outline-text-2" id="text-indexes">
+</div>
+<div id="outline-container-function-create-index" class="outline-3">
+<h3 id="function-create-index">function create-index (name  &amp;key unique if-not-exists concurrently on using fields)</h3>
+<div class="outline-text-3" id="text-function-create-index">
+<p>
+Create an index. Slightly less sophisticated than the query version because it
+does not have a where clause capability.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-drop-index" class="outline-3">
+<h3 id="function-drop-index">function drop-index (name &amp;key concurrently if-exists cascade)</h3>
+<div class="outline-text-3" id="text-function-drop-index">
+<p>
+Drop an index. Available keys are :concurrently, :if-exists, and :cascade.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-indices" class="outline-3">
+<h3 id="function-list-indices">function list-indices (&amp;optional strings-p)</h3>
+<div class="outline-text-3" id="text-function-list-indices">
+<p>
+→ list
+</p>
+
+<p>
+Return a list of the indexs in a database. Turn them into keywords if strings-p
+is not true.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-table-indices" class="outline-3">
+<h3 id="function-list-table-indices">function list-table-indices (table-name &amp;optional strings-p)</h3>
+<div class="outline-text-3" id="text-function-list-table-indices">
+<p>
+→ list
+</p>
+
+<p>
+List the index names and the related columns in a single table. Each index will
+be in a separate sublist.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-index-exists-p" class="outline-3">
+<h3 id="function-index-exists-p">function index-exists-p (name)</h3>
+<div class="outline-text-3" id="text-function-index-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Tests whether an index with the given name exists. The name can be either a
+string or a symbol.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-indexed-column-and-attribute" class="outline-3">
+<h3 id="function-list-indexed-column-and-attribute">function list-indexed-column-and-attributes (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-indexed-column-and-attribute">
+<p>
+→ list
+</p>
+
+<p>
+List the indexed columns and their attributes in a table. Includes primary
+key.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-index-definitions" class="outline-3">
+<h3 id="function-list-index-definitions">function list-index-definitions (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-index-definitions">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of the definitions used to create the current indexes for
+the table
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-keys" class="outline-2">
+<h2 id="keys">Keys</h2>
+<div class="outline-text-2" id="text-keys">
+</div>
+<div id="outline-container-function-find-primary-key-info" class="outline-3">
+<h3 id="function-find-primary-key-info">function find-primary-key-info (table-name &amp;optional (just-key nil))</h3>
+<div class="outline-text-3" id="text-function-find-primary-key-info">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of sublists where the sublist contains two strings. If a table
+primary key consists of only one column, such as 'id' there will be a single
+sublist where the first string is the name of the column and the second string
+is the string name for the datatype for that column. If the primary key for the
+table consists of more than one column, there will be a sublist for each column
+subpart of the key. The sublists will be in the order they are used in the key,
+not in the order they appear in the table. If just-key is set to t, the list
+being returned will contain just the column names in the primary key as string
+names with no sublists. If the table is not in the public schema, provide the
+fully qualified table name e.g. schema-name.table-name.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-foreign-keys" class="outline-3">
+<h3 id="function-list-foreign-keys">function list-foreign-keys (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-foreign-keys">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of sublists of foreign key info in the form of
+   '((constraint-name local-table local-table-column
+     foreign-table-name foreign-column-name))
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-schema" class="outline-2">
+<h2 id="schema">Schema/Schemata</h2>
+<div class="outline-text-2" id="text-schema">
+<p>
+Schema allow you to separate tables into differnet name spaces. In different
+schemata two tables with the same name are allowed to exists. The tables can
+be referred by fully qualified names or with the macro with-schema. You could
+also set the search path with set-search-path. For listing end checking there
+are also the functions list-schemata and schema-exist-p. The following
+functions allow you to create, drop schemata and to set the search path.
+</p>
+</div>
+
+<div id="outline-container-macro-with-schema" class="outline-3">
+<h3 id="macro-with-schema">macro with-schema ((namespace &amp;key :strict t :if-not-exist :create :drop-after) &amp;body body)</h3>
+<div class="outline-text-3" id="text-macro-with-schema">
+<p>
+A macro to set the schema search path (namespace) of the postgresql database to
+include as first entry a specified schema and then executes the body. Before
+executing body the PostgreSQL's session variable search_path is set to the given
+namespace. After executing body the search_path variable is restored to the
+original value.
+</p>
+
+<p>
+   Calling with :strict 't only the specified schema is set as current search
+path. All other schema are then not searched any more. If strict is nil, the
+namespace is just first schema on the search path upon the the body execution.
+</p>
+
+<p>
+   Calling with :if-not-exist set to :create the schema is created if this
+schema did not exist.
+</p>
+
+<p>
+Calling with :if-not-exist set to nil, an error is signaled.
+</p>
+
+<p>
+   calling with drop-after set to 't the schema is removed after the execution
+of the body form.
+</p>
+
+<p>
+example :
+  (with-schema (:schema-name :strict nil :drop-after nil :if-not-exist :error)
+         (foo 1)
+         (foo 2))
+</p>
+
+<p>
+example :
+  (with-schema ('uniq :if-not-exist :create) ;; changing the search path
+         (schema-exists-p 'uniq))
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-schemata" class="outline-3">
+<h3 id="function-list-schemata">function list-schemata ()</h3>
+<div class="outline-text-3" id="text-function-list-schemata">
+<p>
+→ list
+</p>
+
+<p>
+List all existing user defined schemata.
+</p>
+
+<p>
+Note: The query uses the portable information_schema relations instead of
+pg_tables relations.
+</p>
+<div class="org-src-container">
+<pre class="src src-sql"><span style="color: #ffad29; font-weight: bold;">select</span> <span style="color: #ffad29; font-weight: bold;">schema_name</span>
+<span style="color: #ffad29; font-weight: bold;">from</span> information_schema.schemata
+<span style="color: #ffad29; font-weight: bold;">where</span> <span style="color: #ffad29; font-weight: bold;">schema_name</span> !~ <span style="color: #e67128;">'(pg_*)|information_schema'</span>
+<span style="color: #ffad29; font-weight: bold;">order</span> <span style="color: #ffad29; font-weight: bold;">by</span> <span style="color: #ffad29; font-weight: bold;">schema_name</span> ;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-function-list-schemas" class="outline-3">
+<h3 id="function-list-schemas">function list-schemas ()</h3>
+<div class="outline-text-3" id="text-function-list-schemas">
+<p>
+→ list
+</p>
+
+<p>
+List schemas in the current database, excluding the pg_* system schemas.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-schema-exists-p" class="outline-3">
+<h3 id="function-schema-exists-p">function schema-exists-p (schema)</h3>
+<div class="outline-text-3" id="text-function-schema-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Tests the existence of a given schema. Returns T if the schema exists or NIL
+otherwise. The name provided can be either a string or quoted symbol.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-create-schema" class="outline-3">
+<h3 id="function-create-schema">function create-schema (schema)</h3>
+<div class="outline-text-3" id="text-function-create-schema">
+<p>
+Creates a new schema. Raises an error if the schema is already exists.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-drop-schema" class="outline-3">
+<h3 id="function-drop-schema">function drop-schema (schema &amp;key (if-exists nil) (cascade nil))</h3>
+<div class="outline-text-3" id="text-function-drop-schema">
+<p>
+Drops an existing database schema. Accepts :if-exists and/or :cascade arguments
+like :drop-table. A notice instead of an error is raised with the is-exists
+parameter.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-get-search-path" class="outline-3">
+<h3 id="function-get-search-path">function get-search-path ()</h3>
+<div class="outline-text-3" id="text-function-get-search-path">
+<p>
+Returns the default schema search path (which schemas are checked first) for the current session.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-set-search-path" class="outline-3">
+<h3 id="function-set-search-path">function set-search-path (path)</h3>
+<div class="outline-text-3" id="text-function-set-search-path">
+<p>
+This changes the postgresql runtime parameter controlling what order schemas are
+searched. You can always use fully qualified names [schema.table]. By default,
+this function only changes the search path for the current session. This
+function is used by with-schema.
+</p>
+</div>
+</div>
+<div id="outline-container-function-split-fully-qualified-tablename" class="outline-3">
+<h3 id="function-split-fully-qualified-tablename">function split-fully-qualified-tablename (name)</h3>
+<div class="outline-text-3" id="text-function-split-fully-qualified-tablename">
+<p>
+→ list
+Take a tablename of the form database.schema.table or schema.table or table and
+return the tablename and the schema name. The name can be a symbol or a string.
+Returns a list of form '(table schema database. If the tablename is not fully
+qualified, it will assume that the schema should be \"public\".
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-get-schema-comment" class="outline-3">
+<h3 id="function-get-schema-comment">function get-schema-comment (schema-name)</h3>
+<div class="outline-text-3" id="text-function-get-schema-comment">
+<p>
+→ string
+</p>
+
+<p>
+Retrieves the comment, if any attached to the schema. See also get-schema-comment,
+get-column-comments and get-database-comment.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sequences" class="outline-2">
+<h2 id="sequences">Sequences</h2>
+<div class="outline-text-2" id="text-sequences">
+</div>
+<div id="outline-container-function-create-sequence" class="outline-3">
+<h3 id="function-create-sequence">function create-sequence (name &amp;key temp if-not-exists increment min-value max-value start cache)</h3>
+<div class="outline-text-3" id="text-function-create-sequence">
+<p>
+  Create a sequence. Available additional key parameters
+are :temp :if-not-exists :increment :min-value :max-value :start and :cache. See
+<a href="https://www.postgresql.org/docs/current/static/sql-createsequence.html">https://www.postgresql.org/docs/current/static/sql-createsequence.html</a> for
+details on usage.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-sequence-next" class="outline-3">
+<h3 id="function-sequence-next">function sequence-next (sequence)</h3>
+<div class="outline-text-3" id="text-function-sequence-next">
+<p>
+→ integer
+</p>
+
+<p>
+Shortcut for getting the next value from a sequence. The sequence identifier can
+be either a string or a symbol, in the latter case it will be converted to a
+string according to S-SQL rules.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-drop-sequence" class="outline-3">
+<h3 id="function-drop-sequence">function drop-sequence (name &amp;key if-exists cascade)</h3>
+<div class="outline-text-3" id="text-function-drop-sequence">
+<p>
+→ list
+</p>
+
+<p>
+Drop a sequence. Name should be quoted. Available key parameters are :if-exists
+and :cascade.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-sequences" class="outline-3">
+<h3 id="function-list-sequences">function list-sequences (&amp;optional strings-p)</h3>
+<div class="outline-text-3" id="text-function-list-sequences">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of the sequences in the current database. When strings-p is T,
+the names will be given as strings, otherwise as keywords.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-sequence-exists-p" class="outline-3">
+<h3 id="function-sequence-exists-p">function sequence-exists-p (name)</h3>
+<div class="outline-text-3" id="text-function-sequence-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Tests  whether a sequence with the given name exists. The name can be either a
+string or a symbol.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-tables" class="outline-2">
+<h2 id="tables">Tables</h2>
+<div class="outline-text-2" id="text-tables">
+</div>
+<div id="outline-container-function-list-tables" class="outline-3">
+<h3 id="function-list-tables">function list-tables (&amp;optional strings-p)</h3>
+<div class="outline-text-3" id="text-function-list-tables">
+<p>
+→ list
+</p>
+
+<p>
+DEPRECATED FOR LIST-ALL-TABLES. Return a list of the tables in the public schema
+of a database. By default the table names are returned as keywords. They will be
+returned as lowercase strings if strings-p is true.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-all-tables" class="outline-3">
+<h3 id="function-list-all-tables">function list-all-tables (&amp;optional (fully-qualified-names-only nil))</h3>
+<div class="outline-text-3" id="text-function-list-all-tables">
+<p>
+→ list
+</p>
+
+<p>
+If fully-qualified-names-only is set to t, returns a flattened list of all
+schema.table names other than pg_catalog or the information_schema.
+</p>
+
+<p>
+Otherwise returns the following info:
+</p>
+
+<p>
+schema-name, table-name, table-owner, tablespace, hasindexes, hasrules, hastriggers
+and rowsecurity(&amp;optional strings-p).
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-tables-in-schema" class="outline-3">
+<h3 id="function-list-tables-in-schema">function list-tables-in-schema (&amp;optional (schema-name "public") (strings-p nil))</h3>
+<div class="outline-text-3" id="text-function-list-tables-in-schema">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of tables in a particular schema, defaulting to public. If
+schema-name is :all, it will return all the non-system tables in the database
+in fully qualified form: e.g. 'public.test_table'. If string-p is t, the names
+will be returned as strings with underscores converted to hyphens.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-table-sizes" class="outline-3">
+<h3 id="function-list-table-sizes">function list-table-sizes (&amp;key (schema "public") (order-by-size nil) (size t))</h3>
+<div class="outline-text-3" id="text-function-list-table-sizes">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of lists (table-name, size in 8k pages) of tables in the current
+database. Providing a name to the schema parameter will return just the
+information for tables in that schema. It defaults to just the tables in the
+public schema. Setting schema to nil will return all tables, indexes etc in
+the database in descending order of size. This would include system tables, so
+there are a lot more than you would expect. If :size is set to nil, it returns
+only a flat list of table names. Setting order-by-size to t will return the
+result in order of size instead of by table name.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-table-exists-p" class="outline-3">
+<h3 id="function-table-exists-p">function table-exists-p (name)</h3>
+<div class="outline-text-3" id="text-function-table-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Check whether a table exists in a particular schema. Defaults to the search
+path. Takes either a string or a symbol for the table name. The table-name can
+be fully qualified in the form of schema.table-name or
+database.schema.table-name. If the schema is specified either in a qualified
+table-name or in the optional schema-name parameter, we look directly to the
+information schema tables. Otherwise we use the search path which can be
+controlled by being within a with-schema form.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-table-size" class="outline-3">
+<h3 id="function-table-size">function table-size (table-name)</h3>
+<div class="outline-text-3" id="text-function-table-size">
+<p>
+→ list
+</p>
+
+<p>
+Return the size of a given postgresql table in k or m. Table-name can be either
+a string or quoted.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-table-descriptions" class="outline-3">
+<h3 id="function-table-descriptions">function table-description (name &amp;optional schema-name)</h3>
+<div class="outline-text-3" id="text-function-table-descriptions">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of the fields in the named table. Each field is represented
+by a list of three elements: the field name, the type, and a boolean indicating
+whether the field may be NULL.
+</p>
+
+<p>
+Table can be either a string or quoted. Table-names can be fully qualified with
+the schema or not. If the table-name is not fully qualified and a schema name
+is not provided, the table will be assumed to be in the public schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-table-description-plus" class="outline-3">
+<h3 id="function-table-description-plus">function table-description-plus (table-name)</h3>
+<div class="outline-text-3" id="text-function-table-description-plus">
+<p>
+→ list
+</p>
+
+<p>
+Returns more table info than table-description. Specifically returns
+ordinal-position, column-name, data-type, character-maximum-length, modifier,
+whether it is not-null and the default value.
+</p>
+
+<p>
+Table can be either a string or quoted. Table-names can be fully qualified with
+the schema or not. If the table-name is not fully qualified and a schema name
+is not provided, the table will be assumed to be in the public schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-table-description-menu" class="outline-3">
+<h3 id="function-table-description-menu">function table-description-menu (see below)</h3>
+<div class="outline-text-3" id="text-function-table-description-menu">
+<p>
+→ list string list
+</p>
+
+<p>
+This has the following parameters, all set to t by default:
+</p>
+
+<p>
+(table-name &amp;key char-max-length data-type-length
+                 has-default default-value not-null
+                 numeric-precision numeric-scale
+                 storage primary primary-key-name
+                 unique unique-key-name fkey fkey-name
+                 fkey-col-id fkey-table fkey-local-col-id
+                 identity generated collation
+                 col-comments locally-defined inheritance-count
+                stat-collection)
+</p>
+
+<p>
+Takes a fully qualified table name which can be either a string or a symbol.
+</p>
+
+<p>
+Returns three values.
+</p>
+
+<ol class="org-ol">
+<li>A list of plists of each row's parameters. This will always</li>
+</ol>
+<p>
+include :column-name and :data-type-name but all other parameters can be set or unset
+and are set by default (set to t).
+</p>
+
+<ol class="org-ol">
+<li>The comment string attached to the table itself (if any).</li>
+
+<li>A list of the check constraints applied to the rows in the table. See documentation for</li>
+</ol>
+<p>
+list-check-constraints for an example.
+</p>
+
+<p>
+The available keyword parameters are:
+</p>
+
+<ul class="org-ul">
+<li>data-type-length (For a fixed-size type, typlen is the number of bytes in the internal representation of the type. But for a variable-length type, typlen is negative. -1 indicates a “varlena” type (one that has a length word), -2 indicates a null-terminated C string.)</li>
+<li>char-max-length (Typically used for something like a varchar and shows the maximum length)</li>
+<li>has-default (value T if this column has a default value and :NULL if not)</li>
+<li>default-value (value is the default value as string. A default of 9.99 will still be a string)</li>
+<li>not-null (value is T if the column must have a value or :NULL otherwise)</li>
+<li>numeric-precision (value is the total number of digits for a numeric type if that precision was specified)</li>
+<li>numeric-scale (value is the number of digits in the fraction part of a numeric type if that scale was specified)</li>
+<li>storage (value is the storage setting for a column. Result can be plain, extended, main or external)</li>
+<li>primary (value is T if the column is the primary key for the table, :NULL otherwise)</li>
+<li>primary-key-name (value is the name of the primary-key itself, not the column, if the column is the primary key for the table, :NULL otherwise)</li>
+<li>unique (value is T if the column is subject to a unique key, :NULL otherwise)</li>
+<li>unique-key-name (value is the name of the unique-key itself, not the column, applied to the column, :NULL otherwise)</li>
+<li>fkey (value is T if the column is a foreign key, :NULL otherwise)</li>
+<li>fkey-name (value is the name of the foreign key, :NULL otherwise)</li>
+<li>fkey-col-id (value is the column id of the foreign table used as the foreign key. Probably easier to use the Postmodern function list-foreign-keys if you are looking for the name of the columns)</li>
+<li>fkey-table (value is the name of the foreign table, :NULL otherwise)</li>
+<li>fkey-local-col-id (value is the column id of this column. Probably easier to use the Postmodern function list-foreign-keys if you are looking for the name of the columns involved in the foreign key)</li>
+<li>identity (if the column is an identity column, the values can be 'generated always' or 'generated by default'. Otherwise :NULL)</li>
+<li>generated (columns can be generated, if this column is generated and stored on disk, the value will be 'stored', otherwise :NULL)</li>
+<li>collation (columns with collations which are not the default collation for the database will show that collation here, otherwise :NULL)</li>
+<li>col-comments (value is any comment that has been applied to the column, :NULL otherwise)</li>
+<li>locally-defined (value is T if locally defined. It might be both locally defined and inherited)</li>
+<li>inheritance-count (the number of direct ancestors this column has inherited)</li>
+<li>stat-collection (stat-collection returns the value of attstattarget which controls the level of detail of statistics accumulated for this column by ANALYZE. A zero value indicates that no statistics should be collected. A negative value says to use the system default statistics target. The exact meaning of positive values is data type-dependent. For scalar data types, attstattarget is both the target number of most common values to collect, and the target number of histogram bins to create. Attstorage is normally a copy of pg_type.typstorage of this column's type. For TOAST-able data types, this can be altered after column creation to control storage policy.)</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-function-list-check-constraints" class="outline-3">
+<h3 id="function-list-check-constraints">function list-check-constraints (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-check-constraints">
+<p>
+→ list
+</p>
+
+<p>
+Takes a fully qualified table name and returns a list of lists of check constraints
+where each sublist has the form of (check-constraint-name check)
+</p>
+
+<p>
+Example:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-lisp">(query (<span style="color: #23d7d7;">:create-table</span> 'employees2
+                      ((did <span style="color: #23d7d7;">:type</span> (or integer db-null)
+                            <span style="color: #23d7d7;">:primary-key</span> <span style="color: #e67128;">"generated by default as identity"</span>)
+                       (name <span style="color: #23d7d7;">:type</span> (varchar 40) <span style="color: #23d7d7;">:check</span> (<span style="color: #23d7d7;">:&lt;&gt;</span> 'name <span style="color: #e67128;">""</span>))
+                       (birth-date <span style="color: #23d7d7;">:type</span> date <span style="color: #23d7d7;">:check</span> (<span style="color: #23d7d7;">:&gt;</span> 'birth-date <span style="color: #e67128;">"1900-01-01"</span>))
+                       (start-date <span style="color: #23d7d7;">:type</span> date <span style="color: #23d7d7;">:check</span> (<span style="color: #23d7d7;">:&gt;</span> 'start-date 'birth-date))
+                       (salary <span style="color: #23d7d7;">:type</span> numeric <span style="color: #23d7d7;">:check</span> (<span style="color: #23d7d7;">:&gt;</span> 'salary 0)))))
+
+(list-check-constraints 'employees2)
+
+((<span style="color: #e67128;">"employees2_birth_date_check"</span> <span style="color: #e67128;">"CHECK (birth_date &gt; '1900-01-01'::date)"</span>)
+ (<span style="color: #e67128;">"employees2_check"</span> <span style="color: #e67128;">"CHECK (start_date &gt; birth_date)"</span>)
+ (<span style="color: #e67128;">"employees2_name_check"</span> <span style="color: #e67128;">"CHECK (name::text &lt;&gt; ''::text)"</span>)
+ (<span style="color: #e67128;">"employees2_salary_check"</span> <span style="color: #e67128;">"CHECK (salary &gt; 0::numeric)"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-function-list-columns" class="outline-3">
+<h3 id="function-list-columns">function list-columns (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-columns">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of strings of just the column names in a table.
+Pulls info from the postmodern table-description function rather than directly.
+The table-name can be a string or quoted. Any table-name that is not fully
+qualified with the schema will be assumed to be in the public schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-columns-with-types" class="outline-3">
+<h3 id="function-list-columns-with-types">function list-columns-with-types (table-name)</h3>
+<div class="outline-text-3" id="text-function-list-columns-with-types">
+<p>
+→ list
+</p>
+
+<p>
+Returns a list of (name type) lists for the fields of a table. Returns a list
+of strings of just the column names and their sql data types in a table. Pulls
+info from the postmodern table-description function rather than directly. The
+table-name can be a string or quoted. Any table-name that is not fully qualified
+with the schema will be assumed to be in the public schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-column-exists-p" class="outline-3">
+<h3 id="function-column-exists-p">function column-exists-p (table-name column-name &amp;optional schema-name)</h3>
+<div class="outline-text-3" id="text-function-column-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Determine if a particular column exists. Table name and column-name can be
+either strings or symbols. If the optional schema name is not given or the
+table-name is not fully qualified with a schema name, the schema will be assumed
+to be the public schema.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-get-table-oid" class="outline-3">
+<h3 id="function-get-table-oid">function get-table-oid (table-name &amp;optional schema-name)</h3>
+<div class="outline-text-3" id="text-function-get-table-oid">
+<p>
+→ integer
+</p>
+
+<p>
+Retrieves the oid identifier for a particular table from postgresql. Works
+for tables in all schemas.
+</p>
+</div>
+</div>
+<div id="outline-container-function-get-table-comment" class="outline-3">
+<h3 id="function-get-table-comment">function get-table-comment (table-name &amp;optional schema-name)</h3>
+<div class="outline-text-3" id="text-function-get-table-comment">
+<p>
+→ string
+</p>
+
+<p>
+Retrieves the comment, if any attached to the table. See also get-schema-comment,
+get-column-comments and get-database-comment
+</p>
+</div>
+</div>
+<div id="outline-container-function-get-column-comments" class="outline-3">
+<h3 id="function-get-column-comments">function get-column-comments (database schema table)</h3>
+<div class="outline-text-3" id="text-function-get-column-comments">
+<p>
+→ string
+</p>
+
+<p>
+Retrieves a list of lists of column names and the comments, if any, attached
+to the columns of a table.
+</p>
+</div>
+</div>
+<div id="outline-container-rename-table" class="outline-3">
+<h3 id="rename-table">function rename-table (old-name new-name)</h3>
+<div class="outline-text-3" id="text-rename-table">
+<p>
+→ boolean
+</p>
+
+<p>
+Renames a table. Parameters can be strings or symbols. If you are renaming
+a table using a fully qualified schema.table-name, you do not need to
+specify the schema in the new-name. You cannot use this function to move
+tables from one schema to another. Returns t if successful
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-rename-column" class="outline-3">
+<h3 id="function-rename-column">function rename-column (table-name old-name new-name)</h3>
+<div class="outline-text-3" id="text-function-rename-column">
+<p>
+→ boolean
+</p>
+
+<p>
+Rename a column in a table. Parameters can be strings or symbols. If the table
+is not in the public schema, it needs to be fully qualified - e.g. schema.table.
+Returns t if successful
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-tablespaces" class="outline-2">
+<h2 id="tablespaces">Tablespaces</h2>
+<div class="outline-text-2" id="text-tablespaces">
+</div>
+<div id="outline-container-function-list-tablespaces" class="outline-3">
+<h3 id="function-list-tablespaces">function list-tablespaces ()</h3>
+<div class="outline-text-3" id="text-function-list-tablespaces">
+<p>
+→ list
+</p>
+
+<p>
+Lists the tablespaces in the currently connected database. What are tablespace
+you ask? Per the Postgresql documentation
+<a href="https://www.postgresql.org/docs/current/manage-ag-tablespaces.html">https://www.postgresql.org/docs/current/manage-ag-tablespaces.html</a>:
+Tablespaces in PostgreSQL allow database administrators to define locations in
+the file system where the files representing database objects can be stored.
+Once created, a tablespace can be referred to by name when creating database
+objects.
+</p>
+
+<p>
+By using tablespaces, an administrator can control the disk layout of a
+PostgreSQL installation. This is useful in at least two ways. First, if the
+partition or volume on which the cluster was initialized runs out of space and
+cannot be extended, a tablespace can be created on a different partition and
+used until the system can be reconfigured.
+</p>
+
+<p>
+Second, tablespaces allow an administrator to use knowledge of the usage pattern
+of database objects to optimize performance. For example, an index which is very
+heavily used can be placed on a very fast, highly available disk, such as an
+expensive solid state device. At the same time a table storing archived data
+which is rarely used or not performance critical could be stored on a less
+expensive, slower disk system.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-triggers" class="outline-2">
+<h2 id="triggers">Triggers</h2>
+<div class="outline-text-2" id="text-triggers">
+</div>
+<div id="outline-container-function-describe-triggers" class="outline-3">
+<h3 id="function-describe-triggers">function describe-triggers ()</h3>
+<div class="outline-text-3" id="text-function-describe-triggers">
+<p>
+→ list
+</p>
+
+<p>
+List detailed information on the triggers from the information_schema table.
+</p>
+</div>
+</div>
+<div id="outline-container-function-list-triggers" class="outline-3">
+<h3 id="function-list-triggers">function list-triggers (&amp;optional table-name)</h3>
+<div class="outline-text-3" id="text-function-list-triggers">
+<p>
+→ list
+</p>
+
+<p>
+List distinct trigger names from the information_schema table. Table-name can be
+either quoted or string. (A trigger is a specification that the database should
+automatically execute a particular function whenever a certain type of operation
+is performed. Triggers can be attached to tables (partitioned or not), views,
+and foreign tables.
+See <a href="https://www.postgresql.org/docs/current/trigger-definition.html">https://www.postgresql.org/docs/current/trigger-definition.html</a>)
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-list-detailed-triggers" class="outline-3">
+<h3 id="function-list-detailed-triggers">function list-detailed-triggers ()</h3>
+<div class="outline-text-3" id="text-function-list-detailed-triggers">
+<p>
+→ list
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-views" class="outline-2">
+<h2 id="views">Views</h2>
+<div class="outline-text-2" id="text-views">
+</div>
+<div id="outline-container-function-list-views" class="outline-3">
+<h3 id="function-list-views">function list-views (&amp;optional strings-p)</h3>
+<div class="outline-text-3" id="text-function-list-views">
+<p>
+→ list
+</p>
+
+<p>
+Returns list of the user defined views in the current database. When strings-p
+is T, the names will be returned as strings, otherwise as keywords.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-view-exists-p" class="outline-3">
+<h3 id="function-view-exists-p">function view-exists-p (name)</h3>
+<div class="outline-text-3" id="text-function-view-exists-p">
+<p>
+→ boolean
+</p>
+
+<p>
+Tests whether a view with the given name exists. Takes either a string or a
+symbol for the view name.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-describe-views" class="outline-3">
+<h3 id="function-describe-views">function describe-views (&amp;optional (schema "public")</h3>
+<div class="outline-text-3" id="text-function-describe-views">
+<p>
+→ list
+</p>
+
+<p>
+Describe the current views in the specified schema. Includes the select
+statements used to create the view. Takes an optional schema but defaults to
+public schema.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-misc-utility-functions" class="outline-2">
+<h2 id="misc-utility-functions">Miscellaneous Utility Functions</h2>
+<div class="outline-text-2" id="text-misc-utility-functions">
+</div>
+<div id="outline-container-function-coalesce" class="outline-3">
+<h3 id="function-coalesce">function coalesce (&amp;rest arguments)</h3>
+<div class="outline-text-3" id="text-function-coalesce">
+<p>
+→ value
+</p>
+
+<p>
+Returns the first non-NIL, non-NULL (as in :null) argument, or NIL if none are
+present. Useful for providing a fall-back value for the result of a query, or,
+when given only one argument, for transforming :nulls to NIL.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-execute-file" class="outline-3">
+<h3 id="function-execute-file">function execute-file (filename &amp;optional (print nil))</h3>
+<div class="outline-text-3" id="text-function-execute-file">
+<p>
+This function will execute sql queries stored in a file. Each sql statement in
+the file will be run independently, but if one statement fails, subsequent
+query statements will not be run, but any statement prior to the failing
+statement will have been commited.
+</p>
+
+<p>
+Execute-file allows the sql file to include other sql files, with the
+meta-commands \i or  \include which look for a file location relative to your
+default pathname (current working directory) or \ir or \include_relative which
+look for a file location relative to the initial sql file. If the file is not
+found in the expected location, execute-file will look to see if the requested
+file is in the other possible location. If that does not work, it will trigger
+an error with a restart which allows you to provide a new name for the file.
+</p>
+
+<p>
+If you want the standard transction treatment such that all statements succeed
+or no statement succeeds, then ensure that the file starts with a "begin
+transaction" statement and finishes with an "end transaction" statement. See
+the test file test-execute-file-broken-transaction.sql as an example.
+</p>
+
+<p>
+For debugging purposes, if the optional print parameter is set to t, format will
+print the count of the query and the query to the REPL.
+</p>
+
+<p>
+The default setting is to remove sql comments from the file before executing
+the sql code. If that causes problems, the remove-comments parameter can be
+set to nil.
+</p>
+
+<p>
+IMPORTANT NOTE: This utility function assumes that the file containing the sql
+queries can be trusted and bypasses the normal postmodern parameterization of
+queries.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-postgres-array-string-to-list" class="outline-3">
+<h3 id="function-postgres-array-string-to-list">function postgres-array-string-to-list (str)</h3>
+<div class="outline-text-3" id="text-function-postgres-array-string-to-list">
+<p>
+→ array
+</p>
+
+<p>
+Takes a postgresql array in the form of a string like
+"{wol=CTc/wol,a=c/wol,b=c/wol}" and returns a lisp array like
+    #("wol=CTc/wol" "a=c/wol" "b=c/wol")
+</p>
+</div>
+</div>
+<div id="outline-container-function-postgres-array-string-to-array" class="outline-3">
+<h3 id="function-postgres-array-string-to-array">function postgres-array-string-to-array (str)</h3>
+<div class="outline-text-3" id="text-function-postgres-array-string-to-array">
+<p>
+  "Takes a postgresql array in the form of a string like
+\"{wol=CTc/wol,a=c/wol,b=c/wol}\" and returns a lisp list like
+  (\"wol=CTc/wol\" \"a=c/wol\" \"b=c/wol\")."
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-imported-from-s-sql" class="outline-2">
+<h2 id="imported-from-s-sql">Imported From s-sql</h2>
+<div class="outline-text-2" id="text-imported-from-s-sql">
+</div>
+<div id="outline-container-macro-sql" class="outline-3">
+<h3 id="macro-sql">macro sql (form)</h3>
+<div class="outline-text-3" id="text-macro-sql">
+<p>
+→ string
+</p>
+
+<p>
+Convert the given form (a list starting with a keyword) to an SQL query string
+at compile time, according to the rules described here. For example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'a 1)))
+ <span style="color: #e67128;">"(SELECT * FROM country WHERE (a = 1))"</span>
+</pre>
+</div>
+
+<p>
+but
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql '(<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'a 1)))
+</pre>
+</div>
+
+<p>
+would throw an error. For the later case you need to use sql-compile.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-sql-compile" class="outline-3">
+<h3 id="function-sql-compile">function sql-compile (form)</h3>
+<div class="outline-text-3" id="text-function-sql-compile">
+<p>
+→ string
+</p>
+
+<p>
+This is the run-time variant of the sql macro. It converts the given list to
+an SQL query, with the same rules except that symbols in this list do not
+have to be quoted to be interpreted as identifiers. For example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql-compile '(<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'a 1)))
+
+ \"(SELECT * FROM country WHERE (a = 1))\"
+</pre>
+</div>
+
+<p>
+but
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql (<span style="color: #23d7d7;">:select</span> '* <span style="color: #23d7d7;">:from</span> 'country <span style="color: #23d7d7;">:where</span> (<span style="color: #23d7d7;">:=</span> 'a 1)))
+</pre>
+</div>
+<p>
+would throw an error. For the later case you need to use sql.
+</p>
+</div>
+</div>
+
+<div id="outline-container-deftype-smallint" class="outline-3">
+<h3 id="deftype-smallint">deftype smallint ()</h3>
+<div class="outline-text-3" id="text-deftype-smallint">
+<p>
+'(signed-byte 16)
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-bigint" class="outline-3">
+<h3 id="deftype-bigint">deftype bigint ()</h3>
+<div class="outline-text-3" id="text-deftype-bigint">
+<p>
+'(signed-byte 64)
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-numeric" class="outline-3">
+<h3 id="deftype-numeric">deftype numeric (&amp;optional precision/scale scale)</h3>
+<div class="outline-text-3" id="text-deftype-numeric">
+<p>
+(declare (ignore precision/scale scale))
+'number
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-double-precision" class="outline-3">
+<h3 id="deftype-double-precision">deftype double-precision ()</h3>
+<div class="outline-text-3" id="text-deftype-double-precision">
+<p>
+'double-float
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-bytea" class="outline-3">
+<h3 id="deftype-bytea">deftype bytea ()</h3>
+<div class="outline-text-3" id="text-deftype-bytea">
+<p>
+'(array (unsigned-byte 8))
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-text" class="outline-3">
+<h3 id="deftype-text">deftype text ()</h3>
+<div class="outline-text-3" id="text-deftype-text">
+<p>
+'string
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-varchar" class="outline-3">
+<h3 id="deftype-varchar">deftype varchar (length)</h3>
+<div class="outline-text-3" id="text-deftype-varchar">
+<p>
+(declare (ignore length))
+`string)
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-serial" class="outline-3">
+<h3 id="deftype-serial">deftype serial ()</h3>
+<div class="outline-text-3" id="text-deftype-serial">
+<p>
+'integer
+</p>
+</div>
+</div>
+<div id="outline-container-deftype-serial8" class="outline-3">
+<h3 id="deftype-serial8">deftype serial8 ()</h3>
+<div class="outline-text-3" id="text-deftype-serial8">
+<p>
+'integer
+</p>
+</div>
+</div>
+
+<div id="outline-container-deftype-db-null" class="outline-3">
+<h3 id="deftype-db-null">deftype db-null ()</h3>
+<div class="outline-text-3" id="text-deftype-db-null">
+<p>
+Type for representing NULL values. Use like (or integer db-null) for declaring a
+type to be an integer that may be null."
+  '(eql :null)
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-from-sql-name" class="outline-3">
+<h3 id="function-from-sql-name">function from-sql-name (str)</h3>
+<div class="outline-text-3" id="text-function-from-sql-name">
+<p>
+Convert a string to a symbol, upcasing and replacing underscores with hyphens.
+</p>
+</div>
+</div>
+<div id="outline-container-function-parse-queries" class="outline-3">
+<h3 id="function-parse-queries">function parse-queries (file-content)</h3>
+<div class="outline-text-3" id="text-function-parse-queries">
+<p>
+→ list
+</p>
+
+<p>
+Read SQL queries in given string and split them, returns a list.
+</p>
+</div>
+</div>
+<div id="outline-container-function-read-queries" class="outline-3">
+<h3 id="function-read-queries">function read-queries (filename)</h3>
+<div class="outline-text-3" id="text-function-read-queries">
+<p>
+Read SQL queries in a given file and split them, returns a list. Track included
+files so there is no accidental infinite loop. The default setting is to remove
+sql comments from the file before executing the sql code. If that causes problems,
+the remove-comments parameter can be set to nil.
+</p>
+</div>
+</div>
+<div id="outline-container-function-sql-escape-string" class="outline-3">
+<h3 id="function-sql-escape-string">function sql-escape-string (string)</h3>
+<div class="outline-text-3" id="text-function-sql-escape-string">
+<p>
+→ string
+</p>
+
+<p>
+<a href="http://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS">Escapes</a> a string for inclusion in a PostgreSQL query. Example:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql-escape-string \"Puss in 'Boots'\")
+
+\"E'Puss in ''Boots'''\"
+
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-method-sql-escape" class="outline-3">
+<h3 id="method-sql-escape">method sql-escape (arg)</h3>
+<div class="outline-text-3" id="text-method-sql-escape">
+<p>
+A generalisation of sql-escape-string looks at the type of the value passed, and
+properly writes it out it for inclusion in an SQL query. Symbols will be
+converted to SQL names. Examples:
+</p>
+<div class="org-src-container">
+<pre class="src src-lisp">(sql-escape <span style="color: #e67128;">"tr'-x"</span>)
+
+<span style="color: #e67128;">"E'tr''-x'"</span>
+
+(sql-escape (/ 1 13))
+
+<span style="color: #e67128;">"0.0769230769230769230769230769230769230"</span>
+
+(sql-escape #(<span style="color: #e67128;">"Baden-Wurttemberg"</span> <span style="color: #e67128;">"Bavaria"</span> <span style="color: #e67128;">"Berlin"</span> <span style="color: #e67128;">"Brandenburg"</span>))
+
+<span style="color: #e67128;">"ARRAY[E'Baden-Wurttemberg', E'Bavaria', E'Berlin', E'Brandenburg']"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-macro-register-sql-operators" class="outline-3">
+<h3 id="macro-register-sql-operators">macro register-sql-operators (arity &amp;rest names)</h3>
+<div class="outline-text-3" id="text-macro-register-sql-operators">
+<p>
+Define simple operators. Arity is one of :unary (like
+'not'), :unary-postfix (the operator comes after the operand),
+:n-ary (like \+ : the operator falls away when there is only one
+operand), :2+-ary (like '=', which is meaningless for one operand),
+or :n-or-unary (like '-', where the operator is kept in the unary
+case). After the arity follow any number of operators, either just a
+keyword, in which case the downcased symbol name is used as the
+operator, or a two-element list containing a keyword and a name
+string.
+</p>
+</div>
+</div>
+<div id="outline-container-variable-escape-sql-names-p" class="outline-3">
+<h3 id="variable-escape-sql-names-p">variable <code>*escape-sql-names-p*</code></h3>
+<div class="outline-text-3" id="text-variable-escape-sql-names-p">
+<p>
+Determines whether double quotes are added around column, table, and function
+names in queries. Valid values:
+</p>
+
+<ul class="org-ul">
+<li>T, in which case every name is escaped,</li>
+<li>NIL, in which case no name is escape,</li>
+<li>:auto, which causes only <a href="http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html">reserved words</a> to be escaped, or.</li>
+<li>:literal which is the same as :auto except it has added consequence in</li>
+</ul>
+<p>
+to-sql-name (see below).
+</p>
+
+<p>
+The default value is :auto.
+</p>
+
+<p>
+Be careful when binding this with let and such ― since a lot of SQL compilation
+tends to happen at compile-time, the result might not be what you expect. Mixed
+case sensitivity is not currently well supported. Postgresql itself will
+downcase unquoted identifiers. This will be revisited in the future if requested.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-to-sql-name" class="outline-3">
+<h3 id="function-to-sql-name">function to-sql-name (name &amp;optional (escape-p <code>*escape-sql-names-p*</code>) (ignore-reserved-words nil))</h3>
+<div class="outline-text-3" id="text-function-to-sql-name">
+<p>
+Convert a symbol or string into a name that can be a sql table, column, or
+operation name. Add quotes when escape-p is true, or escape-p is :auto and the
+name contains reserved words. Quoted or delimited identifiers can be used by
+passing :literal as the value of escape-p. If escape-p is :literal, and the
+name is a string then the string is still escaped but the symbol or string is
+not downcased, regardless of the setting for <code>*downcase-symbols*</code> and the hyphen
+and forward slash characters are not replaced with underscores.
+</p>
+
+<p>
+Ignore-reserved-words is only used internally for column names which are allowed
+to be reserved words, but it is not recommended.
+</p>
+</div>
+</div>
+
+<div id="outline-container-condition-sql-error" class="outline-3">
+<h3 id="condition-sql-error">condition sql-error</h3>
+<div class="outline-text-3" id="text-condition-sql-error">
+<p>
+No documentation provided.
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-conditions-imported-from-cl-postgres" class="outline-2">
+<h2 id="conditions-imported-from-cl-postgres">Conditions Imported From cl-postgres</h2>
+<div class="outline-text-2" id="text-conditions-imported-from-cl-postgres">
+</div>
+<div id="outline-container-condition-database-connection-error" class="outline-3">
+<h3 id="condition-database-connection-error">condition database-connection-error</h3>
+<div class="outline-text-3" id="text-condition-database-connection-error">
+<p>
+Conditions of this type are signalled when an error occurs that breaks the
+connection socket. They offer a :reconnect restart.
+</p>
+</div>
+</div>
+
+<div id="outline-container-condition-database-error" class="outline-3">
+<h3 id="condition-database-error">condition database-error</h3>
+<div class="outline-text-3" id="text-condition-database-error">
+<p>
+This is the condition type that will be used to signal virtually all
+database-related errors (though in some cases socket errors may be raised when
+a connection fails on the IP level).
+</p>
+</div>
+<div id="outline-container-reader-database-error-code" class="outline-4">
+<h4 id="reader-database-error-code">reader database-error-code</h4>
+<div class="outline-text-4" id="text-reader-database-error-code">
+<p>
+Code: the Postgresql SQLSTATE code for the error
+ (see the Postgresql Manual Appendix A for their meaning). Not localizable.
+ Always present.
+</p>
+</div>
+</div>
+
+<div id="outline-container-accessor-database-error-code" class="outline-4">
+<h4 id="accessor-database-error-code">accessor database-error-message</h4>
+<div class="outline-text-4" id="text-accessor-database-error-code">
+<p>
+Message: the primary human-readable error message. This should be accurate
+but terse (typically one line). Always present.
+</p>
+</div>
+</div>
+
+<div id="outline-container-reader-database-error-detail" class="outline-4">
+<h4 id="reader-database-error-detail">reader database-error-detail</h4>
+<div class="outline-text-4" id="text-reader-database-error-detail">
+<p>
+Detail: an optional secondary error message carrying
+more detail about the problem. Might run to multiple lines or NIL if none is
+available.
+</p>
+</div>
+</div>
+
+<div id="outline-container-reader-database-error-query" class="outline-4">
+<h4 id="reader-database-error-query">reader database-error-query</h4>
+<div class="outline-text-4" id="text-reader-database-error-query">
+<p>
+Query that led to the error, or NIL if no query was involved.
+</p>
+</div>
+</div>
+
+<div id="outline-container-reader-database-error-cause" class="outline-4">
+<h4 id="reader-database-error-cause">reader database-error-cause</h4>
+<div class="outline-text-4" id="text-reader-database-error-cause">
+<p>
+The condition that caused this error, or NIL when it was not caused by another condition.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-function-database-error-constraint-name" class="outline-3">
+<h3 id="function-database-error-constraint-name">function database-error-constraint-name (err)</h3>
+<div class="outline-text-3" id="text-function-database-error-constraint-name">
+<p>
+Given a database-error for an integrity violation, will attempt to
+extract the constraint name.
+</p>
+</div>
+</div>
+
+<div id="outline-container-function-database-error-extract-name" class="outline-3">
+<h3 id="function-database-error-extract-name">function database-error-extract-name (err)</h3>
+<div class="outline-text-3" id="text-function-database-error-extract-name">
+<p>
+Given a database-error, will extract the critical name from the error message.
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

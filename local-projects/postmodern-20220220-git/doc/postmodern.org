@@ -1,0 +1,2583 @@
+#+TITLE: Postmodern Reference Manual
+#+OPTIONS: num:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="style.css" />
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
+#+OPTIONS: ^:nil
+#+OPTIONS: toc:2
+
+* Overview
+:PROPERTIES:
+:CUSTOM_ID: overview
+:END:
+This is the reference manual for the component named postmodern, which is part
+of a library of the same name.
+
+Note that this package also exports the database-connection and database-error
+types from CL-postgres and a few operators from S-SQL.
+
+query, execute, and any other function that would logically need to communicate
+with the database will raise a condition of the type database-error when
+something goes wrong. As a special case, errors that break the connection
+(socket errors, database shutdowns) will be raised as subtypes of
+database-connection-error, providing a :reconnect restart to re-try the
+operation that encountered to the error.
+
+Some specific topics in more detail
+
+- [[file:array-notes.html][Array-Notes]]
+- [[file:create-tables.html][Creating Tables]] (sql, s-sql and using dao classes)
+- [[file:dao-classes.html#table-definition][Creating Tables using dao classes]]
+- [[file:dynamic-queries.html][Dynamic Queries]]
+- [[file:interval-notes.html][Interval Notes]]
+- [[file:isolation-notes.html][Isolation Notes]]
+- [[file:json-from-postgres.html][Json From Postgresql/Postmodern]]
+
+* Connecting
+:PROPERTIES:
+:CUSTOM_ID: connecting
+:END:
+** class database-connection
+:PROPERTIES:
+:ID:       821e500c-5206-4f8b-a505-266d18faf8cb
+:CUSTOM_ID: class-database-connection
+:END:
+
+Representation of a database connection. Contains login information in order to
+be able to automatically re-establish a connection when it is somehow closed.
+
+** function connect (database user-name password host &key (port 5432) pooled-p use-ssl service application-name use-binary)
+:PROPERTIES:
+:CUSTOM_ID: function-connection
+:END:
+→ database-connection
+
+Create a new database connection for the given user and the database. Port will
+default to 5432, which is where most PostgreSQL servers are running. If
+pooled-p is T, a connection will be taken from a pool of connections of this
+type, if one is available there, and when the connection is disconnected it will
+be put back into this pool instead. use-ssl can be :no, :try, :require, :yes, or :full
+and defaults to the value of =*default-use-ssl*=
+
+- :try means if the server supports it
+- :require means use provided ssl certificate with no verification
+- :yes means verify that the server cert is issued by a trusted CA, but does not verify the server hostname
+- :full means expect a CA-signed cert for the supplied hostname and verify the server hostname
+If you set it to anything other than :no be sure to also load the CL+SSL library.
+
+Service defaults to "postgres".
+
+Application-name defaults to a blank string. If provided, Postgresl can use it to track applications with multiple connections.
+
+Use-binary defaults to nil. If set to T, then Postmodern will pass integer, float, double-float (except clisp) and boolean parameters to Postgresql in binary rather than text.
+
+The following example connects to a database named test-db running on a server at the ip
+address 192.168.5.223 with the non-standard port 5434 using a pooled connection, trying to use ssh if the server accepts that and falling back to an unencrypted connection if not, with an application name of "test-app".
+#+begin_src lisp
+  (connect "test_db" "test-user" "test-password" "192.168.5.223"
+           :port 5434 :pooled-p t :use-ssl :try :application-name "test-app" :use-binary t)
+#+end_src
+Postmodern as of version 1.33.0 provides the ability to pass parameters to Postgresql in binary format IF that format is available for that datatype. Currently this means int2, int4, int8, float, double-float (except clisp) and boolean. Rational numbers continue to be passed as text.
+
+The flag is set in the database connection object. This means it can be set either in the initial connection to the database  with =:use-binary t= as noted above or using the =(use-binary-parameters t)= function to set it after the initial connection has been established. If you are using multiple connections, some can be set to use binary parameters, some not.
+
+If a query to Postgresql does not have a table column which would allow Postgresql to determine the correct datatype and you do not specify differently, Postgresql will treat the parameters passed with the query as text. The default text setting with results:
+#+begin_src lisp
+  (query "select $1" 1 :single)
+  "1"
+  (query "select $1" 1.5 :single)
+  "1.5"
+  (query "select $1" T :single)
+  "true"
+  (query "select $1" nil :single)
+  "false"
+  (query "select $1" :NULL :single)
+  :NULL
+#+end_src
+You can specify parameter type as so:
+#+begin_src lisp
+  (query "select $1::integer" 1 :single)
+  1
+#+end_src
+Setting the use-binary slot in the database connection object to t has the following results:
+#+begin_src lisp
+  (query "select $1" 1 :single)
+  1
+  (query "select $1" 1.5 :single)
+  1.5
+  (query "select $1" T :single)
+  T
+  (query "select $1" nil :single)
+  NIL
+  (query "select $1" :NULL :single)
+  :NULL
+#+end_src
+The default for Postmodern is to continue to pass parameters to Postgresql as text (not in binary format) in order to avoid breaking existing user code. If you want to pass parameters to Postgresql in binary format and want to set that up when you are making the database connection, the following examples may help. We continue the difference in the signatures (cl-postgres uses optional parameters and postmodern uses keyword parameters) because of the expected downstream breakage if we shifted cl-postgres:open-database to using keyword parameters.
+
+In postmodern you have the connect function or you can use the with-connection macro:
+#+begin_src lisp
+  (defmacro with-connection (spec &body body)
+    `(let ((*database* (apply #'connect ,spec)))
+       (unwind-protect (progn ,@body)
+         (disconnect *database*))))
+#+end_src
+So often you would connect something like this:
+#+begin_src lisp
+  (with-connection '("database_name" "user-name" "user-password" "localhost or IP address"
+                     :use-binary t)
+    ...)
+#+end_src
+
+You can also change the flag after the connection is established with the =use-binary-parameters= function, passing T to use binary parameters or nil to use text parameters:
+#+begin_src lisp
+  (use-binary-parameters *database* t)
+#+end_src
+Using binary parameters does tighten type checking when using prepared queries. You will not be able to use prepared queries with varying formats. In other words, if you have a prepared query that you pass an integer as the first parameter and a string as the second parameter the first time it is used, any subsequent uses of that prepared query during that session will also have to pass an integer as the first parameter and a string as the second parameter.
+
+Benchmarking does indicate a slight speed and consing benefit to passing parameters as binary, but your mileage will vary depending on your use case.
+
+** variable =*default-use-ssl*=
+:PROPERTIES:
+:CUSTOM_ID: variable-default-use-ssl
+:END:
+
+The default for connect's use-ssl argument.
+Valid settings are :no, :try, :require, :yes, or :full
+
+:try means if the server supports it
+
+:require means use provided ssl certificate with no verification
+
+:yes means verify that the server cert is issued by a trusted CA, but does not verify the server hostname
+
+:full means expect a CA-signed cert for the supplied hostname and verify the server hostname
+
+If you set it to anything other than :no be sure to also load the CL+SSL library.
+
+** method disconnect (database-connection)
+:PROPERTIES:
+:CUSTOM_ID: method-disconnect
+:END:
+
+Disconnects a normal database connection, or moves a pooled connection into the
+pool.
+
+** function connected-p (database-connection)
+:PROPERTIES:
+:CUSTOM_ID: function-connected-p
+:END:
+→ boolean
+
+Returns a boolean indicating whether the given connection is still connected to
+the server.
+
+** method reconnect (database-connection)
+:PROPERTIES:
+:CUSTOM_ID: method-reconnect
+:END:
+
+Reconnect a disconnected database connection. This is not allowed for pooled
+connections ― after they are disconnected they might be in use by some other
+process, and should no longer be used.
+
+** variable =*database*=
+:PROPERTIES:
+:CUSTOM_ID: variable-database
+:END:
+
+Special variable holding the current database connection information. Most
+functions and macros operating on a database assume this binds to a connected
+database.
+
+** macro with-connection (spec &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-with-connection
+:END:
+
+Evaluates the body with =*database*= bound to a connection as specified by spec,
+which should be list that connect can be applied to.
+
+Examples:
+#+begin_src lisp
+  (with-connection '("test_database" "sabra" "some_strange_password_here" "localhost")
+    (list-tables))
+
+  (with-connection '("test_db" "test-user" "test-password" "192.168.5.223"
+                     :port 5434 :pooled-p t :use-ssl try :application-name "test-app")
+    (list-tables))
+
+  (with-connection '("test_db" "test-user" "test-password" "192.168.5.223"
+                     :port 5434 :pooled-p t :use-ssl try :application-name "test-app"
+                     :use-binary t)
+    (list-tables))
+#+end_src
+
+** macro call-with-connection (spec thunk)
+:PROPERTIES:
+:CUSTOM_ID: macro-call-with-connection
+:END:
+
+The functional backend to with-connection. Binds =*database*= to a new connection
+as specified by spec, which should be a list that connect can be applied to, and
+runs the zero-argument function given as second argument in the new environment.
+When the function returns or throws, the new connection is disconnected.
+
+** function connect-toplevel (database user-name password host &key (port 5432) (use-ssl *default-use-ssl*) (application-name "") use-binary)
+:PROPERTIES:
+:CUSTOM_ID: function-connect-toplevel
+:END:
+
+Bind the =*database*= to a new connection. Use this if you only need one
+long running connection. For example, you want a connection for debugging from the REPL.
+It will still allow you to use with-connection to create a separate shorter-term
+connection if you want.
+
+** function disconnect-toplevel ()
+:PROPERTIES:
+:CUSTOM_ID: function-disconnect-toplevel
+:END:
+
+Disconnect the =*database*=.
+
+** function clear-connection-pool ()
+:PROPERTIES:
+:CUSTOM_ID: function-clear-connection-pool
+:END:
+
+Disconnect and remove all connections from the connection pools.
+
+** variable =*max-pool-size*=
+:PROPERTIES:
+:CUSTOM_ID: variable-max-pool-size
+:END:
+
+Set the maximum amount of connections kept in a single connection pool, where a
+pool consists of all the stored connections with the exact same connect
+arguments. Defaults to NIL, which means there is no maximum.
+
+** function list-connections ()
+:PROPERTIES:
+:CUSTOM_ID: function-list-connections
+:END:
+→ list
+
+List the current postgresql connections to the currently connected database. It
+does this by returning info from pg_stat_activity on open connections.
+
+** function use-binary-parameters (database-connection param)
+:PROPERTIES:
+:CUSTOM_ID: function-use-binary-parameters
+:END:
+
+You can set the flag for Postmodern to pass parameters in binary form to Postgresql after the connection is established with the use-binary-parameters function. You need to provide the database connection object and then either t (to use binary parameters) or nil (to pass parameters as text).
+
+    (pomo:use-binary-parameters *database* t)
+
+* Querying
+:PROPERTIES:
+:CUSTOM_ID: querying
+:END:
+For queries involving dao-classes, see [[file:dao-classes.html#query-and-selection][Dao Query and Selection]]
+** macro query (query &rest args/format)
+:PROPERTIES:
+:CUSTOM_ID: macro-query
+:END:
+→ result
+
+Execute the given query, which can be either a string or an S-SQL form
+(list starting with a keyword). If the query contains placeholders ($1, $2, etc)
+their values can be given as extra arguments. If one of these arguments
+is a keyword occurring in the table below, it will not be used as a query
+argument, but will determine the format in which the results are returned
+instead. Any of the following formats can be used, with the default being :rows:
+
+| :none	             | Ignore the result values.                                                                                                                                |
+| :lists, :rows       | 	Return a list of lists, each list containing the values for a row.                                                                                     |
+| :list, :row         | 	Return a single row as a list.                                                                                                                         |
+| :alists	           | Return a list of alists which map column names to values, with the names represented as keywords.                                                        |
+| :alist	            | Return a single row as an alist.                                                                                                                         |
+| :str-alists         | 	Like :alists, but use the original column names.                                                                                                       |
+| :str-alist	        | Return a single row as an alist, with strings for names.                                                                                                 |
+| :plists	           | Return a list of plists which map column names to values,with the names represented as keywords.                                                         |
+| :plist	            | Return a single row as a plist.                                                          |
+| :column	           | Return a single column as a list.                 |
+| :single	           | Return a single value. Will raise an error if the query returns more than one field. If the query returns more than one row, it returns the first row. |
+| :single!	          | Like :single except that it will throw an error when the number of selected rows is not equal to 1.  |
+| :vectors	    | Return a vector of vectors, each vector containing the values for a row. (This is only the plural) |
+| :array-hash         | Return an array of hashtables which map column names to hash table keys     |
+| :json-strs          | Return a list of strings where each row is a json object expressed as a string  |
+| :json-str           | Return a single string where the row returned is a json object expressed as a string           |
+| :json-array-str     | Return a string containing a json array, each element in the array is a selected row expressed as a json object |
+| (:dao type)	       | Return a list of DAOs of the given type. The names of the fields returned by the query must match slots in the DAO class the same way as with query-dao. |
+| (:dao type :single) | 	Return a single DAO of the given type. |
+
+Some Examples:
+*** Default
+:PROPERTIES:
+:CUSTOM_ID: default
+:END:
+The default is :lists
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)))
+  ((1 2147483645 "text one") (2 0 "text two"))
+#+END_SRC
+*** Single
+:PROPERTIES:
+:CUSTOM_ID: single
+:END:
+Returns a single field. Will throw an error if the queries returns more than one field or more than one row
+#+BEGIN_SRC lisp
+  (query (:select 'text :from 'short-data-type-tests :where (:= 'id 3)) :single)
+  "text three"
+#+END_SRC
+*** List
+:PROPERTIES:
+:CUSTOM_ID: list
+:END:
+Returns a list containing the selected fields. Will throw an error if the query returns more than one row
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:= 'id 3)) :list)
+  (3 3 "text three")
+#+END_SRC
+*** Lists
+:PROPERTIES:
+:CUSTOM_ID: lists
+:END:
+This is the default
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :lists)
+  ((1 2147483645 "text one") (2 0 "text two"))
+#+END_SRC
+*** Alist
+:PROPERTIES:
+:CUSTOM_ID: alist
+:END:
+Returns an alist containing the field name as a keyword and the selected fields. Will throw an error if the query returns more than one row.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'test-data :where (:= 'id 3)) :alist)
+  ((:ID . 3) (:INT4 . 3) (:TEXT . "text three"))
+#+END_SRC
+*** Str-alist
+:PROPERTIES:
+:CUSTOM_ID: str-alist
+:END:
+Returns an alist containing the field name as a lower case string and the selected fields. Will throw an error if the query returns more than one row.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:= 'id 3)) :str-alist)
+  (("id" . 3) ("int4" . 3) ("text" . "text three"))
+#+END_SRC
+*** Alists
+:PROPERTIES:
+:CUSTOM_ID: alists
+:END:
+Returns a list of alists containing the field name as a keyword and the selected fields.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :alists)
+  (((:ID . 1) (:INT4 . 2147483645) (:TEXT . "text one"))
+   ((:ID . 2) (:INT4 . 0) (:TEXT . "text two")))
+#+END_SRC
+*** Str-alists
+:PROPERTIES:
+:CUSTOM_ID: str-alists
+:END:
+Returns a list of alists containing the field name as a lower case string and the selected fields.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :str-alists)
+  ((("id" . 1) ("int4" . 2147483645) ("text" . "text one"))
+   (("id" . 2) ("int4" . 0) ("text" . "text two")))
+#+END_SRC
+*** Plist
+:PROPERTIES:
+:CUSTOM_ID: plist
+:END:
+Returns a plist containing the field name as a keyword and the selected fields. Will throw an error if the query returns more than one row.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:= 'id 3)) :plist)
+  (:ID 3 :INT4 3 :TEXT "text three")
+#+END_SRC
+*** Plists
+:PROPERTIES:
+:CUSTOM_ID: plists
+:END:
+Returns a list of plists containing the field name as a keyword and the selected fields.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :plists)
+  ((:ID 1 :INT4 2147483645 :TEXT "text one") (:ID 2 :INT4 0 :TEXT "text two"))
+#+END_SRC
+*** Vectors
+:PROPERTIES:
+:CUSTOM_ID: vectors
+:END:
+Returns a vector of vectors where each internal vector is a returned row from the query. The field names are not included. NOTE: It will return an empty vector instead of NIL if there is no result.
+#+begin_src lisp
+  (query (:select 'id 'int4 'text :from 'test-data)
+         :vectors)
+  #(#(1 2147483645 "text one")
+    #(2 0 "text two")
+    #(3 3 "text three"))
+
+  (query (:select 'id 'int4 'text :from 'test-data :where (:< 'id 1))
+         :vectors)
+  #()
+#+end_src
+*** Array-hash
+:PROPERTIES:
+:CUSTOM_ID: array-hash
+:END:
+Returns a vector of hashtables where each hash table is a returned row from the query with field name as the key expressed as a lower case string.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :array-hash)
+  #(#<HASH-TABLE :TEST EQUAL :COUNT 3 {100D982B53}>
+    #<HASH-TABLE :TEST EQUAL :COUNT 3 {100D982ED3}>)
+
+  (alexandria:hash-table-alist
+   (aref
+    (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :array-hash)
+    1))
+  (("text" . "text two") ("int4" . 0) ("id" . 2))
+#+END_SRC
+*** Dao
+:PROPERTIES:
+:CUSTOM_ID: dao-results
+:END:
+Returns a list of daos of the type specified
+#+BEGIN_SRC lisp
+  (query (:select '* :from 'country) (:dao country))
+  (#<COUNTRY {1010464023}> #<COUNTRY {1010465CB3}>)
+
+  (query (:select '* :from 'country :where (:= 'name "Croatia")) (:dao country))
+  (#<COUNTRY {1010688943}>)
+#+END_SRC
+*** Column
+:PROPERTIES:
+:CUSTOM_ID: column-results
+:END:
+Returns a list of field values of a single field. Will throw an error if more than one field is selected
+#+BEGIN_SRC lisp
+  (query (:select 'id :from 'short-data-type-tests :where (:< 'id 3)) :column)
+  (1 2)
+
+  (query (:select 'id :from 'short-data-type-tests :where (:= 'id 3)) :column)
+  (3)
+#+END_SRC
+*** Json-strs
+:PROPERTIES:
+:CUSTOM_ID: json-strs
+:END:
+Return a list of strings where the row returned is a json object expressed as a string
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :json-strs)
+  ("{\"id\":1,\"int4\":2147483645,\"text\":\"text one\"}"
+   "{\"id\":2,\"int4\":0,\"text\":\"text two\"}")
+#+END_SRC
+This will also handle local-time timestamps and simple-date timestamps,
+time-of-day and date. E.g. (with a local-time timestamp)
+#+BEGIN_SRC lisp
+  (query (:select 'timestamp-with-time-zone
+          :from 'test-data
+          :where (:< 'id 3))
+         :json-strs)
+
+  '("{\"timestampWithTimeZone\":\"{2019-12-30T13:30:54.000000-05:00}\"}"
+    "{\"timestampWithTimeZone\":\"{1919-12-30T13:30:54.000000-05:00}\"}")
+#+END_SRC
+
+The following is an example with a simple-date timestamp.
+#+BEGIN_SRC lisp
+  (query (:select 'timestamp-with-time-zone
+          :from 'test-data
+          :where (:< 'id 3)) :json-strs)
+  '("{\"timestampWithTimeZone\":\"2019-12-30 18:30:54:0\"}"
+    "{\"timestampWithTimeZone\":\"1919-12-30 18:30:54:0\"}")
+#+END_SRC
+*** Json-str
+:PROPERTIES:
+:CUSTOM_ID: json-str
+:END:
+Return a single string where the row returned is a json object expressed as a string
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:= 'id 3)) :json-str)
+  "{\"id\":3,\"int4\":3,\"text\":\"text three\"}"
+#+END_SRC
+As with :json-strs, this will also work for either simple-date or local-time timestamps
+
+*** Json-array-str
+:PROPERTIES:
+:CUSTOM_ID: json-array-str
+:END:
+Return a string containing a json array, each element in the array is a selected row expressed as a json object. NOTE: If there is no result, this will return a string with an empty json array.
+#+BEGIN_SRC lisp
+  (query (:select 'id 'int4 'text :from 'short-data-type-tests :where (:< 'id 3)) :json-array-str)
+  "[{\"id\":1,\"int4\":2147483645,\"text\":\"text one\"}, {\"id\":2,\"int4\":0,\"text\":\"text two\"}]"
+
+  (query (:select 'id 'int4 'text :from 'test-data :where (:< 'id 1)) :json-array-str)
+  "[]"
+#+END_SRC
+As with :json-strs, this will also work for either simple-date or local-time timestamps
+*** Second value returned
+:PROPERTIES:
+:CUSTOM_ID: second-value-returned
+:END:
+If the database returns information about the amount rows that were affected,
+such as with updating or deleting queries, this is returned as a second value.
+
+** macro execute (query &rest args)
+:PROPERTIES:
+:CUSTOM_ID: macro-execute
+:END:
+
+Execute a query, ignore the results. So, in effect, Like a query called with
+format :none. Returns the amount of affected rows as its first returned value.
+(Also returns this amount as the second returned value, but use of this is
+deprecated.)
+
+** macro doquery (query (&rest names) &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-doquery
+:END:
+
+Execute the given query (a string or a list starting with a keyword), iterating
+over the rows in the result. The body will be executed with the values in the
+row bound to the symbols given in names. To iterate over a parameterised query,
+one can specify a list whose car is the query, and whose cdr contains the
+arguments.
+
+An example using s-sql:
+#+BEGIN_SRC lisp
+  (doquery (:select 'name 'score :from 'scores) (n s)
+    (incf (gethash n scores) s))
+
+  (doquery ((:select 'name :from 'scores :where (:> 'score '$1)) 100) (name)
+    (print name))
+#+END_SRC
+The same examples using plain sql:
+#+BEGIN_SRC lisp
+  (doquery "select name, score from scores" (n s)
+    (incf (gethash n scores) s))
+
+  (doquery ((:select 'name :from 'scores :where (:> 'score '$1)) 100) (name)
+    (print name))
+#+END_SRC
+
+** macro prepare (query &optional (format :rows))
+:PROPERTIES:
+:CUSTOM_ID: macro-prepare
+:END:
+→ function
+
+Wraps a query into a function that can be used as the interface to a prepared
+statement. The given query (either a string or an S-SQL form) may contain
+placeholders, which look like $1, $2, etc. The resulting function takes one
+argument for every placeholder in the query, executes the prepared query, and
+returns the result in the format specified. (Allowed formats are the same as for
+query.)
+
+#+begin_src lisp
+  (let ((select-two (prepare (:select (:type '$1 'integer) (:type '$2 'string)))))
+    (funcall select-two 1 "a"))
+
+  (let ((getpid (prepare "select pg_backend_oid()" :single)))
+    (funcall getpid))
+#+end_src
+
+For queries that have to be run very often, especially when they are complex,
+it may help performance since the server only has to plan them once. See the [[http://www.postgresql.org/docs/current/static/sql-prepare.html][
+PostgreSQL manual]] for details.
+
+In some cases, the server will complain about not being able to deduce the type
+of the arguments in a statement. In that case you should add type declarations
+(either with the PostgreSQL's CAST SQL-conforming syntax or
+historical :: syntax, or with S-SQL's :type construct) to help it out.
+
+Note that it will attempt to automatically reconnect if
+database-connection-error, or admin-shutdown. It will reset prepared statements
+triggering an invalid-sql-statement-name error. It will overwrite old prepared
+statements triggering a duplicate-prepared-statement error.
+
+Example:
+#+begin_src lisp
+  (let ((select-int (prepare (:select (:type '$1 integer)) :single)))
+    (funcall select-int 10))
+#+end_src
+
+** macro defprepared (name query &optional (format :rows))
+:PROPERTIES:
+:CUSTOM_ID: macro-def-prepared
+:END:
+→ function
+
+This is a macro-style variant of prepare. It is like prepare, but gives the
+function a name which now becomes a top-level function for the prepared
+statement. The name should not a string but may be quoted.
+
+Example:
+
+#+begin_src lisp
+  (defprepared 'select1 "select a from test_data where c = $1" :single)
+
+  (funcall 'select1 "foobar")
+#+end_src
+
+** macro defprepared-with-names (name (&rest args) (query &rest query-args) &optional (format :rows))
+:PROPERTIES:
+:CUSTOM_ID: macro-defprepared-with-names
+:END:
+
+Like defprepared, but allows to specify names of the function arguments in a
+lambda list as well as arguments supplied to the query.
+#+BEGIN_SRC lisp
+  (defprepared-with-names user-messages (user &key (limit 10))
+    ("select * from messages
+      where user_id = $1
+      order by date desc
+      limit $2" (user-id user) limit)
+    :plists)
+#+END_SRC
+
+** macro with-transaction ((&optional name isolation-level) &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-with-transaction
+:END:
+
+Execute the given body within a database transaction, committing it when the
+body exits normally, and aborting otherwise. An optional name and/or
+isolation-level can be given to the transaction. The name can be used to
+force a commit or abort before the body unwinds. The isolation-level
+will set the isolation-level used by the transaction.
+
+You can specify the following isolation levels in postmodern transactions:
+
+- :read-committed-rw (read committed with read and write)
+- :read-committed-ro (read committed with read only)
+- :repeatable-read-rw (repeatable read with read and write)
+- :repeatable-read-ro (repeatable read with read only)
+- :serializable (serializable with reand and write)
+
+Sample usage where "george" is just the name given to the transaction (not
+quoted or a string) and ... simply indicates other statements would be
+expected here:
+#+BEGIN_SRC lisp
+  (with-transaction ()
+    (execute (:insert-into 'test-data :set 'value 77))
+    ...)
+
+  (with-transaction (george)
+    (execute (:insert-into 'test-data :set 'value 22))
+    ...)
+
+  (with-transaction (george :read-committed-rw)
+    (execute (:insert-into 'test-data :set 'value 33))
+    (query (:select '* :from 'test-data))
+    ...)
+
+  (with-transaction (:serializable)
+    (execute (:insert-into 'test-data :set 'value 44))
+    ...)
+#+END_SRC
+
+Further discussion of transactions and isolation levels can found at
+[[file:isolation-notes.html][isolation-notes.html]] in the doc directory.
+
+** function commit-transaction (transaction)
+:PROPERTIES:
+:CUSTOM_ID: function-commit-transaction
+:END:
+
+Immediately commit an open transaction.
+
+** function abort-transaction (transaction)
+:PROPERTIES:
+:CUSTOM_ID: function-abort-transaction
+:END:
+
+Roll back the given transaction, but the transaction
+block is still active. Thus calling abort-transaction in the middle of a
+transaction does not end the transaction. Any subsequent statements will still
+be executed. Per the Postgresql documentation: ABORT rolls back the current
+transaction and causes all the updates made by the transaction to be discarded.
+This command is identical in behavior to the standard SQL command ROLLBACK, and
+is present only for historical reasons..
+
+** function rollback-transaction (transaction)
+:PROPERTIES:
+:CUSTOM_ID: function-rollback-transaction
+:END:
+Roll back the given transaction, but the transaction
+block is still active. Thus calling abort-transaction in the middle of a
+transaction does not end the transaction. Any subsequent statements will still
+be executed. Per the Postgresql documentation: this rolls back the current
+transaction and causes all the updates made by the transaction to be discarded.
+
+** macro with-savepoint (name &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-savepoint
+:END:
+
+Can only be used within a transaction. Establishes a savepoint with the given
+name at the start of body, and binds the same name to a handle for that
+savepoint. The body is executed and, at the end of body, the savepoint is
+released, unless a condition is thrown, in which case it is rolled back.
+Execute the body within a savepoint, releasing savepoint when the body exits
+normally, and rolling back otherwise. NAME is both the variable that can be
+used to release or rolled back before the body unwinds, and the SQL name of the
+savepoint.
+
+The following example demonstrates with-savepoint, rollback-savepoint and
+release-savepoint.
+
+#+BEGIN_SRC lisp
+  (execute (:create-table test-data ((value :type integer))))
+
+  (defun test12 (x &optional (y nil))
+    (with-logical-transaction (lt1 :read-committed-rw)
+      (execute (:insert-into 'test-data :set 'value 0))
+      (with-savepoint sp1
+        (execute (:insert-into 'test-data :set 'value 1))
+        (format t "1-1. ~a Savepoint-name ~a~%" (query "select * from test_data")
+                (pomo::savepoint-name sp1))
+        (if (< x 0)
+            (rollback-savepoint sp1)
+            (release-savepoint sp1))
+        (format t "1-2. ~a~%" (query "select * from test_data")))
+      (with-savepoint sp2
+        (execute (:insert-into 'test-data :set 'value 2))
+        (format t "2-1. ~a Savepoint-name ~a~%" (query "select * from test_data")
+                (pomo::savepoint-name sp2))
+        (with-savepoint sp3
+          (execute (:insert-into 'test-data :set 'value 3))
+          (format t "3-1. ~a Savepoint-name ~a~%" (query "select * from test_data")
+                  (pomo::savepoint-name sp3))
+          (if (> x 0)
+              (rollback-savepoint sp3)
+              (release-savepoint sp3))
+          (format t "3-2. ~a~%" (query "select * from test_data"))
+          (when y (rollback-savepoint sp2))
+          (format t "3-3. ~a~%" (query "select * from test_data")))
+        (if (= x 0)
+            (rollback-savepoint sp2)
+            (release-savepoint sp2))
+        (format t "2-2. ~a~%" (query "select * from test_data")))
+      (format t "4. ~a~%" (query "select * from test_data"))
+      (when (string= y "abrt")
+        (abort-transaction lt1))
+      (format t "5. ~a~%" (query "select * from test_data"))))
+#+END_SRC
+
+** function release-savepoint (savepoint)
+:PROPERTIES:
+:CUSTOM_ID: function-release-savepoint
+:END:
+
+Immediately release a savepoint, commiting its results.
+
+** function rollback-savepoint (savepoint)
+:PROPERTIES:
+:CUSTOM_ID: function-rollback-savepoint
+:END:
+
+Immediately roll back a savepoint, aborting the results.
+
+** method commit-hooks (transaction-or-savepoint), setf (commit-hooks transaction-or-savepoint)
+:PROPERTIES:
+:CUSTOM_ID: method-commit-hooks
+:END:
+
+An accessor for the transaction or savepoint's list of commit hooks, each of
+which should be a function with no required arguments. These functions will be
+executed when a transaction is committed or a savepoint released.
+
+** function abort-hooks (transaction-or-savepoint), setf (abort-hooks transaction-or-savepoint)
+:PROPERTIES:
+:CUSTOM_ID: method-abort-hooks
+:END:
+
+An accessor for the transaction or savepoint's list of abort hooks, each of
+which should be a function with no required arguments. These functions will be
+executed when a transaction is aborted or a savepoint rolled back (whether via a
+non-local transfer of control or explicitly by either abort-transaction or
+rollback-savepoint).
+
+** variable =*isolation-level*=
+:PROPERTIES:
+:CUSTOM_ID: variable-isolation-levels
+:END:
+
+The transaction isolation level currently in use. Defaults to :read-committed-rw
+
+You can specify the following isolation levels in postmodern transactions:
+
+- :read-committed-rw (read committed with read and write)
+- :read-committed-ro (read committed with read only)
+- :repeatable-read-rw (repeatable read with read and write)
+- :repeatable-read-ro (repeatable read with read only)
+- :serializable (serializable with reand and write)
+
+
+** macro with-logical-transaction ((&optional name isolation-level) &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-with-logical-transaction
+:END:
+
+Executes body within a with-transaction form if no transaction is currently
+in progress, otherwise simulates a nested transaction by executing it
+within a with-savepoint form. The transaction or savepoint is bound to name
+if one is supplied. The isolation-level will set the isolation-level used by the
+transaction.
+
+You can specify the following isolation levels in postmodern transactions:
+
+- :read-committed-rw (read committed with read and write)
+- :read-committed-ro (read committed with read only)
+- :repeatable-read-rw (repeatable read with read and write)
+- :repeatable-read-ro (repeatable read with read only)
+- :serializable (serializable with reand and write)
+
+For more information see [[file:isolation-notes.html][isolation-notes]]
+
+Sample usage where "george" is just the name given to the transaction (not
+quoted or a string) and ... simply indicates other statements would be
+expected here:
+
+#+BEGIN_SRC lisp
+  (with-logical-transaction ()
+    (execute (:insert-into 'test-data :set 'value 77))
+    ...)
+
+  (with-logical-transaction (george)
+    (execute (:insert-into 'test-data :set 'value 22))
+    ...)
+
+  (with-logical-transaction (george :read-committed-rw)
+    (execute (:insert-into 'test-data :set 'value 33))
+    ...)
+
+  (with-logical-transaction (:serializable)
+    (execute (:insert-into 'test-data :set 'value 44))
+    ...)
+#+END_SRC
+
+** function abort-logical-transaction (transaction-or-savepoint)
+:PROPERTIES:
+:CUSTOM_ID: function-abort-logical-transaction
+:END:
+
+Roll back the given logical transaction, regardless of whether it is an actual
+transaction or a savepoint.
+
+** function commit-logical-transaction (transaction-or-savepoint)
+:PROPERTIES:
+:CUSTOM_ID: function-commit-logical-transaction
+:END:
+
+Commit the given logical transaction, regardless of whether it is an actual
+transaction or a savepoint.
+
+** variable =*current-logical-transaction*=
+:PROPERTIES:
+:CUSTOM_ID: variable-current-logical-transaction
+:END:
+
+This is bound to the current transaction-handle or savepoint-handle instance
+representing the innermost open logical transaction.
+
+** macro ensure-transaction (&body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-ensure-transaction
+:END:
+
+Ensures that body is executed within a transaction, but does not begin a new
+transaction if one is already in progress.
+
+** macro ensure-transaction-with-isolation-level (isolation-level &body body)
+:PROPERTIES:
+:CUSTOM_ID: macro-ensure-transaction-with-isolation-level
+:END:
+
+Executes body within a with-transaction form if and only if no transaction is
+already in progress. This adds the ability to specify an isolation level other
+than the current default
+
+* Helper functions for Prepared Statements
+:PROPERTIES:
+:CUSTOM_ID: prepared-statement-helper-functions
+:END:
+
+** defparameter *allow-overwriting-prepared-statements*
+:PROPERTIES:
+:CUSTOM_ID: variable-allow-overwriting-prepared-statements
+:END:
+
+When set to t, ensured-prepared will overwrite prepared statements having the
+same name if the query statement itself in the postmodern meta connection is
+different than the query statement provided to ensure-prepared.
+
+** function prepared-statement-exists-p (name)
+:PROPERTIES:
+:CUSTOM_ID: function-prepared-statement-exists-p
+:END:
+→ boolean
+This returns t if the prepared statement exists in the current postgresql
+session, otherwise nil.
+
+** function list-prepared-statements (&optional (names-only nil))
+:PROPERTIES:
+:CUSTOM_ID: function-list-prepared-statements
+:END:
+→ list
+
+This is syntactic sugar. It runs a query that lists the prepared statements in
+the session in which the function is run. If the names-only parameter is set
+to t, it will only return a list of the names of the prepared statements.
+
+** function drop-prepared-statement (statement-name &key (location :both) (database =*database*=))
+:PROPERTIES:
+:CUSTOM_ID: function-drop-prepared-statement
+:END:
+
+The statement name can be a string or quoted symbol.
+
+Prepared statements are stored both in the meta slot in the postmodern
+connection and in postgresql session information. In the case of prepared
+statements generated with defprepared, there is also a lisp function with
+the same name.
+
+If you know the prepared statement name, you can delete the prepared statement
+from both locations (the default behavior), just from postmodern by passing
+:postmodern to the location key parameter or just from postgresql by passing
+:postgresql to the location key parameter.
+
+If you pass the name 'All' as the statement name, it will
+delete all prepared statements.
+
+The default behavior is to also remove any lisp function of the same name.
+This behavior is controlled by the remove-function key parameter.
+
+** function list-postmodern-prepared-statements (&optional (names-only nil))
+:PROPERTIES:
+:CUSTOM_ID: function-list-postmodern-prepared-statements
+:END:
+→ list
+
+List the prepared statements that postmodern has put in the meta slot in the
+connection. It will return a list of alists of form:
+((:NAME . \"SNY24\")
+(:STATEMENT . \"(SELECT name, salary FROM employee WHERE (city = $1))\")
+(:PREPARE-TIME . #<TIMESTAMP 25-11-2018T15:36:43,385>)
+(:PARAMETER-TYPES . \"{text}\") (:FROM-SQL)
+
+If the names-only parameter is set to t, it will only return a list of
+the names of the prepared statements.
+
+** function find-postgresql-prepared-statement (name)
+:PROPERTIES:
+:CUSTOM_ID: function-find-postgresql-prepared-statement
+:END:
+→ string
+
+Returns the specified named prepared statement (if any) that postgresql has for
+this session and placed in the meta slot in the connection.
+
+** function find-postmodern-prepared-statement (name)
+:PROPERTIES:
+:CUSTOM_ID: function-find-postmodern-prepared-statement
+:END:
+→ string
+
+Returns the specified named prepared statement (if any) that postmodern has put
+in the meta slot in the connection. Note that this is the statement itself, not
+the name.
+
+** function reset-prepared-statement (condition)
+:PROPERTIES:
+:CUSTOM_ID: function-reset-prepared-statement
+:END:
+→ restart
+
+If you have received an invalid-prepared-statement error but the prepared
+statement is still in the meta slot in the postmodern connection, this will try
+to regenerate the prepared statement at the database connection level and
+restart the connection.
+
+** function get-pid ()
+:PROPERTIES:
+:CUSTOM_ID: function-get-pid
+:END:
+→ integer
+
+Get the process id used by postgresql for this connection.
+
+** function get-pid-from-postmodern ()
+:PROPERTIES:
+:CUSTOM_ID: function-get-pid-from-postmodern
+:END:
+→ integer
+
+Get the process id used by postgresql for this connection, but get it from the
+postmodern connection parameters.
+
+** function cancel-backend (pid)
+:PROPERTIES:
+:CUSTOM_ID: function-cancel-backend
+:END:
+
+Polite way of terminating a query at the database (as opposed to calling
+close-database). This is slower than (terminate-backend pid) and does not
+always work.
+
+** function terminate-backend (pid)
+:PROPERTIES:
+:CUSTOM_ID: function-terminate-backend
+:END:
+
+Less polite way of terminating at the database (as opposed to calling
+close-database). Faster than (cancel-backend pid) and more reliable.
+* Database Management
+:PROPERTIES:
+:CUSTOM_ID: database-management
+:END:
+
+** function create-database (database-name &key (encoding "UTF8") (connection-limit -1) owner limit-public-access comment collation template)
+:PROPERTIES:
+:CUSTOM_ID: function-create-database
+:END:
+
+Creates a basic database. Besides the obvious database-name parameter, you
+can also use key parameters to set encoding (defaults to UTF8), owner,
+connection-limit (defaults to no limit)). If limit-public-access is set to t,
+then only superuser roles or roles with explicit access to this database will
+be able to access it. See [[#roles]].
+
+If collation is set, the assumption is that template0 needs to be used as the base
+of the database rather than template1 which may contain encoding specific or locale
+specific data.
+#+BEGIN_SRC lisp
+  (create-database 'testdb :limit-public-access t
+                           :comment "This database is for testing silly theories")
+#+END_SRC
+** function drop-database (database)
+:PROPERTIES:
+:CUSTOM_ID: function-drop-database
+:END:
+
+Drop the specified database. The database parameter can be a string or a
+symbol. Note: Only the owner of a database (or superuser) can drop a database
+and there cannot be any current connections to the database.
+[[#database-information][See Database information below for information specific functions]
+
+* Table definition and creation using a dao
+  :PROPERTIES:
+  :CUSTOM_ID: table-definition
+  :END:
+
+  See: [[file:dao-classes.html#table-definition][Creating Tables using dao classes]]
+
+* Roles
+  :PROPERTIES:
+  :CUSTOM_ID: roles
+  :END:
+Every connection is specific to a particular database. However, creating roles
+or users is global to the entire cluster (the running postgresql server). You
+can create policies for any individual database, schema or table, but you need
+to ensure that those policies also apply to any subsequently created database,
+schema or table. Note that each user is automatically a member of the public
+group, so you need to change those policies for public as well.
+
+Per the Postgresql Documentation, CREATE ROLE adds a new role to a PostgreSQL
+database cluster. A role is an entity that can own database objects and have
+database privileges; a role can be considered a “user”, a “group”, or both
+depending on how it is used.
+https://www.postgresql.org/docs/current/sql-createrole.html. The only real
+difference between "create role" and "create user" is that create user
+defaults to having a login attribute and create role defaults to not having
+a login attribute.
+
+Often applications will have their own concept of users and the application
+will itself have one or more types of roles to which the application user is
+assigned. So, for example, the application may have two roles - reader and
+editor with which it interacts with postgresql and then there are many
+application users registered with the application and probably listed in some
+type of user table in postgresql that the application manages. When users 1,2
+or 3 log in to the application, the application might connect to the postgresql
+cluster using a role that only has read (select) permissions. When users 4 or 5
+log in to the application, the applicatin might connect to the postgresql cluster
+using a role that has read, insert, update and delete permission. Postmodern
+provides a simplified create-role system allowing easy creation of roles that
+have readonly, editor or superuser type permissions. Further, those
+permissions can be limited to individual databases, schemas or tables.
+
+We suggest that you separate application users from roles. Make it easy to
+drop application users. Dropping roles requires going through every database,
+reassigning ownership of any objects that role might own or have privileges
+on, then dropping ownership of objects, then dropping the role itself.
+
+** function role-exists-p (role-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-role-exists-p
+   :END:
+→ boolean
+
+Does the named role exist in this database cluster? Returns t or nil.
+** function create-role
+   :PROPERTIES:
+   :CUSTOM_ID: function-create-role
+   :END:
+(name password &key (base-role :readonly) (schema :public)
+                                    (tables :all) (databases :current)
+                                    (allow-whitespace nil)
+                                    (allow-utf8 nil)
+                                    (allow-disallowed-names nil) (comment nil))
+
+Keyword parameters: Base-role. Base-role should be one of :readonly, :editor,
+:admin, :standard or :superuser. A readonly user can only select existing data in the
+specified tables or databases. An editor has the ability to insert, update,
+delete or select data. An admin has all privileges on a database, but cannot
+create new databases, roles, or replicate the system. A standard user has no
+particular privileges other than connecting to databases.
+
+ :schema defaults to :public but can be a list of schemas. User will not have
+access to any schemas not in the list.
+
+ :tables defaults to :all but can be a list of tables. User will not have access
+to any tables not in the list.
+
+ :databases defaults to :current but can be a list of databases. User will not
+have access to any databases not in the list.
+
+ :allow-whitespace - Whitespace in either the name or password is not allowed by
+default.
+
+ :allow-utf8 defaults to nil. If t, the name and password will be normalized. If
+nil, the name and password are limited to printable ascii characters. For fun
+reading on utf8 user names see
+https://labs.spotify.com/2013/06/18/creative-usernames. Also interesting reading
+is https://github.com/flurdy/bad_usernames and https://github.com/dsignr/disallowed-usernames/blob/master/disallowed%20usernames.csv,
+and https://www.b-list.org/weblog/2018/feb/11/usernames/
+
+ :allow-disallowed-names defaults to nil. If nil, the user name will be checked
+against =*disallowed-role-names*=.
+
+ As an aside, if allowing utf8 in names, you might want to think about whether
+you should second copy of the username in the original casing and normalized as
+NFC for display purposes as opposed to normalizing to NFKC. It might be viewed
+as culturally insensitive to change the display of the name.
+** function drop-role (role-name &optional (new-owner "postgres") (database :all))
+   :PROPERTIES:
+   :CUSTOM_ID: function-drop-role
+   :END:
+→ boolean
+
+The role-name and optional new-owner name should be strings. If they are
+symbols, they will be converted to string and hyphens will be converted to
+underscores.
+
+Before dropping the role, you must drop all the objects it owns (or reassign
+their ownership) and revoke any privileges the role has been granted on other
+objects. If database is :all, drop-role will loop through all databases in
+the cluster ensuring that the role has no privileges or owned objects in
+every database. Otherwise drop-role will drop objects owned by a role in the
+current database.
+
+We will reassign ownership of the objects to the postgres role
+unless otherwise specified in the optional second parameter. Returns t if
+successful. Will not drop the postgres role.
+** function alter-role-search-path (role search-path)
+   :PROPERTIES:
+   :CUSTOM_ID: function-alter-role
+   :END:
+
+Changes the priority of where a role looks for tables (which schema first,
+second, etc. Role should be a string or symbol. Search-path could be a list of schema
+names either as strings or symbols.
+** function change-password (role password &optional expiration-date)
+   :PROPERTIES:
+   :CUSTOM_ID: function-change-password
+   :END:
+
+Alters a role's password. If the optional expiration-date parameter is provided,
+the password will expire at the stated date. A sample expiration date would be
+'December 31, 2020'. If the expiration date is 'infinity', it will never expire.
+The password will be encrypted in the system catalogs. This is
+automatic with postgresql versions 10 and above.
+
+** function grant-role-permissions (role-type name &key (schema :public) (tables :all) (databases :all))
+   :PROPERTIES:
+   :CUSTOM_ID: function-grant-role-permissions
+   :END:
+
+Grant-role-permissions assumes that a role has already been created, but
+permissions need to be granted or revoked on a particular database.
+
+   A  :superuser can create databases, roles, replication, etc. Returns nil.
+   A  :standard user has no particular privileges or restrictions. Returns nil.
+   An :admin user can edit existing data, insert new data and create new tables
+in the specified databases/schemas/tables.
+   An :editor user can update fields or insert new records but cannot create new
+tables in the specified tables or databases.
+   A  :readonly role can only read existing data in the specified schemas,
+tables or databases. Schema, tables or databases can be :all or a list of
+schemas, tables or databases to be granted permission.
+
+  Granting :all provides access to all future items of that type as well.
+
+  Note that the schema and table rights and revocations granted are limited to
+the connected database at the time of execution of this function.
+** function grant-readonly-permissions (schema-name role-name &optional (table-name nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-grant-readonly-permissions
+   :END:
+
+Grants select privileges to a role for the named schema. If the optional
+table-name parameter is provided, the privileges are only granted with respect
+to that table. Note that we are giving some function execute permissions if
+table-name is nil, but if the table-name is specified, those are not provided.
+Your mileage may vary on how many privileges you want to provide to a
+read-only role with access to only a limited number of tables.
+** function grant-editor-permissions (schema-name role-name &optional (table-name nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-grant-editor-permissions
+   :END:
+
+Grants select, insert, update and delete privileges to a role for the named
+schema. If the optional table-name parameter is provided, the privileges are only
+granted with respect to that table. Note that we are giving some function execute
+permissions if table-name is nil, but if the table-name is specified, those are
+not provided. Your mileage may vary on how many privileges you want to provide
+to a editor role with access to only a limited number of tables.
+** function grant-admin-permissions (schema-name role-name &optional (table-name nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-grant-admin-permissions
+   :END:
+
+Grants all privileges to a role for the named schema. If the optional table-name
+parameter is provided, the privileges are only granted with respect to that table.
+** function revoke-all-on-table (table-name role-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-revoke-all-on-table
+   :END:
+
+Takes a table-name which could be a string, symbol or list of strings or
+symbols of tables names, a role name and revokes all privileges that
+role-name may have with that/those tables. This is limited to the currently
+connected database and can only revoke the privileges granted by the caller
+of the function.
+** function list-role-accessible-databases (role-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-role-accessible-databases
+   :END:
+→ list
+
+Returns a list of the databases to which the specified role can connect.
+** function list-roles (&optional (lt nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-roles
+   :END:
+→ list
+
+Returns a list of alists of rolenames, role attributes and membership in roles.
+See https://www.postgresql.org/docs/current/role-membership.html for an
+explanation. Optionally passing :alists or :plists can be used to set the return
+list types to :alists or :plists. This is the same as the psql function \du.
+
+** function list-role-permissions (&optional role)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-role-permissions
+   :END:
+→ list
+
+This returns a list of sublists of the permissions granted  within the
+currently connected database. If an optional role is provided, the result is
+limited to that role. The sublist returned will be in the form of role-name,
+schema-name, table-name and then a string containing all the rights of that role
+on that table in that schema.
+* Database Information
+  :PROPERTIES:
+  :CUSTOM_ID: database-information
+  :END:
+** function add-comment (type name comment &optional (second-name ""))
+   :PROPERTIES:
+   :CUSTOM_ID: funciton-add-comment
+   :END:
+
+Attempts to add a comment to a particular database object. The first parameter is a keyword for the type of database object. The second parameter is the name of the object. The third parameter is the comment itself. Some objects require an additional identifier. The names can be strings or symbols.
+
+Example usage would be:
+#+BEGIN_SRC lisp
+ (add-comment :database 'my-database-name "Does anyone actually use this database?")
+
+ (add-comment :column 'country-locations.name "Is what it looks like - the name of a country")
+
+ (add-comment :column "country_locations.name" "Is what it looks like - the name of a country")
+#+END_SRC
+
+Example usage where two identifiers are required would be constraints:
+#+BEGIN_SRC lisp
+ (add-comment :constraint 'constraint1  "Some kind of constraint descriptions here"
+              'country-locations)
+#+END_SRC
+
+** find-comments (type identifier)
+:PROPERTIES:
+:CUSTOM_ID: function-find-comments
+:END:
+Returns the comments attached to a particular database object. The allowed
+types are :database :schema :table :columns (all the columns in a table)
+:column (for a single column).
+
+An example would be (find-comments :table 's2.employees) where the table employees
+is in the s2 schema.
+** function get-database-comment (database-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-database-comment
+   :END:
+→ string
+
+Returns the comment, if any, attached to a database. See also get-schema-comment,
+get-column-comments and get-database-comment.
+** function postgresql-version ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-postgresql-version
+   :END:
+→ string
+
+Returns the version string provided by postgresql of the current postgresql
+server. E.g. "PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc
+(Arch Linux 9.3.0-1) 9.3.0, 64-bit". If you want just the postgresql version
+number, use (cl-postgres:get-postgresql-version).
+
+** function database-version ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-version
+   :END:
+→ string
+
+DEPRECATED. This returns the postgresql server version number, not a version
+number from the currently connected database. The format of the return string
+is determined by the current postgresql server.
+E.g. "PostgreSQL 12.2 on x86_64-pc-linux-gnu, compiled by gcc
+(Arch Linux 9.3.0-1) 9.3.0, 64-bit".
+
+If you want just the postgresql version
+number, use (cl-postgres:get-postgresql-version).
+
+** function current-database ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-current-databse
+   :END:
+→ string
+
+Returns the string name of the current database.
+
+** function database-exists-p (database-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-exists-p
+   :END:
+→ boolean
+
+Checks to see if a particular database exists. Returns T if true, nil if not.
+
+** function database-size (&optional database-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-size
+   :END:
+→ list
+
+Given the name of a database, will return the name, a pretty-print string of
+the size of the database and the size in bytes. If a database name is not
+provided, it will return the result for the currently connected database.
+
+** function num-records-in-database ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-num-records-in-database
+   :END:
+→ list
+
+Returns a list of lists with schema, table name and approximate number of
+records in the currently connected database.
+
+** function list-databases (&key (order-by-size nil) (size t))
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-databases
+   :END:
+→ list
+
+Returns a list of lists where each sub-list contains the name of the database,
+a pretty-print string of the size of that database and the size in bytes. The
+default order is by database name. Pass t as a parameter to :order-by-size
+for order by size. Setting size to nil will return just the database names
+in a single list ordered by name. This function excludes the template databases
+
+** function list-database-functions ()
+   :PROPERTIES:
+   :CUSTOM_ID: list-database-functions
+   :END:
+→ list
+
+Returns a list of the functions in the database from the information_schema.
+
+** function list-database-users ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-databse-users
+   :END:
+→ list
+
+List database users (actually 'roles' in Postgresql terminology).
+** function list-database-access-rights (&optional database-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-database-access-rights
+   :END:
+→ list
+
+If the database parameter is specifed, this returns an list of lists where
+each sublist is a role name and whether they have access rights (t or nil) to that
+particular database. If the database-name is not provided, the sublist is
+a database name, a role name and whether they have access rights (t or nil). This
+excludes the template databases.
+
+** function list-available-types ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-available-types
+   :END:
+→ list
+
+List the available data types in the connected postgresql version, It returns a
+list of lists, each sublist containing the oid (object identifier number) and
+the name of the data types. E.g. (21 "smallint")
+
+** function list-available-collations ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-available-collations
+   :END:
+→ list
+
+Get a list of the collations available from the current database cluster.
+Collations are a mess as different operating systems provide different
+collations. We might get some sanity if Postgresql can use ICU as the default.
+See https://wiki.postgresql.org/wiki/Collations.
+** function list-available-extensions ()
+   :PROPERTIES:
+   :CUSTOM_ID: list-available-extensions
+   :END:
+→ list
+
+List the postgresql extensions which are available in the system to the
+currently connected database. The extensions may or may not be installed.
+** function list-installed-extensions ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-installed-extensions
+   :END:
+→ list
+
+List the postgresql extensions which are installed in the currently connected
+database.
+
+** function load-uuid-extension ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-load-uuid-extensin
+   :END:
+
+Loads the Postgresql uuid-ossp contrib module. Once loaded, you can call uuid
+generation functions such as uuid_generate_v4 within a query. E.g.
+#+begin_src lisp
+  (query "select uuid_generate_v4()")
+#+end_src
+It will be skipped if it is already loaded. See Postgresql documentation at https://www.postgresql.org/docs/current/uuid-ossp.htmlList for more details.
+
+** function list-templates ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-templates
+   :END:
+→ list
+
+Returns a list of existing database template names.
+** function change-toplevel-database (new-database user password host)
+   :PROPERTIES:
+   :CUSTOM_ID: function-change-toplevel-database
+   :END:
+→ string
+
+Just changes the database assuming you are using a toplevel connection.
+Recommended only for development work. Returns the name of the newly connected
+database as a string.
+
+** function cache-hit-ratio ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-cache-hit-ratio
+   :END:
+→ list
+
+The cache hit ratio shows data on serving the data from memory compared to how
+often you have to go to disk. This function returns a list of heapblocks read
+from disk, heapblocks hit from memory and the ratio of heapblocks hit from
+memory / total heapblocks hit. Borrowed from: https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/
+
+** function bloat-measurement ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-bloat-measurement
+   :END:
+→ list
+
+Bloat measurement of unvacuumed dead tuples.
+Borrowed from: https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/ who
+borrowed it from https://github.com/heroku/heroku-pg-extras/tree/master/commands.
+
+** function unused-indexes ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-unused-indexes
+   :END:
+→ list
+
+Returns a list of lists showing schema.table, indexname, index_size and number
+of scans. The code was borrowed from: https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/
+
+** function check-query-performance (&optional (ob nil) (num-calls 100) (limit 20))
+   :PROPERTIES:
+   :CUSTOM_ID: function-check-query-performance
+   :END:
+→ list
+
+This function requires that postgresql extension pg_stat_statements must be
+loaded via shared_preload_libraries. It is borrowed from https://www.citusdata.com/blog/2019/03/29/health-checks-for-your-postgres-database/.
+Optional parameters:
+
+ OB allow order-by to be 'calls', 'total-time', 'rows-per'
+or 'time-per', defaulting to time-per.
+
+num-calls to require that the number of calls exceeds a certain threshold, and
+limit to limit the number of rows returned. It returns a list of lists, each
+row containing the query, number of calls, total_time, total_time/calls,
+stddev_time, rows, rows/calls and the cache hit percentage.
+
+* Constraints
+  :PROPERTIES:
+  :CUSTOM_ID: constraints
+  :END:
+** function list-unique-or-primary-constraints (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-unique-or-primary-constraints
+   :END:
+→ list
+
+List constraints on a table. Table-name can be either a string or quoted. Turns
+constraints into keywords if strings-p is not true.
+
+** function list-all-constraints (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-all-constraints
+   :END:
+→ list
+
+Users information_schema to list all the constraints in a table. Table-name can
+be either a string or quoted. Turns constraints into keywords if strings-p is
+not true.
+
+** function describe-constraint (table-name constraint-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-describe-constraint
+   :END:
+→ list
+
+Return a list of alists of the descriptions a particular constraint given the
+table-name and the constraint name using the information_schema table.
+
+** function describe-foreign-key-constraints ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-describe-foreign-key-constraints
+   :END:
+→ list
+
+Generates a list of lists of information on the foreign key constraints
+* Indexes/Indices
+  :PROPERTIES:
+  :CUSTOM_ID: indexes
+  :END:
+** function create-index (name  &key unique if-not-exists concurrently on using fields)
+   :PROPERTIES:
+   :CUSTOM_ID: function-create-index
+   :END:
+
+Create an index. Slightly less sophisticated than the query version because it
+does not have a where clause capability.
+
+** function drop-index (name &key concurrently if-exists cascade)
+   :PROPERTIES:
+   :CUSTOM_ID: function-drop-index
+   :END:
+
+Drop an index. Available keys are :concurrently, :if-exists, and :cascade.
+
+** function list-indices (&optional strings-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-indices
+   :END:
+→ list
+
+Return a list of the indexs in a database. Turn them into keywords if strings-p
+is not true.
+
+** function list-table-indices (table-name &optional strings-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-table-indices
+   :END:
+→ list
+
+List the index names and the related columns in a single table. Each index will
+be in a separate sublist.
+
+** function index-exists-p (name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-index-exists-p
+   :END:
+→ boolean
+
+Tests whether an index with the given name exists. The name can be either a
+string or a symbol.
+
+** function list-indexed-column-and-attributes (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-indexed-column-and-attribute
+   :END:
+→ list
+
+List the indexed columns and their attributes in a table. Includes primary
+key.
+
+** function list-index-definitions (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-index-definitions
+   :END:
+→ list
+
+Returns a list of the definitions used to create the current indexes for
+the table
+
+* Keys
+  :PROPERTIES:
+  :CUSTOM_ID: keys
+  :END:
+** function find-primary-key-info (table-name &optional (just-key nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-find-primary-key-info
+   :END:
+→ list
+
+Returns a list of sublists where the sublist contains two strings. If a table
+primary key consists of only one column, such as 'id' there will be a single
+sublist where the first string is the name of the column and the second string
+is the string name for the datatype for that column. If the primary key for the
+table consists of more than one column, there will be a sublist for each column
+subpart of the key. The sublists will be in the order they are used in the key,
+not in the order they appear in the table. If just-key is set to t, the list
+being returned will contain just the column names in the primary key as string
+names with no sublists. If the table is not in the public schema, provide the
+fully qualified table name e.g. schema-name.table-name.
+
+** function list-foreign-keys (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-foreign-keys
+   :END:
+→ list
+
+Returns a list of sublists of foreign key info in the form of
+   '((constraint-name local-table local-table-column
+     foreign-table-name foreign-column-name))
+
+* Schema/Schemata
+  :PROPERTIES:
+  :CUSTOM_ID: schema
+  :END:
+Schema allow you to separate tables into differnet name spaces. In different
+schemata two tables with the same name are allowed to exists. The tables can
+be referred by fully qualified names or with the macro with-schema. You could
+also set the search path with set-search-path. For listing end checking there
+are also the functions list-schemata and schema-exist-p. The following
+functions allow you to create, drop schemata and to set the search path.
+
+** macro with-schema ((namespace &key :strict t :if-not-exist :create :drop-after) &body body)
+   :PROPERTIES:
+   :CUSTOM_ID: macro-with-schema
+   :END:
+
+A macro to set the schema search path (namespace) of the postgresql database to
+include as first entry a specified schema and then executes the body. Before
+executing body the PostgreSQL's session variable search_path is set to the given
+namespace. After executing body the search_path variable is restored to the
+original value.
+
+   Calling with :strict 't only the specified schema is set as current search
+path. All other schema are then not searched any more. If strict is nil, the
+namespace is just first schema on the search path upon the the body execution.
+
+   Calling with :if-not-exist set to :create the schema is created if this
+schema did not exist.
+
+   Calling with :if-not-exist set to nil, an error is signaled.
+
+   calling with drop-after set to 't the schema is removed after the execution
+of the body form.
+
+   example :
+     (with-schema (:schema-name :strict nil :drop-after nil :if-not-exist :error)
+            (foo 1)
+            (foo 2))
+
+   example :
+     (with-schema ('uniq :if-not-exist :create) ;; changing the search path
+            (schema-exists-p 'uniq))
+
+** function list-schemata ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-schemata
+   :END:
+→ list
+
+List all existing user defined schemata.
+
+Note: The query uses the portable information_schema relations instead of
+pg_tables relations.
+#+BEGIN_SRC sql
+select schema_name
+from information_schema.schemata
+where schema_name !~ '(pg_*)|information_schema'
+order by schema_name ;
+#+END_SRC
+
+** function list-schemas ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-schemas
+   :END:
+→ list
+
+List schemas in the current database, excluding the pg_* system schemas.
+
+** function schema-exists-p (schema)
+   :PROPERTIES:
+   :CUSTOM_ID: function-schema-exists-p
+   :END:
+→ boolean
+
+Tests the existence of a given schema. Returns T if the schema exists or NIL
+otherwise. The name provided can be either a string or quoted symbol.
+
+** function create-schema (schema)
+   :PROPERTIES:
+   :CUSTOM_ID: function-create-schema
+   :END:
+
+Creates a new schema. Raises an error if the schema is already exists.
+
+** function drop-schema (schema &key (if-exists nil) (cascade nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-drop-schema
+   :END:
+
+Drops an existing database schema. Accepts :if-exists and/or :cascade arguments
+like :drop-table. A notice instead of an error is raised with the is-exists
+parameter.
+
+** function get-search-path ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-search-path
+   :END:
+
+Returns the default schema search path (which schemas are checked first) for the current session.
+
+** function set-search-path (path)
+   :PROPERTIES:
+   :CUSTOM_ID: function-set-search-path
+   :END:
+
+This changes the postgresql runtime parameter controlling what order schemas are
+searched. You can always use fully qualified names [schema.table]. By default,
+this function only changes the search path for the current session. This
+function is used by with-schema.
+** function split-fully-qualified-tablename (name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-split-fully-qualified-tablename
+   :END:
+→ list
+Take a tablename of the form database.schema.table or schema.table or table and
+return the tablename and the schema name. The name can be a symbol or a string.
+Returns a list of form '(table schema database. If the tablename is not fully
+qualified, it will assume that the schema should be \"public\".
+
+** function get-schema-comment (schema-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-schema-comment
+   :END:
+→ string
+
+Retrieves the comment, if any attached to the schema. See also get-schema-comment,
+get-column-comments and get-database-comment.
+* Sequences
+  :PROPERTIES:
+  :CUSTOM_ID: sequences
+  :END:
+** function create-sequence (name &key temp if-not-exists increment min-value max-value start cache)
+   :PROPERTIES:
+   :CUSTOM_ID: function-create-sequence
+   :END:
+
+  Create a sequence. Available additional key parameters
+are :temp :if-not-exists :increment :min-value :max-value :start and :cache. See
+https://www.postgresql.org/docs/current/static/sql-createsequence.html for
+details on usage.
+
+** function sequence-next (sequence)
+   :PROPERTIES:
+   :CUSTOM_ID: function-sequence-next
+   :END:
+→ integer
+
+Shortcut for getting the next value from a sequence. The sequence identifier can
+be either a string or a symbol, in the latter case it will be converted to a
+string according to S-SQL rules.
+
+** function drop-sequence (name &key if-exists cascade)
+   :PROPERTIES:
+   :CUSTOM_ID: function-drop-sequence
+   :END:
+→ list
+
+Drop a sequence. Name should be quoted. Available key parameters are :if-exists
+and :cascade.
+
+** function list-sequences (&optional strings-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-sequences
+   :END:
+→ list
+
+Returns a list of the sequences in the current database. When strings-p is T,
+the names will be given as strings, otherwise as keywords.
+
+** function sequence-exists-p (name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-sequence-exists-p
+   :END:
+→ boolean
+
+Tests  whether a sequence with the given name exists. The name can be either a
+string or a symbol.
+
+* Tables
+  :PROPERTIES:
+  :CUSTOM_ID: tables
+  :END:
+** function list-tables (&optional strings-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-tables
+   :END:
+→ list
+
+DEPRECATED FOR LIST-ALL-TABLES. Return a list of the tables in the public schema
+of a database. By default the table names are returned as keywords. They will be
+returned as lowercase strings if strings-p is true.
+
+** function list-all-tables (&optional (fully-qualified-names-only nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-all-tables
+   :END:
+→ list
+
+If fully-qualified-names-only is set to t, returns a flattened list of all
+schema.table names other than pg_catalog or the information_schema.
+
+Otherwise returns the following info:
+
+schema-name, table-name, table-owner, tablespace, hasindexes, hasrules, hastriggers
+and rowsecurity(&optional strings-p).
+
+** function list-tables-in-schema (&optional (schema-name "public") (strings-p nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-tables-in-schema
+   :END:
+→ list
+
+Returns a list of tables in a particular schema, defaulting to public. If
+schema-name is :all, it will return all the non-system tables in the database
+in fully qualified form: e.g. 'public.test_table'. If string-p is t, the names
+will be returned as strings with underscores converted to hyphens.
+
+** function list-table-sizes (&key (schema "public") (order-by-size nil) (size t))
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-table-sizes
+   :END:
+→ list
+
+Returns a list of lists (table-name, size in 8k pages) of tables in the current
+database. Providing a name to the schema parameter will return just the
+information for tables in that schema. It defaults to just the tables in the
+public schema. Setting schema to nil will return all tables, indexes etc in
+the database in descending order of size. This would include system tables, so
+there are a lot more than you would expect. If :size is set to nil, it returns
+only a flat list of table names. Setting order-by-size to t will return the
+result in order of size instead of by table name.
+
+** function table-exists-p (name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-table-exists-p
+   :END:
+→ boolean
+
+Check whether a table exists in a particular schema. Defaults to the search
+path. Takes either a string or a symbol for the table name. The table-name can
+be fully qualified in the form of schema.table-name or
+database.schema.table-name. If the schema is specified either in a qualified
+table-name or in the optional schema-name parameter, we look directly to the
+information schema tables. Otherwise we use the search path which can be
+controlled by being within a with-schema form.
+
+** function table-size (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-table-size
+   :END:
+→ list
+
+Return the size of a given postgresql table in k or m. Table-name can be either
+a string or quoted.
+
+** function table-description (name &optional schema-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-table-descriptions
+   :END:
+→ list
+
+Returns a list of the fields in the named table. Each field is represented
+by a list of three elements: the field name, the type, and a boolean indicating
+whether the field may be NULL.
+
+Table can be either a string or quoted. Table-names can be fully qualified with
+the schema or not. If the table-name is not fully qualified and a schema name
+is not provided, the table will be assumed to be in the public schema.
+
+** function table-description-plus (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-table-description-plus
+   :END:
+→ list
+
+Returns more table info than table-description. Specifically returns
+ordinal-position, column-name, data-type, character-maximum-length, modifier,
+whether it is not-null and the default value.
+
+Table can be either a string or quoted. Table-names can be fully qualified with
+the schema or not. If the table-name is not fully qualified and a schema name
+is not provided, the table will be assumed to be in the public schema.
+
+** function table-description-menu (see below)
+   :PROPERTIES:
+   :CUSTOM_ID: function-table-description-menu
+   :END:
+→ list string list
+
+This has the following parameters, all set to t by default:
+
+    (table-name &key char-max-length data-type-length
+                     has-default default-value not-null
+                     numeric-precision numeric-scale
+                     storage primary primary-key-name
+                     unique unique-key-name fkey fkey-name
+                     fkey-col-id fkey-table fkey-local-col-id
+                     identity generated collation
+                     col-comments locally-defined inheritance-count
+                    stat-collection)
+
+Takes a fully qualified table name which can be either a string or a symbol.
+
+Returns three values.
+
+1. A list of plists of each row's parameters. This will always
+include :column-name and :data-type-name but all other parameters can be set or unset
+and are set by default (set to t).
+
+2. The comment string attached to the table itself (if any).
+
+3. A list of the check constraints applied to the rows in the table. See documentation for
+list-check-constraints for an example.
+
+The available keyword parameters are:
+
+- data-type-length (For a fixed-size type, typlen is the number of bytes in the internal representation of the type. But for a variable-length type, typlen is negative. -1 indicates a “varlena” type (one that has a length word), -2 indicates a null-terminated C string.)
+- char-max-length (Typically used for something like a varchar and shows the maximum length)
+- has-default (value T if this column has a default value and :NULL if not)
+- default-value (value is the default value as string. A default of 9.99 will still be a string)
+- not-null (value is T if the column must have a value or :NULL otherwise)
+- numeric-precision (value is the total number of digits for a numeric type if that precision was specified)
+- numeric-scale (value is the number of digits in the fraction part of a numeric type if that scale was specified)
+- storage (value is the storage setting for a column. Result can be plain, extended, main or external)
+- primary (value is T if the column is the primary key for the table, :NULL otherwise)
+- primary-key-name (value is the name of the primary-key itself, not the column, if the column is the primary key for the table, :NULL otherwise)
+- unique (value is T if the column is subject to a unique key, :NULL otherwise)
+- unique-key-name (value is the name of the unique-key itself, not the column, applied to the column, :NULL otherwise)
+- fkey (value is T if the column is a foreign key, :NULL otherwise)
+- fkey-name (value is the name of the foreign key, :NULL otherwise)
+- fkey-col-id (value is the column id of the foreign table used as the foreign key. Probably easier to use the Postmodern function list-foreign-keys if you are looking for the name of the columns)
+- fkey-table (value is the name of the foreign table, :NULL otherwise)
+- fkey-local-col-id (value is the column id of this column. Probably easier to use the Postmodern function list-foreign-keys if you are looking for the name of the columns involved in the foreign key)
+- identity (if the column is an identity column, the values can be 'generated always' or 'generated by default'. Otherwise :NULL)
+- generated (columns can be generated, if this column is generated and stored on disk, the value will be 'stored', otherwise :NULL)
+- collation (columns with collations which are not the default collation for the database will show that collation here, otherwise :NULL)
+- col-comments (value is any comment that has been applied to the column, :NULL otherwise)
+- locally-defined (value is T if locally defined. It might be both locally defined and inherited)
+- inheritance-count (the number of direct ancestors this column has inherited)
+- stat-collection (stat-collection returns the value of attstattarget which controls the level of detail of statistics accumulated for this column by ANALYZE. A zero value indicates that no statistics should be collected. A negative value says to use the system default statistics target. The exact meaning of positive values is data type-dependent. For scalar data types, attstattarget is both the target number of most common values to collect, and the target number of histogram bins to create. Attstorage is normally a copy of pg_type.typstorage of this column's type. For TOAST-able data types, this can be altered after column creation to control storage policy.)
+
+** function list-check-constraints (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-check-constraints
+   :END:
+→ list
+
+Takes a fully qualified table name and returns a list of lists of check constraints
+where each sublist has the form of (check-constraint-name check)
+
+Example:
+
+#+BEGIN_SRC lisp
+(query (:create-table 'employees2
+                      ((did :type (or integer db-null)
+                            :primary-key "generated by default as identity")
+                       (name :type (varchar 40) :check (:<> 'name ""))
+                       (birth-date :type date :check (:> 'birth-date "1900-01-01"))
+                       (start-date :type date :check (:> 'start-date 'birth-date))
+                       (salary :type numeric :check (:> 'salary 0)))))
+
+(list-check-constraints 'employees2)
+
+(("employees2_birth_date_check" "CHECK (birth_date > '1900-01-01'::date)")
+ ("employees2_check" "CHECK (start_date > birth_date)")
+ ("employees2_name_check" "CHECK (name::text <> ''::text)")
+ ("employees2_salary_check" "CHECK (salary > 0::numeric)"))
+#+END_SRC
+** function list-columns (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-columns
+   :END:
+→ list
+
+Returns a list of strings of just the column names in a table.
+Pulls info from the postmodern table-description function rather than directly.
+The table-name can be a string or quoted. Any table-name that is not fully
+qualified with the schema will be assumed to be in the public schema.
+
+** function list-columns-with-types (table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-columns-with-types
+   :END:
+→ list
+
+Returns a list of (name type) lists for the fields of a table. Returns a list
+of strings of just the column names and their sql data types in a table. Pulls
+info from the postmodern table-description function rather than directly. The
+table-name can be a string or quoted. Any table-name that is not fully qualified
+with the schema will be assumed to be in the public schema.
+
+** function column-exists-p (table-name column-name &optional schema-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-column-exists-p
+   :END:
+→ boolean
+
+Determine if a particular column exists. Table name and column-name can be
+either strings or symbols. If the optional schema name is not given or the
+table-name is not fully qualified with a schema name, the schema will be assumed
+to be the public schema.
+
+** function get-table-oid (table-name &optional schema-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-table-oid
+   :END:
+→ integer
+
+Retrieves the oid identifier for a particular table from postgresql. Works
+for tables in all schemas.
+** function get-table-comment (table-name &optional schema-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-table-comment
+   :END:
+→ string
+
+Retrieves the comment, if any attached to the table. See also get-schema-comment,
+get-column-comments and get-database-comment
+** function get-column-comments (database schema table)
+   :PROPERTIES:
+   :CUSTOM_ID: function-get-column-comments
+   :END:
+→ string
+
+Retrieves a list of lists of column names and the comments, if any, attached
+to the columns of a table.
+** function rename-table (old-name new-name)
+   :PROPERTIES:
+   :CUSTOM_ID: rename-table
+   :END:
+→ boolean
+
+Renames a table. Parameters can be strings or symbols. If you are renaming
+a table using a fully qualified schema.table-name, you do not need to
+specify the schema in the new-name. You cannot use this function to move
+tables from one schema to another. Returns t if successful
+
+** function rename-column (table-name old-name new-name)
+:PROPERTIES:
+:CUSTOM_ID: function-rename-column
+:END:
+→ boolean
+
+Rename a column in a table. Parameters can be strings or symbols. If the table
+is not in the public schema, it needs to be fully qualified - e.g. schema.table.
+Returns t if successful
+* Tablespaces
+  :PROPERTIES:
+  :CUSTOM_ID: tablespaces
+  :END:
+** function list-tablespaces ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-tablespaces
+   :END:
+→ list
+
+Lists the tablespaces in the currently connected database. What are tablespace
+you ask? Per the Postgresql documentation
+https://www.postgresql.org/docs/current/manage-ag-tablespaces.html:
+Tablespaces in PostgreSQL allow database administrators to define locations in
+the file system where the files representing database objects can be stored.
+Once created, a tablespace can be referred to by name when creating database
+objects.
+
+By using tablespaces, an administrator can control the disk layout of a
+PostgreSQL installation. This is useful in at least two ways. First, if the
+partition or volume on which the cluster was initialized runs out of space and
+cannot be extended, a tablespace can be created on a different partition and
+used until the system can be reconfigured.
+
+Second, tablespaces allow an administrator to use knowledge of the usage pattern
+of database objects to optimize performance. For example, an index which is very
+heavily used can be placed on a very fast, highly available disk, such as an
+expensive solid state device. At the same time a table storing archived data
+which is rarely used or not performance critical could be stored on a less
+expensive, slower disk system.
+
+* Triggers
+  :PROPERTIES:
+  :CUSTOM_ID: triggers
+  :END:
+** function describe-triggers ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-describe-triggers
+   :END:
+→ list
+
+List detailed information on the triggers from the information_schema table.
+** function list-triggers (&optional table-name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-triggers
+   :END:
+→ list
+
+List distinct trigger names from the information_schema table. Table-name can be
+either quoted or string. (A trigger is a specification that the database should
+automatically execute a particular function whenever a certain type of operation
+is performed. Triggers can be attached to tables (partitioned or not), views,
+and foreign tables.
+See https://www.postgresql.org/docs/current/trigger-definition.html)
+
+** function list-detailed-triggers ()
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-detailed-triggers
+   :END:
+→ list
+
+* Views
+  :PROPERTIES:
+  :CUSTOM_ID: views
+  :END:
+** function list-views (&optional strings-p)
+   :PROPERTIES:
+   :CUSTOM_ID: function-list-views
+   :END:
+→ list
+
+Returns list of the user defined views in the current database. When strings-p
+is T, the names will be returned as strings, otherwise as keywords.
+
+** function view-exists-p (name)
+   :PROPERTIES:
+   :CUSTOM_ID: function-view-exists-p
+   :END:
+→ boolean
+
+Tests whether a view with the given name exists. Takes either a string or a
+symbol for the view name.
+
+** function describe-views (&optional (schema "public")
+   :PROPERTIES:
+   :CUSTOM_ID: function-describe-views
+   :END:
+→ list
+
+Describe the current views in the specified schema. Includes the select
+statements used to create the view. Takes an optional schema but defaults to
+public schema.
+
+* Miscellaneous Utility Functions
+  :PROPERTIES:
+  :CUSTOM_ID: misc-utility-functions
+  :END:
+** function coalesce (&rest arguments)
+   :PROPERTIES:
+   :CUSTOM_ID: function-coalesce
+   :END:
+→ value
+
+Returns the first non-NIL, non-NULL (as in :null) argument, or NIL if none are
+present. Useful for providing a fall-back value for the result of a query, or,
+when given only one argument, for transforming :nulls to NIL.
+
+** function execute-file (filename &optional (print nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-execute-file
+   :END:
+This function will execute sql queries stored in a file. Each sql statement in
+the file will be run independently, but if one statement fails, subsequent
+query statements will not be run, but any statement prior to the failing
+statement will have been commited.
+
+Execute-file allows the sql file to include other sql files, with the
+meta-commands \i or  \include which look for a file location relative to your
+default pathname (current working directory) or \ir or \include_relative which
+look for a file location relative to the initial sql file. If the file is not
+found in the expected location, execute-file will look to see if the requested
+file is in the other possible location. If that does not work, it will trigger
+an error with a restart which allows you to provide a new name for the file.
+
+If you want the standard transction treatment such that all statements succeed
+or no statement succeeds, then ensure that the file starts with a "begin
+transaction" statement and finishes with an "end transaction" statement. See
+the test file test-execute-file-broken-transaction.sql as an example.
+
+For debugging purposes, if the optional print parameter is set to t, format will
+print the count of the query and the query to the REPL.
+
+The default setting is to remove sql comments from the file before executing
+the sql code. If that causes problems, the remove-comments parameter can be
+set to nil.
+
+IMPORTANT NOTE: This utility function assumes that the file containing the sql
+queries can be trusted and bypasses the normal postmodern parameterization of
+queries.
+
+** function postgres-array-string-to-list (str)
+   :PROPERTIES:
+   :CUSTOM_ID: function-postgres-array-string-to-list
+   :END:
+→ array
+
+Takes a postgresql array in the form of a string like
+"{wol=CTc/wol,a=c/wol,b=c/wol}" and returns a lisp array like
+    #("wol=CTc/wol" "a=c/wol" "b=c/wol")
+** function postgres-array-string-to-array (str)
+   :PROPERTIES:
+   :CUSTOM_ID: function-postgres-array-string-to-array
+   :END:
+  "Takes a postgresql array in the form of a string like
+\"{wol=CTc/wol,a=c/wol,b=c/wol}\" and returns a lisp list like
+  (\"wol=CTc/wol\" \"a=c/wol\" \"b=c/wol\")."
+* Imported From s-sql
+  :PROPERTIES:
+  :CUSTOM_ID: imported-from-s-sql
+  :END:
+** macro sql (form)
+   :PROPERTIES:
+   :CUSTOM_ID: macro-sql
+   :END:
+→ string
+
+Convert the given form (a list starting with a keyword) to an SQL query string
+at compile time, according to the rules described here. For example:
+#+BEGIN_SRC lisp
+(sql (:select '* :from 'country :where (:= 'a 1)))
+ "(SELECT * FROM country WHERE (a = 1))"
+#+END_SRC
+
+but
+#+BEGIN_SRC lisp
+(sql '(:select '* :from 'country :where (:= 'a 1)))
+#+END_SRC
+
+would throw an error. For the later case you need to use sql-compile.
+
+** function sql-compile (form)
+   :PROPERTIES:
+   :CUSTOM_ID: function-sql-compile
+   :END:
+→ string
+
+This is the run-time variant of the sql macro. It converts the given list to
+an SQL query, with the same rules except that symbols in this list do not
+have to be quoted to be interpreted as identifiers. For example:
+#+BEGIN_SRC lisp
+ (sql-compile '(:select '* :from 'country :where (:= 'a 1)))
+
+  \"(SELECT * FROM country WHERE (a = 1))\"
+#+END_SRC
+
+but
+#+BEGIN_SRC lisp
+(sql (:select '* :from 'country :where (:= 'a 1)))
+#+END_SRC
+would throw an error. For the later case you need to use sql.
+
+** deftype smallint ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-smallint
+   :END:
+
+  '(signed-byte 16)
+** deftype bigint ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-bigint
+   :END:
+
+  '(signed-byte 64)
+** deftype numeric (&optional precision/scale scale)
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-numeric
+   :END:
+
+  (declare (ignore precision/scale scale))
+  'number
+** deftype double-precision ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-double-precision
+   :END:
+
+  'double-float
+** deftype bytea ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-bytea
+   :END:
+
+  '(array (unsigned-byte 8))
+** deftype text ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-text
+   :END:
+
+  'string
+** deftype varchar (length)
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-varchar
+   :END:
+
+  (declare (ignore length))
+  `string)
+** deftype serial ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-serial
+   :END:
+
+'integer
+** deftype serial8 ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-serial8
+   :END:
+
+'integer
+
+** deftype db-null ()
+   :PROPERTIES:
+   :CUSTOM_ID: deftype-db-null
+   :END:
+
+Type for representing NULL values. Use like (or integer db-null) for declaring a
+type to be an integer that may be null."
+  '(eql :null)
+
+** function from-sql-name (str)
+   :PROPERTIES:
+   :CUSTOM_ID: function-from-sql-name
+   :END:
+
+Convert a string to a symbol, upcasing and replacing underscores with hyphens.
+** function parse-queries (file-content)
+   :PROPERTIES:
+   :CUSTOM_ID: function-parse-queries
+   :END:
+→ list
+
+Read SQL queries in given string and split them, returns a list.
+** function read-queries (filename)
+   :PROPERTIES:
+   :CUSTOM_ID: function-read-queries
+   :END:
+
+Read SQL queries in a given file and split them, returns a list. Track included
+files so there is no accidental infinite loop. The default setting is to remove
+sql comments from the file before executing the sql code. If that causes problems,
+the remove-comments parameter can be set to nil.
+** function sql-escape-string (string)
+   :PROPERTIES:
+   :CUSTOM_ID: function-sql-escape-string
+   :END:
+→ string
+
+[[http://www.postgresql.org/docs/current/static/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS][Escapes]] a string for inclusion in a PostgreSQL query. Example:
+#+BEGIN_SRC lisp
+ (sql-escape-string \"Puss in 'Boots'\")
+
+ \"E'Puss in ''Boots'''\"
+
+#+END_SRC
+
+
+** method sql-escape (arg)
+   :PROPERTIES:
+   :CUSTOM_ID: method-sql-escape
+   :END:
+
+A generalisation of sql-escape-string looks at the type of the value passed, and
+properly writes it out it for inclusion in an SQL query. Symbols will be
+converted to SQL names. Examples:
+#+BEGIN_SRC lisp
+(sql-escape "tr'-x")
+
+"E'tr''-x'"
+
+(sql-escape (/ 1 13))
+
+"0.0769230769230769230769230769230769230"
+
+(sql-escape #("Baden-Wurttemberg" "Bavaria" "Berlin" "Brandenburg"))
+
+"ARRAY[E'Baden-Wurttemberg', E'Bavaria', E'Berlin', E'Brandenburg']"
+#+END_SRC
+** macro register-sql-operators (arity &rest names)
+   :PROPERTIES:
+   :CUSTOM_ID: macro-register-sql-operators
+   :END:
+
+Define simple operators. Arity is one of :unary (like
+'not'), :unary-postfix (the operator comes after the operand),
+:n-ary (like \+ : the operator falls away when there is only one
+operand), :2+-ary (like '=', which is meaningless for one operand),
+or :n-or-unary (like '-', where the operator is kept in the unary
+case). After the arity follow any number of operators, either just a
+keyword, in which case the downcased symbol name is used as the
+operator, or a two-element list containing a keyword and a name
+string.
+** variable =*escape-sql-names-p*=
+   :PROPERTIES:
+   :CUSTOM_ID: variable-escape-sql-names-p
+   :END:
+
+Determines whether double quotes are added around column, table, and function
+names in queries. Valid values:
+
+- T, in which case every name is escaped,
+- NIL, in which case no name is escape,
+- :auto, which causes only [[http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html][reserved words]] to be escaped, or.
+- :literal which is the same as :auto except it has added consequence in
+to-sql-name (see below).
+
+The default value is :auto.
+
+Be careful when binding this with let and such ― since a lot of SQL compilation
+tends to happen at compile-time, the result might not be what you expect. Mixed
+case sensitivity is not currently well supported. Postgresql itself will
+downcase unquoted identifiers. This will be revisited in the future if requested.
+
+** function to-sql-name (name &optional (escape-p =*escape-sql-names-p*=) (ignore-reserved-words nil))
+   :PROPERTIES:
+   :CUSTOM_ID: function-to-sql-name
+   :END:
+
+Convert a symbol or string into a name that can be a sql table, column, or
+operation name. Add quotes when escape-p is true, or escape-p is :auto and the
+name contains reserved words. Quoted or delimited identifiers can be used by
+passing :literal as the value of escape-p. If escape-p is :literal, and the
+name is a string then the string is still escaped but the symbol or string is
+not downcased, regardless of the setting for =*downcase-symbols*= and the hyphen
+and forward slash characters are not replaced with underscores.
+
+Ignore-reserved-words is only used internally for column names which are allowed
+to be reserved words, but it is not recommended.
+
+** condition sql-error
+   :PROPERTIES:
+   :CUSTOM_ID: condition-sql-error
+   :END:
+        No documentation provided.
+
+
+* Conditions Imported From cl-postgres
+  :PROPERTIES:
+  :CUSTOM_ID: conditions-imported-from-cl-postgres
+  :END:
+** condition database-connection-error
+   :PROPERTIES:
+   :CUSTOM_ID: condition-database-connection-error
+   :END:
+
+Conditions of this type are signalled when an error occurs that breaks the
+connection socket. They offer a :reconnect restart.
+
+** condition database-error
+   :PROPERTIES:
+   :CUSTOM_ID: condition-database-error
+   :END:
+
+This is the condition type that will be used to signal virtually all
+database-related errors (though in some cases socket errors may be raised when
+a connection fails on the IP level).
+*** reader database-error-code
+    :PROPERTIES:
+    :CUSTOM_ID: reader-database-error-code
+    :END:
+
+Code: the Postgresql SQLSTATE code for the error
+ (see the Postgresql Manual Appendix A for their meaning). Not localizable.
+ Always present.
+
+*** accessor database-error-message
+    :PROPERTIES:
+    :CUSTOM_ID: accessor-database-error-code
+    :END:
+
+Message: the primary human-readable error message. This should be accurate
+but terse (typically one line). Always present.
+
+*** reader database-error-detail
+    :PROPERTIES:
+    :CUSTOM_ID: reader-database-error-detail
+    :END:
+
+Detail: an optional secondary error message carrying
+more detail about the problem. Might run to multiple lines or NIL if none is
+available.
+
+*** reader database-error-query
+    :PROPERTIES:
+    :CUSTOM_ID: reader-database-error-query
+    :END:
+Query that led to the error, or NIL if no query was involved.
+
+*** reader database-error-cause
+    :PROPERTIES:
+    :CUSTOM_ID: reader-database-error-cause
+    :END:
+The condition that caused this error, or NIL when it was not caused by another condition.
+
+** function database-error-constraint-name (err)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-error-constraint-name
+   :END:
+
+Given a database-error for an integrity violation, will attempt to
+extract the constraint name.
+
+** function database-error-extract-name (err)
+   :PROPERTIES:
+   :CUSTOM_ID: function-database-error-extract-name
+   :END:
+
+Given a database-error, will extract the critical name from the error message.
