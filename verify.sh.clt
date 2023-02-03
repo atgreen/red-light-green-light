@@ -63,6 +63,16 @@ else
 fi
 
 # ---- Look up this document in rekor and print out the record ----------------
+echo DEBUG
+echo == DIGEST ====================================
+cat ${DIGEST}
+echo == SERVER_SIGNATURE ==========================
+cat ${SERVER_SIGNATURE}
+echo == SERVER_PUBKEY =============================
+cat ${SERVER_PUBKEY}
+echo ==============================================
+
+# ---- Look up this document in rekor and print out the record ----------------
 echo Searching for sigstore record:
 HASH=$(rekor-cli verify --artifact ${DIGEST} --signature ${SERVER_SIGNATURE} --public-key ${SERVER_PUBKEY} --pki-format x509 | grep "Entry Hash:" | awk '{ printf $3 }')
 rekor-cli get --uuid $HASH
