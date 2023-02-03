@@ -16,13 +16,12 @@ echo Log in
 echo =========================================================================
 echo "rlgl login --key=AAAAAAA-BBBBBBB-CCCCCCC-DDDDDDD http://${1}"
 rlgl login --key=AAAAAAA-BBBBBBB-CCCCCCC-DDDDDDD http://${1}
-ID=$(rlgl start ${1})
 
 echo =========================================================================
 echo Evaluate report
 echo =========================================================================
-echo "$ rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html"
-OUT=$(rlgl e --id=$ID --policy=https://github.com/atgreen/test-policy ./report.html || true)
+echo "$ rlgl e --policy=https://github.com/atgreen/test-policy ./report.html"
+OUT=$(rlgl e --policy=https://github.com/atgreen/test-policy ./report.html || true)
 echo $OUT
 REPORT=$(echo $OUT | awk '{ print $2 }' | cut -f2 -d=)
 echo =========================================================================
