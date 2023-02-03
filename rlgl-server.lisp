@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -586,7 +586,7 @@ token claims and token header"
 				  (when (str:ends-with? ".csv" filename)
 				    (make-instance 'parser/csv))))
 		      (tests (if parser
-				 (rlgl-parsers:parse-report parser doc)
+				 (rlgl-parsers:parse-report parser doc labels)
                                  (progn
                                    (delete-document *storage-driver* (cdr (assoc :REF json)))
 				   (error "Report not recognized")))))

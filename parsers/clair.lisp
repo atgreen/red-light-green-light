@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -29,7 +29,7 @@
    :doctype "text"))
 
 
-(defmethod parse-report ((parser parser/clair) doc)
+(defmethod parse-report ((parser parser/clair) doc labels)
   (let* ((report (json:decode-json-from-source (flexi-streams:make-flexi-stream
 						(flexi-streams:make-in-memory-input-stream doc)
 						:external-format :utf-8)))
@@ -38,8 +38,9 @@
 	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))
 	     (mapcar (lambda (v)
 		       (json:decode-json-from-string
-			(format nil "{ \"report\": \"clair\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
+			(format nil "{ \"report\": \"clair\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" ~A}"
 				(cdr (assoc :VULNERABILITY v))
-				(cdr (assoc :LINK v)))))
+				(cdr (assoc :LINK v))
+                                (rlgl-util:jsonify-labels labels))))
 		     vulnerabilities))))
     (append tests-fail tests-pass)))

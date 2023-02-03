@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -28,7 +28,7 @@
    :title  "OpenSCAP OVAL Scan Report"
    :doctype "html"))
 
-(defmethod parse-report ((parser parser/oscap-oval) doc)
+(defmethod parse-report ((parser parser/oscap-oval) doc labels)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
 			    (flexi-streams:make-in-memory-input-stream doc)
 			    :external-format :utf-8)))
@@ -43,8 +43,8 @@
 			     (setf tests-fail
 				   (cons
 				    (json:decode-json-from-string
-				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" }"
-					     text url))
+				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\" ~A}"
+					     text url (rlgl-util:jsonify-labels labels)))
 				    tests-fail)))))
     (lquery:$ pdoc "tr.resultgoodA > td:nth-child(4) > a"
 	      (combine (attr :href) (text))
@@ -52,7 +52,7 @@
 			     (setf tests-pass
 				   (cons
 				    (json:decode-json-from-string
-				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"PASS\", \"id\": \"~A\", \"url\": \"~A\" }"
-					     text url))
+				     (format nil "{ \"report\": \"oscap-oval\", \"result\": \"PASS\", \"id\": \"~A\", \"url\": \"~A\" ~A}"
+					     text url (rlgl-util:jsonify-labels labels)))
 				    tests-pass)))))
     (append tests-fail tests-pass)))

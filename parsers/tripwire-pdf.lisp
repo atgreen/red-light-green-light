@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2020, 2021, 2022  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2020, 2021, 2022, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -50,7 +50,7 @@
   (multiple-value-bind (test-name pos)
       (find-next pos "Test Name: " doc)))
 
-(defun parse-tripwire-text (text)
+(defun parse-tripwire-text (text labels)
   (let ((tests (list))
         (position 0))
     (multiple-value-bind (policy-name ppos)
@@ -62,11 +62,12 @@
           do (multiple-value-bind (rule-name rpos)
                  (find-prev tpos "Rule Name: " text)
                (setf tests (cons (json:decode-json-from-string
-                                  (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": ~S, \"rule\": ~S, \"id\": ~S }"
+                                  (format nil "{ \"report\": \"tripwire-pdf\", \"status\": ~S, \"policy\": ~S, \"rule\": ~S, \"id\": ~S ~A}"
                                           (find-next tpos "Status: " text)
                                           (rlgl-util:escape-json-string policy-name)
                                           (rlgl-util:escape-json-string rule-name)
-                                          (rlgl-util:escape-json-string test-name)))
+                                          (rlgl-util:escape-json-string test-name)
+                                          (rlgl-util:jsonify-labels labels)))
                                  tests))
                (multiple-value-bind (next-test-name next-tpos)
                    (find-next (+ 1 tpos) "Test Name: " text)
@@ -74,7 +75,7 @@
                  (setf tpos next-tpos))))))
     tests))
 
-(defmethod parse-report ((parser parser/tripwire-pdf) doc)
+(defmethod parse-report ((parser parser/tripwire-pdf) doc labels)
   (tmpdir:with-tmpdir (tmpdir)
     (let* ((base-filename (str:concat tmpdir "/" (generate-random-string)))
            (pdf-filename (str:concat base-filename ".pdf"))
@@ -88,4 +89,5 @@
       (inferior-shell:run
        (str:concat "pdftotext " pdf-filename " " txt-filename))
       (parse-tripwire-text (alexandria:read-file-into-string
-                            txt-filename :external-format :latin-1)))))
+                            txt-filename :external-format :latin-1)
+                           labels))))

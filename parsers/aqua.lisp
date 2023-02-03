@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -28,7 +28,7 @@
    :title  "Aqua Scan Report"
    :doctype "html"))
 
-(defmethod parse-report ((parser parser/aqua) doc)
+(defmethod parse-report ((parser parser/aqua) doc labels)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
 			    (flexi-streams:make-in-memory-input-stream doc)
 			    :external-format :utf-8)))
@@ -48,11 +48,12 @@
 		   (cons
 		    (json:decode-json-from-string
 		     (format nil
-			     "{ \"report\": \"aqua\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\", \"severity\": \"~A\", \"score\": \"~A\" }"
+			     "{ \"report\": \"aqua\", \"result\": \"FAIL\", \"id\": \"~A\", \"url\": \"~A\", \"severity\": \"~A\", \"score\": \"~A\" ~A}"
 			     (car (cdr (aref vulns i)))
 			     (car (aref vulns i))
 			     (aref severity i)
-			     (aref score i)))
+			     (aref score i)
+                             (rlgl-util:jsonify-labels labels)))
 		    tests-fail)))))
 
     tests-fail))

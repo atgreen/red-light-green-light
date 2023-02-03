@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -22,6 +22,8 @@
   (:export #:random-hex-string
 	   #:valid-url?
 	   #:make-absolute-pathname
+           #:pair-to-assign-string
+           #:jsonify-labels
 	   #:escape-json-string))
 
 (in-package #:rlgl-util)
@@ -54,3 +56,11 @@
 	 (s2 (str:replace-all "\"" "\\\\\\\"" s1)))
     (format nil "~A~%" s2)
     s2))
+
+(defun pair-to-assign-string (stream pair colon? at-sign?)
+  (format stream "~S = ~S" (car pair) (cdr pair)))
+
+(defun jsonify-labels (labels)
+  (if labels
+      (format nil ", ~{~/rlgl-util:pair-to-assign-string/~^, ~}" labels)
+      ""))

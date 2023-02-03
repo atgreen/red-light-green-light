@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -28,17 +28,18 @@
    :title  "Anchore Scan Report"
    :doctype "text"))
 
-(defmethod parse-report ((parser parser/anchore) doc)
+(defmethod parse-report ((parser parser/anchore) doc labels)
   (let* ((report (json:decode-json-from-string doc))
 	 (tests-pass (list))
 	 (tests-fail
 	   (let ((vulnerabilities (cdr (assoc :VULNERABILITIES report))))
 	     (mapcar (lambda (v)
 		       (json:decode-json-from-string
-			(format nil "{ \"report\": \"anchore\", \"result\": \"FAIL\", \"id\": \"~A\", \"package name\": \"~A\", \"severity\": \"~A\", \"url\": \"~A\" }"
+			(format nil "{ \"report\": \"anchore\", \"result\": \"FAIL\", \"id\": \"~A\", \"package name\": \"~A\", \"severity\": \"~A\", \"url\": \"~A\" ~A}"
 				(cdr (assoc :VULN v))
 				(cdr (assoc :PACKAGE--NAME v))
 				(cdr (assoc :SEVERITY v))
-				(cdr (assoc :URL v)))))
+				(cdr (assoc :URL v))
+                                (rlgl-util:jsonify-labels labels))))
 		     vulnerabilities))))
     (append tests-fail tests-pass)))

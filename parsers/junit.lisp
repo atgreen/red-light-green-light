@@ -26,7 +26,7 @@
    :title  "JUnit Test Report"
    :doctype "text"))
 
-(defmethod parse-report ((parser parser/junit) doc)
+(defmethod parse-report ((parser parser/junit) doc labels)
   (let ((xmls (cxml:parse-octets doc
 				 (cxml-xmls:make-xmls-builder))))
     (let ((children (cdr (cdr xmls))))
@@ -44,7 +44,7 @@
 			   ((string= (car a) "name")
 			    (setf result (car (cdr a))))))
 		       (json:decode-json-from-string
-			(format nil "{ \"report\": \"junit\", \"result\": \"~A\", \"id\": \"~A\" }"
-				result classname)))
+			(format nil "{ \"report\": \"junit\", \"result\": \"~A\", \"id\": \"~A\" ~A}"
+				result classname (rlgl-util:jsonify-labels labels))))
 		     nil))
 	       children)))))

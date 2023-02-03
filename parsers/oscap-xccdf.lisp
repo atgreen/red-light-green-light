@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-PARSERS; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,7 @@
    :title  "OpenSCAP XCCDF Scan Report"
    :doctype "html"))
 
-(defmethod parse-report ((parser parser/oscap-xccdf) doc)
+(defmethod parse-report ((parser parser/oscap-xccdf) doc labels)
   (let ((pdoc (plump:parse (flexi-streams:make-flexi-stream
 			    (flexi-streams:make-in-memory-input-stream doc)
 			    :external-format :utf-8)))
@@ -44,14 +44,14 @@
 		 (setf tests-fail
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"oscap-xccdf\", \"result\": \"FAIL\", \"id\": \"~A\", \"severity\": \"~A\" }"
-				 id severity))
+			 (format nil "{ \"report\": \"oscap-xccdf\", \"result\": \"FAIL\", \"id\": \"~A\", \"severity\": \"~A\" ~A}"
+				 id severity (rlgl-util:jsonify-labels labels)))
 			tests-fail)))
 		((string= result "pass")
 		 (setf tests-pass
 		       (cons
 			(json:decode-json-from-string
-			 (format nil "{ \"report\": \"oscap-xccdf\", \"result\": \"PASS\", \"id\": \"~A\", \"severity\": \"~A\" }"
-				 id severity))
+			 (format nil "{ \"report\": \"oscap-xccdf\", \"result\": \"PASS\", \"id\": \"~A\", \"severity\": \"~A\" ~A}"
+				 id severity (rlgl-util:jsonify-labels labels)))
 			tests-pass)))))))))
     (append tests-fail tests-pass)))
