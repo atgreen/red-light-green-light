@@ -52,26 +52,32 @@
 		    ((str:starts-with? "FAIL:" line)
 		     (cons
 		      (json:decode-json-from-string
-		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
-			       host target (rlgl-util:escape-json-string
-					    (str:substring 6 nil line))
-                               (rlgl-util:jsonify-labels labels)))
+                       (let ((s (format nil "{ \"report\": \"dejagnu\", \"result\": \"FAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
+			                host target (rlgl-util:escape-json-string
+					             (str:substring 6 nil line))
+                                        (rlgl-util:jsonify-labels labels))))
+                         (log:info s)
+                         s))
 		      tests))
 		    ((str:starts-with? "XFAIL:" line)
 		     (cons
 		      (json:decode-json-from-string
-		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
-			       host target (rlgl-util:escape-json-string
-					    (str:substring 7 nil line))
-                               (rlgl-util:jsonify-labels labels)))
+                       (let ((s (format nil "{ \"report\": \"dejagnu\", \"result\": \"XFAIL\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
+			                host target (rlgl-util:escape-json-string
+					             (str:substring 7 nil line))
+                                        (rlgl-util:jsonify-labels labels))))
+                         (log:info s)
+                         s))
 		      tests))
 		    ((str:starts-with? "XPASS:" line)
 		     (cons
 		      (json:decode-json-from-string
-		       (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
-			       host target (rlgl-util:escape-json-string
-					    (str:substring 7 nil line))
-                               (rlgl-util:jsonify-labels labels)))
+                       (let ((s (format nil "{ \"report\": \"dejagnu\", \"result\": \"XPASS\", \"host\": \"~A\", \"target\": \"~A\", \"id\": \"~A\" ~A}"
+			                host target (rlgl-util:escape-json-string
+					             (str:substring 7 nil line))
+                                        (rlgl-util:jsonify-labels labels))))
+                         (log:info s)
+                         s))
 		      tests))
 		    (t tests))))
     tests))
