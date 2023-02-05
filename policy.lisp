@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: POLICY; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -116,13 +116,13 @@ based on URL."
 ;; regex matcher for the special case of numeric ranges: two floating
 ;; point numbers separated by "..".
 (defparameter +range-matcher+
-  (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)\.\.[0-9]+(|\.[0-9]*)$"))
+  (cl-ppcre:create-scanner "^\\d+(|\.\\d*)\.\.\\d+(|\.\\d*)$"))
 
 (defparameter +number-matcher+
-  (cl-ppcre:create-scanner "^[0-9]+(|\.[0-9]*)"))
+  (cl-ppcre:create-scanner "^\\d+(|\.\\d*)"))
 
 (defparameter +numeric-range+
-  (cl-ppcre:create-scanner "^(.+)\.\.(.+)$"))
+  (cl-ppcre:create-scanner "^(\\d+)\.\.(\\d+)$"))
 
 (defun parse-numeric-range (value)
   "Extract the numeric values for a double-dotted range."
