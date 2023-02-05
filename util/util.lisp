@@ -22,7 +22,7 @@
   (:export #:random-hex-string
 	   #:valid-url?
 	   #:make-absolute-pathname
-           #:pair-to-assign-string
+           #:pair-to-json-field-string
            #:jsonify-labels
 	   #:escape-json-string))
 
@@ -57,13 +57,13 @@
     (format nil "~A~%" s2)
     s2))
 
-(defun pair-to-assign-string (stream pair colon? at-sign?)
+(defun pair-to-json-field-string (stream pair colon? at-sign?)
   (format stream "~S : ~S" (symbol-name (car pair)) (cdr pair)))
 
 (defun jsonify-labels (labels)
   (if labels
       (progn
-        (format t ", ~{~/rlgl-util:pair-to-assign-string/~^, ~}" labels)
+        (format t ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels)
         (terpri)
-        (format nil ", ~{~/rlgl-util:pair-to-assign-string/~^, ~}" labels))
+        (format nil ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels))
       ""))
