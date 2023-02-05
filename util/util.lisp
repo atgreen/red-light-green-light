@@ -22,7 +22,6 @@
   (:export #:random-hex-string
 	   #:valid-url?
 	   #:make-absolute-pathname
-           #:pair-to-json-field-string
            #:jsonify-labels
 	   #:escape-json-string))
 
@@ -57,10 +56,28 @@
     (format nil "~A~%" s2)
     s2))
 
-(defun pair-to-json-field-string (stream pair colon? at-sign?)
-  (format stream "~S : ~S" (json:lisp-to-camel-case (string (car pair))) (cdr pair)))
+(defun pair-to-json-field-string (key-value-pair)
+  "Convert a KEY-VALUE-PAIR to a JSON field string.
+
+The key is converted to CamelCase using the `json:lisp-to-camel-case` function.
+
+Example: (pair-to-json-field-string '(foo . 1)) => '\"foo\": \"1\"'"
+  (format nil "~S : ~S"
+          (json:lisp-to-camel-case (symbol-name (car key-value-pair)))
+          (cdr key-value-pair)))
 
 (defun jsonify-labels (labels)
-  (if labels
-        (format nil ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels)
-      ""))
+  "Convert a list of LABELS to a JSON string.
+
+Each label is a key-value pair. The key is converted to CamelCase
+using the `json:lisp-to-camel-case` function.
+
+Example: (jsonify-labels '((foo . 1) (bar . 2))) => ', \"foo\": 1, \"bar\": 2'"
+      (flet ((pair-to-json-field-string (key-value-pair)
+               (format nil "~S: ~S"
+                       (json:lisp-to-camel-case (symbol-name (car key-value-pair)))
+                       (cdr key-value-pair))))
+        (if labels
+            (format nil ", ~{~A~^, ~}"
+                    (mapcar #'pair-to-json-field-string labels))
+            "")))
