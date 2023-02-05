@@ -58,7 +58,7 @@
     s2))
 
 (defun pair-to-json-field-string (stream pair colon? at-sign?)
-  (format stream "~S : ~S" (symbol-name (car pair)) (cdr pair)))
+  (format stream "~S : ~S" (json:lisp-to-camel-case (string (car pair))) (cdr pair)))
 
 (defun jsonify-labels (labels)
   (if labels
