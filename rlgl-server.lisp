@@ -635,8 +635,9 @@ token claims and token header"
 		   (rlgl-util:make-absolute-pathname fpath))))
 	(store-document *storage-driver* doc))
     (error (c)
-      (log:error "~A" c)
-      (format nil "Error storing document: ~A" c))))
+      (let ((msg (format nil "Error storing document: ~A" c)))
+        (log:error "~A" msg)
+        msg))))
 
 (snooze:defroute pubkey (:get :text/plain)
   "Return the public key for this server."
@@ -645,15 +646,13 @@ token claims and token header"
 
 (defun want-sig? (id)
   (let ((id-string (string id)))
-    (if (str:ends-with? ".SIG" id-string)
-       (str:substring 0 (- (length id-string) 4) id-string)
-       nil)))
+    (when (str:ends-with? ".SIG" id-string)
+      (str:substring 0 (- (length id-string) 4) id-string))))
 
 (defun want-csig? (id)
   (let ((id-string (string id)))
-    (if (str:ends-with? ".CSIG" id-string)
-       (str:substring 0 (- (length id-string) 5) id-string)
-       nil)))
+    (when (str:ends-with? ".CSIG" id-string)
+      (str:substring 0 (- (length id-string) 5) id-string))))
 
 (defun missing-doc ()
   (markup:write-html
