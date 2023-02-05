@@ -296,8 +296,10 @@ One optional field is:
 
 * `url`: a URL linking to contextual info for that `id`.
 
-And then as many extra fields may be added to the JSON object as may
-be useful below.
+All labels passed on the `rlgl evaluate` command appear as fields in
+the normalized output form.  The report parser may also add report
+type-specific extra fields to the normalized output as they see fit.
+This is useful for pattern matching, as described below.
 
 Policies are maintained in git repos, and consist of three plain text
 files: `XFAIL`, `FAIL`, and `PASS`.  Each of these files contains a
