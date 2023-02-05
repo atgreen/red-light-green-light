@@ -58,7 +58,7 @@
     s2))
 
 (defun pair-to-assign-string (stream pair colon? at-sign?)
-  (format stream "~S : ~S" (car pair) (cdr pair)))
+  (format stream "~S : ~S" (symbol-name (car pair)) (cdr pair)))
 
 (defun jsonify-labels (labels)
   (if labels
