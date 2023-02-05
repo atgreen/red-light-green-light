@@ -56,16 +56,6 @@
     (format nil "~A~%" s2)
     s2))
 
-(defun pair-to-json-field-string (key-value-pair)
-  "Convert a KEY-VALUE-PAIR to a JSON field string.
-
-The key is converted to CamelCase using the `json:lisp-to-camel-case` function.
-
-Example: (pair-to-json-field-string '(foo . 1)) => '\"foo\": \"1\"'"
-  (format nil "~S : ~S"
-          (json:lisp-to-camel-case (symbol-name (car key-value-pair)))
-          (cdr key-value-pair)))
-
 (defun jsonify-labels (labels)
   "Convert a list of LABELS to a JSON string.
 
