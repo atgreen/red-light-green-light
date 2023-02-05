@@ -62,5 +62,7 @@
 
 (defun jsonify-labels (labels)
   (if labels
+      (format t ", ~{~/rlgl-util:pair-to-assign-string/~^, ~}" labels)
+      (terpri)
       (format nil ", ~{~/rlgl-util:pair-to-assign-string/~^, ~}" labels)
       ""))
