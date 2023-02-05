@@ -62,8 +62,5 @@
 
 (defun jsonify-labels (labels)
   (if labels
-      (progn
-        (format t ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels)
-        (terpri)
-        (format nil ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels))
+        (format nil ", ~{~/rlgl-util:pair-to-json-field-string/~^, ~}" labels)
       ""))
