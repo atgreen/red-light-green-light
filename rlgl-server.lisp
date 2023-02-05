@@ -193,7 +193,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
     (let* ((request hunchentoot:*request*)
            (parameters `(("idsite" . ,*matomo-idsite*)
                          ("token_auth" . ,*matomo-token-auth*)
-                         ("rand" . ,(rlgl-util:random-hex-string))
+                         ("rand" . ,(rlgl-util:random-base36-string))
                          ("ua" . ,(hunchentoot:user-agent request))
                          ("action_name" . ,action)
                          ("ref" . ,(hunchentoot:header-in :HTTP_REFERER request))
@@ -611,7 +611,7 @@ token claims and token header"
  			                              (rlgl.db:record-log *db* api-key (version policy) red-or-green ref doc-digest-signature signature labels)
                                                       (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
                                                       (rekor-envelope doc-digest doc-digest-signature)))
-                                       (callback-id (rlgl-util:random-hex-string)))
+                                       (callback-id (rlgl-util:random-base36-string)))
                                    (setf (gethash callback-id *callbacks*) callback-fn)
 			           (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
 			  	           (string red-or-green)

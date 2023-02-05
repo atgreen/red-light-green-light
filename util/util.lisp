@@ -19,7 +19,7 @@
 (defpackage #:rlgl-util
   (:use #:cl)
   (:shadow #:package)
-  (:export #:random-hex-string
+  (:export #:random-base36-string
 	   #:valid-url?
 	   #:make-absolute-pathname
            #:jsonify-labels
@@ -31,7 +31,8 @@
   (bt:make-lock "Random state lock"))
 (setf *random-state* (make-random-state t))
 
-(defun random-hex-string ()
+(defun random-base36-string ()
+  "Return a random base36 (0-9A-Z) string of 8 characters."
   (bt:with-lock-held (*random-state-lock*)
     (format nil "~:@(~36,8,'0R~)" (random (expt 36 8) *random-state*))))
 

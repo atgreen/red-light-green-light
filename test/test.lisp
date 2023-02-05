@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2022  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -47,7 +47,7 @@
 				               :method :post
 				               :content-type "application/json"
 				               :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
-						                (rlgl-util:random-hex-string)
+						                (rlgl-util:random-base36-string)
 						                "http://github.com/moxielogic/rlgl-toolchain-policy"
 						                *upload-ref*)))
                   (json (json:decode-json-from-string result)))
@@ -90,7 +90,7 @@
 				                   :method :post
 				                   :content-type "application/json"
 				                   :content (format nil "{ \"id\": \"~A\", \"policy\": \"http://github.com/atgreen/red-light-green-light\", \"ref\": \"~A\" }"
-						                    (rlgl-util:random-hex-string)
+						                    (rlgl-util:random-base36-string)
                                                                     *upload-ref*)))))
     (log:info result))
 

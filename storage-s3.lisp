@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -54,6 +54,6 @@
 
 (defmethod store-document ((backend storage/s3) document)
   "Store a document into s3 storage."
-  (let ((ref (str:concat "RLGL-" (rlgl-util:random-hex-string))))
+  (let ((ref (str:concat "RLGL-" (rlgl-util:random-base36-string))))
     (zs3:put-vector document (s3-bucket backend) ref)
     ref))

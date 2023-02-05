@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2023  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -32,7 +32,7 @@
     (if (probe-file filename)
 	(setf (slot-value backend 'key)
 	      (alexandria:read-file-into-string filename :external-format :latin-1))
-	(let ((key (rlgl-util:random-hex-string)))
+	(let ((key (rlgl-util:random-base36-string)))
 	  (with-open-file (stream filename
 				  :direction :output
 				  :if-exists :supersede
@@ -50,7 +50,7 @@
 
 (defmethod store-document ((backend storage/local) document)
   "Store a document into local storage."
-  (let ((filename (concatenate 'string "RLGL-" (rlgl-util:random-hex-string))))
+  (let ((filename (concatenate 'string "RLGL-" (rlgl-util:random-base36-string))))
     (with-open-file (stream (str:concat (local-dir backend) "/" filename)
 			    :direction :output
 			    :if-exists :supersede
