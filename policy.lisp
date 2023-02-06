@@ -216,33 +216,6 @@ exists after the JSON object, or NIL otherwise."
 
 (defun apply-policy (policy candidate-result-list)
   "Apply a POLICY to CANDIDATE-RESULT-LIST, a list of test results,
-where these results are represented as alists derived from json
-encoded values produced by the report parsers.  This function returns
-two values, :GREEN or :RED, as well as a list of pairs made by consing
-the matcher object with the test result alist."
-  (let* ((now (get-universal-time))
-         (matcher-lists (list (xfail-matchers policy)
-                              (fail-matchers policy)
-                              (pass-matchers policy)))
-         (result (mapcar (lambda (result)
-                           (let ((matching-matcher
-                                  (loop for matchers in matcher-lists
-                                        for matcher in matchers
-                                        when (and (< now (expiration-date matcher))
-                                                  (match-candidate-pattern result (matcher matcher)))
-                                        return matcher)))
-                             (if matching-matcher
-                                 (cons matching-matcher result)
-                               (cons nil result))))
-                         candidate-result-list)))
-    (values (if (find nil (mapcar #'car result))
-                :RED
-                :GREEN)
-            result)))
-
-#|
-(defun apply-policy (policy candidate-result-list)
-  "Apply a POLICY to CANDIDATE-RESULT-LIST, a list of test results,
   where these results are represented as alists derived from json
   encoded values produced by the report parsers.  This function
   returns two values: :GREEN or :RED, as well as a list of pairs made
@@ -282,4 +255,3 @@ the matcher object with the test result alist."
 			     result))
 			  candidate-result-list)))
       (values red-or-green result))))
-|#
