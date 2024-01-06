@@ -31,7 +31,9 @@ USER 1000
 RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_ORB_VERSION}/green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz" \
     && tar xf green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
     && rm green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
-    && echo "# config file here" > green-orb.yaml
+    && echo "# config file here" > green-orb.yaml \
+    && pwd \
+    && ls -l
 
 RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make install; ocicl version; ocicl setup > ~/.sbclrc \
     && echo "(push (uiop:getcwd) asdf:*central-registry*)" >> ~/.sbclrc \
