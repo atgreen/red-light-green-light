@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2023  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2024  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -370,7 +370,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <footer class="page-footer font-small
                     special-color-dark pt-4">
        <div class="footer-copyright
-                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2022<a href="https://linkedin.com/in/green" > Anthony
+                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2024<a href="https://linkedin.com/in/green" >Anthony
            Green</a></div>
      </footer>
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
