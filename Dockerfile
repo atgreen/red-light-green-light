@@ -31,18 +31,14 @@ USER 1000
 RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_ORB_VERSION}/green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz" \
     && tar xf green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
     && rm green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
-    && echo "# config file here" > green-orb.yaml \
-    && pwd \
-    && ls -la
+    && echo "# config file here" > green-orb.yaml
 
 RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make install; ocicl version; ocicl setup > ~/.sbclrc \
     && echo "(push (uiop:getcwd) asdf:*central-registry*)" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*verbose* t)" >> ~/.sbclrc \
-    && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc \
-    && pwd \
-    && ls -la
-    && sbcl --non-interactive --eval "(progn (asdf:load-system :rlgl-server) (quit))"
+    && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc
 
+RUN ./orb sbcl --non-interactive --eval "(progn (asdf:load-system :rlgl-server) (quit))"
 
 RUN chmod -R go+rwx /opt/rlgl
 
