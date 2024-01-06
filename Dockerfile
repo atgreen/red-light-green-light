@@ -39,7 +39,7 @@ RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make
     && echo "(push (uiop:getcwd) asdf:*central-registry*)" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*verbose* t)" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc \
-    && ./orb sbcl --non-interactive --eval "(progn (asdf:load-system: rlgl-server) (quit))"
+    && sbcl --non-interactive --eval "(progn (asdf:load-system: rlgl-server) (quit))"
 
 RUN chmod -R go+rwx /opt/rlgl
 
