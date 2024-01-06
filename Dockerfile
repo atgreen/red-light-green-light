@@ -43,6 +43,4 @@ RUN ocicl install && ./orb sbcl --non-interactive --eval "(progn (asdf:load-syst
 
 RUN chmod -R go+rwx /opt/rlgl
 
-RUN ocicl install
-
 CMD ./orb sbcl --userinit /opt/rlgl/.sbclrc --eval '(asdf:load-system :rlgl-server)' --eval '(progn (rlgl-server:rlgl-server:start-rlgl-server (loop do (sleep 1000))))'
