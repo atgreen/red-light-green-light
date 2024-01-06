@@ -25,7 +25,7 @@
 
 (defun getenv-aws-credentials ()
   (list (uiop:getenv "AWS_ACCESS_KEY")
-	(uiop:getenv "AWS_SECRET_KEY")))
+	      (uiop:getenv "AWS_SECRET_KEY")))
 
 ;; ----------------------------------------------------------------------------
 
