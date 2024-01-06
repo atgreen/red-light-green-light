@@ -33,13 +33,16 @@ RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_
     && rm green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
     && echo "# config file here" > green-orb.yaml \
     && pwd \
-    && ls -l
+    && ls -la
 
 RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make install; ocicl version; ocicl setup > ~/.sbclrc \
     && echo "(push (uiop:getcwd) asdf:*central-registry*)" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*verbose* t)" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc \
+    && pwd \
+    && ls -la
     && sbcl --non-interactive --eval "(progn (asdf:load-system :rlgl-server) (quit))"
+
 
 RUN chmod -R go+rwx /opt/rlgl
 
