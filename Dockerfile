@@ -34,9 +34,10 @@ RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_
     && echo "# config file here" > green-orb.yaml
 
 RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make install; ocicl version; ocicl setup > ~/.sbclrc \
-    && echo "(push (uiop:getcwd) asdf:*central-registry*)" >> ~/.sbclrc \
+    && echo "(asdf:initialize-source-registry '(:source-registry :ignore-inherited-configuration (:tree #P\"/opt/rlgl/\")))" >> ~/.sbclrc \
     && echo "(setf ocicl-runtime:*verbose* t)" >> ~/.sbclrc \
-    && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc
+    && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc \
+    && cd .. && rm -rf ocicl
 
 RUN ./orb sbcl --non-interactive --eval "(progn (asdf:load-system :rlgl-server) (quit))"
 
