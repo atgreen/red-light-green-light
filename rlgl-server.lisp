@@ -740,11 +740,11 @@ token claims and token header"
 				    (cdr item))
 			      unknown))))
     (setf results
-	  (concatenate 'list
-		       (reverse fail)
-		       (reverse xfail)
-		       (reverse pass)
-		       (reverse unknown)))
+	        (concatenate 'list
+		                   (reverse fail)
+		                   (reverse xfail)
+		                   (reverse pass)
+		                   (reverse unknown)))
     (let ((report-columns (if columns columns '(:RESULT :ID))))
           (markup:write-html-to-stream
           <page-template title="Red Light Green Light" >
