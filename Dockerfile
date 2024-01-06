@@ -41,8 +41,8 @@ RUN git clone --depth=1 https://github.com/ocicl/ocicl.git; cd ocicl; make; make
     && echo "(setf ocicl-runtime:*download* t)" >> ~/.sbclrc \
     && ./orb sbcl --non-interactive --eval "(progn (asdf:load-system: rlgl-server) (quit))"
 
-RUN chmod -R go+rwx /opt/gbuser
+RUN chmod -R go+rwx /opt/rlgl
 
 RUN ocicl install
 
-CMD ./orb sbcl --userinit /opt/gbuser/.sbclrc --eval '(asdf:load-system :rlgl-server)' --eval '(progn (rlgl-server:rlgl-server:start-rlgl-server (loop do (sleep 1000))))'
+CMD ./orb sbcl --userinit /opt/rlgl/.sbclrc --eval '(asdf:load-system :rlgl-server)' --eval '(progn (rlgl-server:rlgl-server:start-rlgl-server (loop do (sleep 1000))))'
