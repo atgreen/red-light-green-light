@@ -22,12 +22,12 @@
   :version "8"
   :serial t
   :components ((:file "package")
-	       (:file "api-key")
-	       (:file "matcher")
-	       (:file "policy")
-	       (:file "storage-local")
-	       (:file "storage-s3")
-	       (:file "rlgl-server"))
+               (:file "api-key")
+               (:file "matcher")
+               (:file "policy")
+               (:file "storage-local")
+               (:file "storage-s3")
+               (:file "rlgl-server"))
   :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
                :metabang-bind :markup :cl-template
                :cl-toml :snooze :cl-json :plump :lquery :ironclad
