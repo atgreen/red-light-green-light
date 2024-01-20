@@ -23,12 +23,12 @@ check: clean
         sbcl --dynamic-space-size 4096 \
 	     --disable-debugger \
 	     --eval '(ql:quickload :prove)' \
-	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./user") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./util") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./db") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./parsers") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename ".") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./user") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./util") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./db") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./parsers") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./test/") asdf:*central-registry* )' \
 	     --eval '(ql:register-local-projects)' \
 	     --eval '(ql:quickload :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
@@ -40,14 +40,14 @@ run: clean
 	openssl genrsa -out /tmp/rlgl-test-key.pem 1024
 	PRIVATE_KEY_FILE=/tmp/rlgl-test-key.pem \
         sbcl --dynamic-space-size 4096 \
-	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./user") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./util") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./db") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./parsers") ql:*local-project-directories* )' \
-	     --eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
-	     --eval '(ql:register-local-projects)' \
-	     --eval '(ql:quickload :rlgl-server)' \
+	     --eval '(pushnew (truename ".") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./local-projects/cl-json-util") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./user") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./util") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./db") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./parsers") asdf:*central-registry* )' \
+	     --eval '(pushnew (truename "./test/") asdf:*central-registry* )' \
+	     --eval '(asdf:load-system :rlgl-server)' \
 	     --eval '(rlgl-server:start-rlgl-server t "test/config.ini")'
 
 cover: clean
@@ -55,7 +55,7 @@ cover: clean
 	     --eval '(require :sb-cover)' \
 	     --eval '(ql:quickload :prove)' \
 	     --eval '(declaim (optimize sb-cover:store-coverage-data))' \
-	     --eval '(pushnew (truename ".") ql:*local-project-directories* )' \
+	     --eval '(pushnew (truename ".") asdf:*central-registry* )' \
 	     --eval '(ql:register-local-projects)' \
 	     --eval '(ql:quickload :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
@@ -66,8 +66,8 @@ cover: clean
 coveralls: clean
 	COVERALLS=true sbcl --disable-debugger \
 		--eval '(ql:quickload :cl-coveralls)' \
-		--eval '(pushnew (truename ".") ql:*local-project-directories* )' \
-		--eval '(pushnew (truename "./test/") ql:*local-project-directories* )' \
+		--eval '(pushnew (truename ".") asdf:*central-registry* )' \
+		--eval '(pushnew (truename "./test/") asdf:*central-registry*)' \
 		--eval '(ql:register-local-projects)' \
 		--eval '(ql:quickload :test-rlgl-server)' \
 		--eval '(coveralls:with-coveralls (:project-dir	(directory-namestring (truename "."))) (test-rlgl-server:run))' \

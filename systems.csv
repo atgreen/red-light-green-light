@@ -180,3 +180,6 @@ collectors, ghcr.io/ocicl/collectors@sha256:63c376d694da5341afd15f276caac5a24d80
 symbol-munger, ghcr.io/ocicl/symbol-munger@sha256:d73a086e1c00edd7acc8b1c914fd96f0e811421d39a33961670f1f12bc3b3aa7, symbol-munger-20230519-e96558e/symbol-munger.asd
 salza2, ghcr.io/ocicl/salza2@sha256:77e9d1cb385ee3ef16c28d495278d77b86b129a4dcceaa38f186e1bf076a5032, salza2-2.1/salza2.asd
 iterate, ghcr.io/ocicl/iterate@sha256:fe08e8b697f27807fbfe216e5953cd0b2c6bcdea947815e4494b44af3d6534d4, iterate-20230518-4a64b68/iterate.asd
+legit, ghcr.io/ocicl/legit@sha256:2b4d26441a608555baf54636afb3b1344e7ddc2c40cd74b44eeb74a9c42dd9be, legit-20231004-9c677b9/legit.asd
+simple-inferiors, ghcr.io/ocicl/simple-inferiors@sha256:46e6110b6efdfd06a955e86ae0f7daa2ea65725fd680a534358bdbc88a813a0c, simple-inferiors-20230808-056ee77/simple-inferiors.asd
+lambda-fiddle, ghcr.io/ocicl/lambda-fiddle@sha256:8138cbabd4ab3010f5c082719559aad66035c1a962b82d9e6e239aab54beeacd, lambda-fiddle-20230808-d019c7f/lambda-fiddle.asd

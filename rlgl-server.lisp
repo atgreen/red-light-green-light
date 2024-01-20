@@ -23,22 +23,11 @@
 (in-package :rlgl-server)
 
 ;; ----------------------------------------------------------------------------
-;; Get the version number at compile time.  This comes from
-;; RLGL_VERSION (set on the linux container build commandline), or
-;; from git at compile-time.  Use UNKNOWN if all else fails.
+;; Always pull the version from git
 
-;; This can come from build time...
-(eval-when (:compile-toplevel :execute :load-toplevel)
-  (defparameter +rlgl-git-version+
-    (inferior-shell:run/ss
-     "(test -d .git && git describe --tags --dirty=+) || echo UNKNOWN")))
-
-;; But this must come from runtime...
 (defparameter +rlgl-version+
-  (let ((v +rlgl-git-version+))
-    (if (equal v "UNKNOWN")
- 	(or (uiop:getenv "RLGL_VERSION") v)
- 	v)))
+  (string-trim '(#\Newline) (with-output-to-string (legit:*git-output*)
+                              (legit:git-describe :tags t :dirty t))))
 
 (defun rlgl-root ()
   (fad:pathname-as-directory
@@ -370,8 +359,7 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <footer class="page-footer font-small
                     special-color-dark pt-4">
        <div class="footer-copyright
-                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2024<a href="https://linkedin.com/in/green" >Anthony
-           Green</a></div>
+                   text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2024<a href="https://linkedin.com/in/green" > Anthony Green</a></div>
      </footer>
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
              integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
