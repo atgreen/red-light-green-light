@@ -27,7 +27,7 @@
 
 (defparameter +rlgl-version+
   (string-trim '(#\Newline) (with-output-to-string (legit:*git-output*)
-                              (legit:git-describe :tags t :dirty t))))
+                              (legit:git-describe :tags t))))
 
 (defun rlgl-root ()
   (fad:pathname-as-directory
