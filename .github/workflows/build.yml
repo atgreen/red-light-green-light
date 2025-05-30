@@ -104,11 +104,11 @@ jobs:
           if timeout -s TERM 45 bash -c \
              'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
                   do echo "Waiting for ${0}" && sleep 2;\
-                    done' http://$ip:8080/healthz ; then
+                    done' http://$CONTAINER_IP:8080/healthz ; then
 
-            # Setup test environment in container
+            # Setup test environment in` container
             podman exec -t -e IP="$CONTAINER_IP" ci_rlgl-server_1 \
-              sh -c 'echo -n "http://$IP:8080" > /tmp/server-uri'
+              sh -c 'echo -n "http://$CONTAINER_IP:8080" > /tmp/server-uri'
 
             SERVER_URI=$(podman exec -t ci_rlgl-server_1 cat /tmp/server-uri)
             echo "Server URI: $SERVER_URI"
