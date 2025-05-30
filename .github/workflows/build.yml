@@ -75,6 +75,7 @@ jobs:
         openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
         openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
 
+        pip3 install podman-compose
         podman-compose -f .ci/docker-compose.yml up -d
         ip=$(podman container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
         if [ -z "${ip:-}" ]; then
