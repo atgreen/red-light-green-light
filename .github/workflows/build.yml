@@ -17,12 +17,31 @@ jobs:
     name: Build image
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup SBCL and ocicl
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        brew install sbcl ocicl dejagnu
+        ocicl setup >> ~/.sbclrc
+        patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-rpath /lib64 /home/linuxbrew/.linuxbrew/Cellar/sbcl/*/libexec/bin/sbcl
+
     - run: |
         git fetch --prune --unshallow --tags
         echo exit code $?
         git tag --list
         echo "RLGL_VERSION=$(git describe --tags --dirty=+)"
+
+    - name: Install dependencies
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        ocicl install
+
+    - name: Build
+      run: |
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        make binary
 
     - name: Set up Go 1.17
       uses: actions/setup-go@v3
@@ -37,35 +56,6 @@ jobs:
       id: version
       run: echo "::set-output name=version::$(git describe --tags --dirty=+)"
 
-    - name: Get base hash
-      id: base-hash
-      run: echo "::set-output name=base-hash::$(cat Dockerfile.base rlgl-server.asd | sha512sum | cut -b 1-8)"
-
-    - name: Test if base exists
-      id: base-exists
-      run: echo "::set-output name=base-exists::$(podman manifest inspect quay.io/moxielogic/rlgl-server-base:${{ steps.base-hash.outputs.base-hash }} > /dev/null 2>&1 && echo 'EXISTS')"
-
-    - name: Prepare base image
-      id: build-base
-      uses: redhat-actions/buildah-build@v2
-      with:
-        image: rlgl-server-base
-        tags: ${{ steps.base-hash.outputs.base-hash }} latest
-        dockerfiles: |
-          Dockerfile.base
-      if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
-
-    - name: Push Base To quay.io
-      id: push-base-to-quay
-      uses: redhat-actions/push-to-registry@v2
-      with:
-        image: ${{ steps.build-base.outputs.image }}
-        tags: ${{ steps.build-base.outputs.tags }}
-        registry: quay.io/moxielogic
-        username: ${{ secrets.QUAY_USERNAME }}
-        password: ${{ secrets.QUAY_PASSWORD }}
-      if: ${{ steps.base-exists.outputs.base-exists != 'EXISTS' }}
-
     - name: Build rlgl cli
       run: |
         (cd rlgl; make build)
@@ -77,67 +67,3 @@ jobs:
         version: latest
         skip-pkg-cache: true
         working-directory: rlgl
-
-    - name: Buildah Action
-      id: build-image
-      uses: redhat-actions/buildah-build@v2
-      with:
-        image: rlgl-server
-        tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
-        dockerfiles: |
-          Dockerfile
-        build-args: |
-          RLGL_VERSION=${{ steps.version.outputs.version }}
-
-    - name: Push To quay.io
-      id: push-to-quay
-      uses: redhat-actions/push-to-registry@v2
-      with:
-        image: ${{ steps.build-image.outputs.image }}
-        tags: ${{ steps.build-image.outputs.tags }}
-        registry: quay.io/moxielogic
-        username: ${{ secrets.QUAY_USERNAME }}
-        password: ${{ secrets.QUAY_PASSWORD }}
-
-    - name: Test
-      run: |
-        # Create a new test keypair
-        openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
-        openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
-
-        docker-compose -f .ci/docker-compose.yml up -d
-        ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
-        if [ -z "${ip:-}" ]; then
-            err "Container ${cid} has no IP address"
-            return 1
-        fi
-
-        if timeout -s TERM 45 bash -c \
-                  'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
-                      do echo "Waiting for ${0}" && sleep 2;\
-                       done' http://$ip:8080/healthz ; then
-
-          docker exec -t -e IP=$ip ci_rlgl-server_1 sh -c 'echo -n http://$IP:8080 > /tmp/server-uri'
-          docker exec -t ci_rlgl-server_1 cat /tmp/server-uri
-
-          ./.ci/test.sh $ip:8080 || true
-
-          docker logs ci_rlgl-server_1
-
-        else
-
-          ERROR=$?
-          docker logs ci_rlgl-server_1
-          exit $ERROR
-
-        fi
-
-    - name: Print image url
-      run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
-
-    # - name: Rollout to staging environment
-    #   uses: actions-hub/kubectl@master
-    #   env:
-    #     KUBE_CONFIG: ${{ secrets.PROD_KUBECONFIG }}
-    #   with:
-    #     args: rollout restart deployment rlgl-server
