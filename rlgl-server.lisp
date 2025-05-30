@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2024  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -75,30 +75,6 @@ rekor-server = \"https://rekor.sigstore.dev\"
   (alexandria:read-file-into-string
    (merge-pathnames #p"verify.sh.clt" (rlgl-root))
    :external-format :latin-1))
-
-;; ----------------------------------------------------------------------------
-(defparameter *rlgl-registry* nil)
-(defparameter *http-requests-counter* nil)
-(defparameter *http-request-duration* nil)
-
-(defun initialize-metrics ()
-  (unless *rlgl-registry*
-    (setf *rlgl-registry* (prom:make-registry))
-    (let ((prom:*default-registry* *rlgl-registry*))
-      (setf *http-requests-counter*
-            (prom:make-counter :name "http_requests_total"
-                               :help "Counts http request by type"
-                               :labels '("method" "app")))
-      (setf *http-request-duration*
-	    (prom:make-histogram :name "http_request_duration_milliseconds"
-                                 :help "HTTP requests duration[ms]"
-                                 :labels '("method" "app")
-                                 :buckets '(10 25 50 75 100 250 500 750 1000 1500 2000 3000)))
-      #+sbcl
-      (prom.sbcl:make-memory-collector)
-      #+sbcl
-      (prom.sbcl:make-threads-collector)
-      (prom.process:make-process-collector))))
 
 ;; ----------------------------------------------------------------------------
 ;; Document storage backends
@@ -360,7 +336,6 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
                     special-color-dark pt-4">
        <div class="footer-copyright
                    text-center py-3">Version ,(progn +rlgl-version+) // (C) 2018-2024<a href="https://linkedin.com/in/green" > Anthony Green</a></div>
-     </footer>
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
              integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
              crossorigin="anonymous" ></script>
@@ -370,7 +345,8 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
 	     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
              crossorigin="anonymous" ></script>
-     <script src="js/index.js"></script>
+             <script src="js/index.js"></script>
+      </footer>
    </html>)
 
 ;; Render the home page.
@@ -554,65 +530,65 @@ token claims and token header"
 (defun do-evaluate ()
   (let ((api-key (authorize)))
     (handler-case
-      (let ((json-string
-	      (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
-	(log:info "evaluate: '~A'" json-string)
-	(let ((json (json:decode-json-from-string json-string)))
-	  (let ((policy-name (cdr (assoc :POLICY json)))
-                (labels (json:decode-json-from-string (or (cdr (assoc :LABELS json)) "{}"))))
-	    (cond
-	      ((null policy-name)
-	       (error "POLICY missing"))
-	      ((not (rlgl-util:valid-url? policy-name))
-	       (error "POLICY not a valid URL"))
-	      (t
-	       (authorize-policy-bound-api-key policy-name)
-	       (let* ((policy (make-policy policy-name))
-		      (doc (read-document *storage-driver* (cdr (assoc :REF json))))
-		      (filename (cdr (assoc :NAME json)))
-		      (parser (or (recognize-report doc)
-				  (when (str:ends-with? ".csv" filename)
-				    (make-instance 'parser/csv))))
-		      (tests (if parser
-				 (rlgl-parsers:parse-report parser doc labels)
-                                 (progn
-                                   (delete-document *storage-driver* (cdr (assoc :REF json)))
-				   (error "Report not recognized")))))
-                 (let ((result
-		         (multiple-value-bind (red-or-green processed-results)
-		             (apply-policy policy tests)
-		           (let ((stream (make-string-output-stream)))
-		             (render stream
-                                     (rlgl-parsers:doctype parser)
-                                     (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
-                                     (cdr (assoc :REF json)) processed-results
-			             (rlgl-parsers:title parser)
-			             (commit-url-format policy)
-                                     (rlgl-parsers:columns parser)
-                                     labels)
-		             (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
-                                    (ref (store-document *storage-driver* doc-oc))
-                                    (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
-                               (let ((doc-digest-signature (make-string-signature doc-digest)))
-                                 (let ((callback-fn (lambda (signature)
-                                                      (log:info "About to record log")
- 			                              (rlgl.db:record-log *db* api-key (version policy) red-or-green ref doc-digest-signature signature labels)
-                                                      (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
-                                                      (rekor-envelope doc-digest doc-digest-signature)))
-                                       (callback-id (rlgl-util:random-base36-string)))
-                                   (setf (gethash callback-id *callbacks*) callback-fn)
-			           (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
-			  	           (string red-or-green)
-				           *server-uri*
-				           ref
-                                           doc-digest
-                                           callback-id))))))))
-                   (log:info result)
-                   result)))))))
-    (error (c)
-      (log:error "~A" c)
-      (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
-      (format nil "ERROR: ~A~%" c)))))
+        (let ((json-string
+	             (funcall (read-from-string "hunchentoot:raw-post-data") :force-text t)))
+	        (log:info "evaluate: '~A'" json-string)
+	        (let ((json (json:decode-json-from-string json-string)))
+	          (let ((policy-name (cdr (assoc :POLICY json)))
+                  (labels (json:decode-json-from-string (or (cdr (assoc :LABELS json)) "{}"))))
+	            (cond
+	             ((null policy-name)
+	              (error "POLICY missing"))
+	             ((not (rlgl-util:valid-url? policy-name))
+	              (error "POLICY not a valid URL"))
+	             (t
+	              (authorize-policy-bound-api-key policy-name)
+	              (let* ((policy (make-policy policy-name))
+		                   (doc (read-document *storage-driver* (cdr (assoc :REF json))))
+		                   (filename (cdr (assoc :NAME json)))
+		                   (parser (or (recognize-report doc)
+				                           (when (str:ends-with? ".csv" filename)
+				                             (make-instance 'parser/csv))))
+		                   (tests (if parser
+				                          (rlgl-parsers:parse-report parser doc labels)
+                                (progn
+                                  (delete-document *storage-driver* (cdr (assoc :REF json)))
+				                          (error "Report not recognized")))))
+                  (let ((result
+		                     (multiple-value-bind (red-or-green processed-results)
+		                                          (apply-policy policy tests)
+		                                          (let ((stream (make-string-output-stream)))
+		                                            (render stream
+                                                        (rlgl-parsers:doctype parser)
+                                                        (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc))
+                                                        (cdr (assoc :REF json)) processed-results
+			                                                  (rlgl-parsers:title parser)
+			                                                  (commit-url-format policy)
+                                                        (rlgl-parsers:columns parser)
+                                                        labels)
+		                                            (let* ((doc-oc (flexi-streams:string-to-octets (get-output-stream-string stream)))
+                                                       (ref (store-document *storage-driver* doc-oc))
+                                                       (doc-digest (ironclad:byte-array-to-hex-string (ironclad:digest-sequence 'ironclad:sha3/256 doc-oc))))
+                                                  (let ((doc-digest-signature (make-string-signature doc-digest)))
+                                                    (let ((callback-fn (lambda (signature)
+                                                                         (log:info "About to record log")
+ 			                                                                   (rlgl.db:record-log *db* api-key (version policy) red-or-green ref doc-digest-signature signature labels)
+                                                                         (track-action "evaluate" :url (format nil "/doc?id=~A" ref))
+                                                                         (rekor-envelope doc-digest doc-digest-signature)))
+                                                          (callback-id (rlgl-util:random-base36-string)))
+                                                      (setf (gethash callback-id *callbacks*) callback-fn)
+			                                                (format nil "{ \"colour\": ~S, \"url\": \"~A/doc?id=~A\", \"digest\": ~S, \"callback\": ~S }"
+			  	                                                    (string red-or-green)
+				                                                      *server-uri*
+				                                                      ref
+                                                              doc-digest
+                                                              callback-id))))))))
+                    (log:info result)
+                    result)))))))
+      (error (c)
+             (log:error "~A" c)
+             (setf (hunchentoot:return-code*) hunchentoot:+http-bad-request+)
+             (format nil "ERROR: ~A~%" c)))))
 
 (defun do-upload ()
   (authorize)
@@ -783,7 +759,7 @@ token claims and token header"
 		                    <pre> ,(str:trim (format nil "~{~A~%~}" (cdr log-lines))) </pre>
                                   </div> ))
   	                          <div id="border" >
-		                    <pre> ,(cl-json-util:pretty-json (json:encode-json-to-string alist)) </pre>
+		                    <pre> ,(jsown:pretty-json (json:encode-json-to-string alist)) </pre>
                                   </div>
                                 </div>
                              </td>
@@ -822,12 +798,8 @@ token claims and token header"
    (hunchentoot:create-prefix-dispatcher "/new-policy-bound-api-key" 'do-new-policy-bound-api-key)
    (snooze:make-hunchentoot-app)))
 
-(defclass exposer-acceptor (prom.tbnl:exposer hunchentoot:acceptor)
-  ())
-
 (defclass application (hunchentoot:easy-acceptor)
-  ((exposer :initarg :exposer :reader application-metrics-exposer)
-   (mute-access-logs :initform t :initarg :mute-access-logs :reader mute-access-logs)
+  ((mute-access-logs :initform t :initarg :mute-access-logs :reader mute-access-logs)
    (mute-messages-logs :initform t :initarg :mute-error-logs :reader mute-messages-logs)))
 
 (defmacro start-server (&key (handler '*handler*) (port 8080))
@@ -836,13 +808,10 @@ token claims and token header"
      (setf snooze:*catch-errors* :verbose)
      (setf *print-pretty* nil)
      (setf hunchentoot:*dispatch-table* +rlgl-dispatch-table+)
-     (setf prom:*default-registry* *rlgl-registry*)
-     (let ((exposer (make-instance 'exposer-acceptor :registry *rlgl-registry* :port 9101)))
-       (log:info "About to start hunchentoot")
-       (setf ,handler (hunchentoot:start (make-instance 'application
-						         :document-root #p"./"
-						         :port ,port
-						         :exposer exposer))))))
+     (log:info "About to start hunchentoot")
+     (setf ,handler (hunchentoot:start (make-instance 'application
+						                                          :document-root #p"./"
+						                                          :port ,port)))))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -1009,10 +978,6 @@ token claims and token header"
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
-  (log:info "About to initialize metrics")
-
-  (initialize-metrics)
-
   (log:info "About to start server")
 
   (thread-pool:start-pool *thread-pool*)
@@ -1026,19 +991,3 @@ token claims and token header"
   "Stop the web application."
   (stop-server)
   (thread-pool:stop-pool *thread-pool*))
-
-(defmethod hunchentoot:start ((app application))
-  (hunchentoot:start (application-metrics-exposer app))
-  (call-next-method))
-
-(defmethod hunchentoot:stop ((app application) &key soft)
-  (call-next-method)
-  (hunchentoot:stop (application-metrics-exposer app) :soft soft))
-
-(defmethod hunchentoot:acceptor-dispatch-request ((app application) request)
-  (let ((labels (list (string-downcase (string (hunchentoot:request-method request)))
-		      "rlgl_app")))
-    (prom:counter.inc *http-requests-counter* :labels labels)
-    (prom:histogram.time
-     (prom:get-metric *http-request-duration* labels)
-     (call-next-method))))

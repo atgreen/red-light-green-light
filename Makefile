@@ -3,14 +3,10 @@ all:
 binary:
 	buildapp --output rlgl-server \
 		--asdf-tree `pwd`/.. \
-		--asdf-tree `pwd`/local-projects/postmodern-20220220-git \
-		--asdf-tree `pwd`/local-projects/cl-json-util \
-		--asdf-tree `pwd`/local-projects/snooze-20210518-git \
 		--asdf-tree `pwd`/parsers \
 		--asdf-tree `pwd`/db \
 		--asdf-tree `pwd`/user \
 		--asdf-tree `pwd`/util \
-		--asdf-tree ~/quicklisp/dists/quicklisp/software \
 		--load-system rlgl-server \
 		--compress-core \
 		--entry "rlgl-server:start-rlgl-server"
@@ -22,17 +18,16 @@ check: clean
 	PUBLIC_KEY_FILE=/tmp/rlgl-public-test-key.pem \
         sbcl --dynamic-space-size 4096 \
 	     --disable-debugger \
-	     --eval '(ql:quickload :prove)' \
+	     --eval '(asdf:load-system :prove)' \
 	     --eval '(pushnew (truename ".") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./user") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./util") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./db") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./parsers") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./test/") asdf:*central-registry* )' \
-	     --eval '(ql:register-local-projects)' \
-	     --eval '(ql:quickload :rlgl-server)' \
+	     --eval '(asdf:load-system :rlgl-server)' \
 	     --eval "(asdf:oos 'asdf:load-op :rlgl-server :force t)" \
-	     --eval '(ql:quickload :test-rlgl-server)' \
+	     --eval '(asdf:load-system :test-rlgl-server)' \
 	     --eval '(test-rlgl-server:run)' \
 	     --eval '(sb-ext:quit)'
 
@@ -41,7 +36,6 @@ run: clean
 	PRIVATE_KEY_FILE=/tmp/rlgl-test-key.pem \
         sbcl --dynamic-space-size 4096 \
 	     --eval '(pushnew (truename ".") asdf:*central-registry* )' \
-	     --eval '(pushnew (truename "./local-projects/cl-json-util") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./user") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./util") asdf:*central-registry* )' \
 	     --eval '(pushnew (truename "./db") asdf:*central-registry* )' \

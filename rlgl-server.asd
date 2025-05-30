@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2022, 2024  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2022, 2024, 2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -30,15 +30,12 @@
                (:file "rlgl-server"))
   :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
                :metabang-bind :markup :cl-template
+               :misc-extensions
                :cl-toml :snooze :cl-json :plump :lquery :ironclad
                :inferior-shell :hunchentoot :spinneret
-               :cl-json-util :cl-fad :str :log4cl :cl-ppcre
+               :jsown-utils :cl-fad :str :log4cl :cl-ppcre
                :cxml :cl-dbi :cl-date-time-parser :quri
-               :local-time :cl-csv :prometheus :cl-postgres
+               :local-time :cl-csv :cl-postgres
                :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
                :drakma :uuid :cl-base32 :legit
-               :split-sequence :thread-pool
-               :prometheus.formats.text
-               :prometheus.exposers.hunchentoot
-               :prometheus.collectors.sbcl
-               :prometheus.collectors.process))
+               :split-sequence :thread-pool))
