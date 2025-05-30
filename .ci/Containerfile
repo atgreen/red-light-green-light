@@ -1,0 +1,31 @@
+FROM registry.access.redhat.com/ubi10/ubi
+
+MAINTAINER Anthony Green <green@moxielogic.com>
+
+ENV LC_ALL=C.utf8 \
+    LANG=C.utf8 \
+    LANGUAGE=C.utf8 \
+    GREEN_ORB_VERSION=0.2.4 \
+    PATH=/opt/rlgl/.local/bin:$PATH \
+    HOME=/opt/rlgl
+
+RUN dnf -y install bzip2 git file poppler-utils gpg
+
+RUN mkdir -p /opt/rlgl
+RUN useradd -r -u 1000  -m -d /opt/rlgl -s /bin/bash rlgl
+
+WORKDIR /opt/rlgl
+COPY rlgl-server /opt/rlgl
+RUN chown -R rlgl /opt/rlgl
+RUN mkdir -p /var/rlgl/docs /var/rlgl/policy && chown -R 1000:0 /var/rlgl && chmod -R go+rwx /var/rlgl
+
+USER 1000
+
+RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_ORB_VERSION}/green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz" \
+    && tar xf green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
+    && rm green-orb-${GREEN_ORB_VERSION}-linux-amd64.tar.gz \
+    && echo "# config file here" > green-orb.yaml
+
+RUN chmod -R go+rwx /opt/rlgl
+
+CMD git config --global --add safe.directory /opt/rlgl && ./orb ./rlgl-server

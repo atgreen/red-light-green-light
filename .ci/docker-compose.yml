@@ -1,7 +1,7 @@
 version: '3.2'
 services:
   rlgl-server:
-    image: "quay.io/moxielogic/rlgl-server:latest"
+    image: "rlgl-server:latest"
     ports:
       - "8080:8080"
     volumes:

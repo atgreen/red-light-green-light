@@ -67,3 +67,44 @@ jobs:
         version: latest
         skip-pkg-cache: true
         working-directory: rlgl
+
+    - name: Build test container
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: rlgl-server
+        tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
+        dockerfiles: |
+          .ci/Containerfile
+
+    - name: Test
+      run: |
+        # Create a new test keypair
+        openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
+        openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
+
+        docker-compose -f .ci/docker-compose.yml up -d
+        ip=$(docker container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
+        if [ -z "${ip:-}" ]; then
+            err "Container ${cid} has no IP address"
+            return 1
+        fi
+
+        if timeout -s TERM 45 bash -c \
+                  'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
+                      do echo "Waiting for ${0}" && sleep 2;\
+                       done' http://$ip:8080/healthz ; then
+
+          docker exec -t -e IP=$ip ci_rlgl-server_1 sh -c 'echo -n http://$IP:8080 > /tmp/server-uri'
+          docker exec -t ci_rlgl-server_1 cat /tmp/server-uri
+
+          ./.ci/test.sh $ip:8080 || true
+
+          docker logs ci_rlgl-server_1
+
+        else
+
+          ERROR=$?
+          docker logs ci_rlgl-server_1
+          exit $ERROR
+
+        fi
