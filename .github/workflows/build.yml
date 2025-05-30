@@ -101,12 +101,10 @@ jobs:
           echo "Container IP: $CONTAINER_IP"
 
           # Wait for service to be ready
-          if timeout -s TERM 45 bash -c '
-            while [[ "$(curl -s -o /dev/null -L -w "%{http_code}" $1)" != "200" ]]; do
-              echo "Waiting for $1"
-              sleep 2
-            done
-          ' _ "http://$CONTAINER_IP:8080/healthz"; then
+          if timeout -s TERM 45 bash -c \
+             'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
+                  do echo "Waiting for ${0}" && sleep 2;\
+                    done' http://$ip:8080/healthz ; then
 
             # Setup test environment in container
             podman exec -t -e IP="$CONTAINER_IP" ci_rlgl-server_1 \
