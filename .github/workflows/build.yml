@@ -1,104 +1,131 @@
 name: CI
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [master]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  GO_VERSION: '1.17'
+
 jobs:
   build:
-    name: Build image
+    name: Build and Test
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for git describe
 
-    - name: Setup SBCL and ocicl
-      run: |
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        brew install sbcl ocicl dejagnu
-        ocicl setup >> ~/.sbclrc
-        patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-rpath /lib64 /home/linuxbrew/.linuxbrew/Cellar/sbcl/*/libexec/bin/sbcl
+      - name: Setup Homebrew environment
+        run: eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-    - run: |
-        git fetch --prune --unshallow --tags
-        echo exit code $?
-        git tag --list
-        echo "RLGL_VERSION=$(git describe --tags --dirty=+)"
+      - name: Install system dependencies
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install sbcl ocicl dejagnu
+          ocicl setup >> ~/.sbclrc
+          patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 \
+                   --set-rpath /lib64 \
+                   /home/linuxbrew/.linuxbrew/Cellar/sbcl/*/libexec/bin/sbcl
 
-    - name: Install dependencies
-      run: |
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        ocicl install
+      - name: Get version info
+        id: version
+        run: |
+          git fetch --prune --tags
+          VERSION=$(git describe --tags --dirty=+)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "RLGL_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Version: $VERSION"
 
-    - name: Build
-      run: |
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        make binary
+      - name: Install project dependencies
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          ocicl install
 
-    - name: Set up Go 1.17
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.17
+      - name: Build binary
+        run: |
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          make binary
 
-    - name: Get short git commit hash
-      id: hash
-      run: echo "::set-output name=hash::${GITHUB_SHA::7}"
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
 
-    - name: Get version number
-      id: version
-      run: echo "::set-output name=version::$(git describe --tags --dirty=+)"
+      - name: Get commit hash
+        id: hash
+        run: echo "hash=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-    - name: Build rlgl cli
-      run: |
-        (cd rlgl; make build)
-        mv rlgl/build/* cli
+      - name: Build CLI
+        run: |
+          cd rlgl && make build
+          mv build/* ../cli/
 
-    - name: Build test container
-      uses: redhat-actions/buildah-build@v2
-      with:
-        image: rlgl-server
-        tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
-        dockerfiles: |
-          .ci/Containerfile
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: rlgl-server
+          tags: |
+            latest
+            ${{ steps.hash.outputs.hash }}
+            ${{ steps.version.outputs.version }}
+          dockerfiles: .ci/Containerfile
 
-    - name: Test
-      run: |
-        # Create a new test keypair
-        openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
-        openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
+      - name: Generate test keys
+        run: |
+          openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
+          openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
 
-        pip3 install podman-compose
-        podman-compose -f .ci/docker-compose.yml up -d
-        ip=$(podman container inspect --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' ci_rlgl-server_1)
-        if [ -z "${ip:-}" ]; then
-            err "Container ${cid} has no IP address"
-            return 1
-        fi
+      - name: Setup test environment
+        run: |
+          pip3 install podman-compose
+          podman-compose -f .ci/docker-compose.yml up -d
 
-        if timeout -s TERM 45 bash -c \
-                  'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
-                      do echo "Waiting for ${0}" && sleep 2;\
-                       done' http://$ip:8080/healthz ; then
+      - name: Run tests
+        run: |
+          # Get container IP
+          CONTAINER_IP=$(podman container inspect \
+            --format '{{ (index .NetworkSettings.Networks "ci_default").IPAddress }}' \
+            ci_rlgl-server_1)
 
-          podman exec -t -e IP=$ip ci_rlgl-server_1 sh -c 'echo -n http://$IP:8080 > /tmp/server-uri'
-          podman exec -t ci_rlgl-server_1 cat /tmp/server-uri
+          if [ -z "$CONTAINER_IP" ]; then
+            echo "ERROR: Container has no IP address"
+            exit 1
+          fi
 
-          ./.ci/test.sh $ip:8080 || true
+          echo "Container IP: $CONTAINER_IP"
 
-          podman logs ci_rlgl-server_1
+          # Wait for service to be ready
+          if timeout -s TERM 45 bash -c '
+            while [[ "$(curl -s -o /dev/null -L -w "%{http_code}" $1)" != "200" ]]; do
+              echo "Waiting for $1"
+              sleep 2
+            done
+          ' _ "http://$CONTAINER_IP:8080/healthz"; then
 
-        else
+            # Setup test environment in container
+            podman exec -t -e IP="$CONTAINER_IP" ci_rlgl-server_1 \
+              sh -c 'echo -n "http://$IP:8080" > /tmp/server-uri'
 
-          ERROR=$?
-          podman logs ci_rlgl-server_1
-          exit $ERROR
+            SERVER_URI=$(podman exec -t ci_rlgl-server_1 cat /tmp/server-uri)
+            echo "Server URI: $SERVER_URI"
 
-        fi
+            # Run tests
+            ./.ci/test.sh "$CONTAINER_IP:8080" || TEST_FAILED=true
+
+            # Always show logs
+            podman logs ci_rlgl-server_1
+
+            if [ "$TEST_FAILED" = "true" ]; then
+              exit 1
+            fi
+          else
+            echo "ERROR: Service failed to start within timeout"
+            podman logs ci_rlgl-server_1
+            exit 1
+          fi
