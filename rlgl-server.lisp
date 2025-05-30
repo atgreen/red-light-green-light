@@ -984,8 +984,7 @@ token claims and token header"
 
   (start-server)
 
-  (when sleep?
-    (loop do (sleep 1000))))
+  (sleep most-positive-fixnum))
 
 (defun stop-rlgl-server ()
   "Stop the web application."
