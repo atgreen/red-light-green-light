@@ -1,15 +1,7 @@
 all:
 
 binary:
-	buildapp --output rlgl-server \
-		--asdf-tree `pwd`/.. \
-		--asdf-tree `pwd`/parsers \
-		--asdf-tree `pwd`/db \
-		--asdf-tree `pwd`/user \
-		--asdf-tree `pwd`/util \
-		--load-system rlgl-server \
-		--compress-core \
-		--entry "rlgl-server:start-rlgl-server"
+	sbcl --eval "(asdf:initialize-source-registry \`(:source-registry :inherit-configuration (:tree ,(uiop:getcwd))))" --eval "(asdf:make :rlgl-server)"
 
 check: clean
 	openssl genrsa -out /tmp/rlgl-test-key.pem 1024

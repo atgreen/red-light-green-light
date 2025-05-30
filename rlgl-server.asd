@@ -38,4 +38,12 @@
                :local-time :cl-csv :cl-postgres
                :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
                :drakma :uuid :cl-base32 :legit
-               :split-sequence :thread-pool))
+               :split-sequence :thread-pool)
+  :build-operation "program-op"
+  :build-pathname "rlgl-server"
+  :entry-point "rlgl-server:start-rlgl-server"
+  :description "Red Light Green Light Server")
+
+#+sb-core-compression
+(defmethod asdf:perform ((o asdf:image-op) (c asdf:system))
+  (uiop:dump-image (asdf:output-file o c) :executable t :compression t))
