@@ -3,6 +3,7 @@ anaphora, ghcr.io/ocicl/anaphora@sha256:55f1c61b7826c5451a60b4b4522e35e770504bbf
 arnesi, ghcr.io/ocicl/arnesi@sha256:2608e157cb9628c624dd0f8ca41b74a87558a5f6ec56b70c330e3621b6e8063e, arnesi-20241212-93dc906/arnesi.asd
 array-utils, ghcr.io/ocicl/array-utils@sha256:c6329b6388eb5aad7378c87eb05ec3a67c4dc83aa23202920676ce1faf95ca3b, array-utils-20240607-873888d/array-utils.asd
 array-utils-test, ghcr.io/ocicl/array-utils@sha256:c6329b6388eb5aad7378c87eb05ec3a67c4dc83aa23202920676ce1faf95ca3b, array-utils-20240607-873888d/array-utils-test.asd
+asdf-package-system, ghcr.io/ocicl/asdf-package-system@sha256:dfacc260786f4e9e2aa13a797a7b326b58e08ea5db778421a9985b9c67362df1, asdf-package-system-20240503-61776f2/asdf-package-system.asd
 autoload, ghcr.io/ocicl/mgl-pax-bootstrap@sha256:42e99a0c4f35124650a63ca3ff8c13fbdbea183b76077c16bda2dc19998da773, mgl-pax-20250528-3e8ae54/autoload/autoload.asd
 babel, ghcr.io/ocicl/babel@sha256:b505136744213e6b953913780a4b647da40e83818a10f41004846863b5037810, babel-20240606-23c1440/babel.asd
 babel-streams, ghcr.io/ocicl/babel@sha256:b505136744213e6b953913780a4b647da40e83818a10f41004846863b5037810, babel-20240606-23c1440/babel-streams.asd

@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2023  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2023, 2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -50,6 +50,10 @@
 						                (rlgl-util:random-base36-string)
 						                "http://github.com/moxielogic/rlgl-toolchain-policy"
 						                *upload-ref*)))
+                  (junk (progn
+                          (format t "====================================================~%")
+                          (print result)g
+                          (format t "====================================================~%")))
                   (json (json:decode-json-from-string result)))
              (setf *json* json)
              (like (cdr (assoc :CALLBACK json)) "[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+")))

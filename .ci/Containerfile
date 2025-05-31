@@ -9,15 +9,18 @@ ENV LC_ALL=C.utf8 \
     PATH=/opt/rlgl/.local/bin:$PATH \
     HOME=/opt/rlgl
 
-RUN dnf -y install bzip2 git file poppler-utils gpg
+RUN dnf -y install bzip2 git file poppler-utils gpg openssl
 
 RUN mkdir -p /opt/rlgl
 RUN useradd -r -u 1000  -m -d /opt/rlgl -s /bin/bash rlgl
 
 WORKDIR /opt/rlgl
 COPY rlgl-server /opt/rlgl
+COPY cli /opt/rlgl/cli
+COPY recog.d /opt/rlgl/recog.d
 RUN chown -R rlgl /opt/rlgl
 RUN mkdir -p /var/rlgl/docs /var/rlgl/policy && chown -R 1000:0 /var/rlgl && chmod -R go+rwx /var/rlgl
+RUN mkdir -p /home/linuxbrew/.linuxbrew/lib && cp /lib64/ld-linux-x86-64.so.2 /home/linuxbrew/.linuxbrew/lib/ld.so
 
 USER 1000
 
@@ -28,4 +31,4 @@ RUN curl -L -O "https://github.com/atgreen/green-orb/releases/download/v${GREEN_
 
 RUN chmod -R go+rwx /opt/rlgl
 
-CMD git config --global --add safe.directory /opt/rlgl && ./orb ./rlgl-server
+CMD git config --global --add safe.directory /opt/rlgl && RLGL_ROOT=/opt/rlgl/ ./orb /opt/rlgl/rlgl-server

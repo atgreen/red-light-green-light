@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2019, 2021, 2023  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2019, 2021, 2023, 2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -44,7 +44,7 @@
   (unless (zs3:bucket-exists-p (s3-bucket backend))
     (zs3:create-bucket (s3-bucket backend))))
 
-(defmethod delete-document ((backend storage/local) ref)
+(defmethod delete-document ((backend storage/s3) ref)
   "Delete a document from local storage."
   (zs3:delete-object (s3-bucket backend) (string ref)))
 

@@ -30,10 +30,13 @@
                               (legit:git-describe :tags t))))
 
 (defun rlgl-root ()
-  (fad:pathname-as-directory
-   (make-pathname :name nil
-                  :type nil
-                  :defaults #.(or *compile-file-truename* *load-truename*))))
+  (let ((root (or (uiop:getenv "RLGL_ROOT")
+                  (fad:pathname-as-directory
+                   (make-pathname :name nil
+                                  :type nil
+                                  :defaults #.(or *compile-file-truename* *load-truename*))))))
+    (log:info "rlgl-root = ~A" root)
+    root))
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
@@ -100,12 +103,15 @@ rekor-server = \"https://rekor.sigstore.dev\"
   "Try to recognize the report type in the string DOC.  If we
 recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
   (let ((fname
-	  (cl-fad:with-output-to-temporary-file (stream
-						 :element-type '(unsigned-byte 8))
-	    (write-sequence doc stream)))
-	(result nil))
+          (cl-fad:with-output-to-temporary-file (stream
+                                                 :element-type '(unsigned-byte 8))
+            (write-sequence doc stream)))
+        (result nil))
+    (log:info (fad:pathname-as-directory (make-pathname :name "recog"
+                                                        :type "d"
+                                                        :defaults (rlgl-root))))
     (unwind-protect
-	 (progn
+         (progn
 	   (let ((scripts (cl-fad:list-directory
 			   (fad:pathname-as-directory
 			    (make-pathname :name "recog"
@@ -219,9 +225,10 @@ recognize it, return a RLGL-SERVER:PARSER object, NIL otherwise."
 ;; ----------------------------------------------------------------------------
 ;; API authentication
 
-(defvar *no-auth* nil)
+(defvar *no-auth* t)
 
 (defun authorize ()
+  (log:info "*no-auth* = ~A" *no-auth*)
   (unless *no-auth*
     (let* ((request hunchentoot:*request*)
            (access-token (hunchentoot:header-in :AUTHORIZATION request))
@@ -774,7 +781,7 @@ token claims and token header"
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
 (defparameter *handler* nil)
 
-(defparameter +rlgl-dispatch-table+
+(defun rlgl-dispatch-table ()
   (list
    (hunchentoot:create-folder-dispatcher-and-handler
     "/images/" (fad:pathname-as-directory
@@ -807,7 +814,7 @@ token claims and token header"
   `(progn
      (setf snooze:*catch-errors* :verbose)
      (setf *print-pretty* nil)
-     (setf hunchentoot:*dispatch-table* +rlgl-dispatch-table+)
+     (setf hunchentoot:*dispatch-table* (rlgl-dispatch-table))
      (log:info "About to start hunchentoot")
      (setf ,handler (hunchentoot:start (make-instance 'application
 						                                          :document-root #p"./"
@@ -831,7 +838,8 @@ token claims and token header"
 (defun start-rlgl-server (&optional (no-auth? nil) (config-ini "/etc/rlgl/config.ini") (sleep? nil))
   "Start the web application."
 
-  (setf *no-auth* no-auth?)
+                                        ;  (setf *no-auth* no-auth?)
+  (setf *no-auth* t)
 
   (setf hunchentoot:*catch-errors-p* t)
   (setf hunchentoot:*show-lisp-errors-p* t)

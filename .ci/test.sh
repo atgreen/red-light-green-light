@@ -1,11 +1,11 @@
 #!/bin/sh
 
-set -e
+set -xe
 
 cd test
 
 # --- Install rlgl and rekor --------------------------------------------------
-curl -s http://${1}/cli/rlgl-linux-amd64.tgz | tar --strip-components=2 -xvzf - ./rlgl/rlgl
+curl -s http://${1}/cli/rlgl-linux-amd64.tgz > rlgl-dl.tgz # | tar --strip-components=2 -xvzf - ./rlgl/rlgl
 curl -Ls https://github.com/sigstore/rekor/releases/download/v0.11.0/rekor-cli-linux-amd64 > rekor-cli
 chmod +x rekor-cli
 ./rekor-cli version
