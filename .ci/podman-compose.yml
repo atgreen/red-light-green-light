@@ -1,0 +1,16 @@
+version: '3.2'
+services:
+  rlgl-server:
+    image: "rlgl-server:latest"
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: .ci/config.ini
+        target: /etc/rlgl/config.ini
+      - type: bind
+        source: /tmp/private_key.pem
+        target: /etc/rlgl/private_key.pem
+      - type: bind
+        source: /tmp/public_key.pem
+        target: /etc/rlgl/public_key.pem
