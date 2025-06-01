@@ -29,14 +29,10 @@
   (string-trim '(#\Newline) (with-output-to-string (legit:*git-output*)
                               (legit:git-describe :tags t))))
 
+(defvar *rlgl-root* nil)
+
 (defun rlgl-root ()
-  (let ((root (or (uiop:getenv "RLGL_ROOT")
-                  (fad:pathname-as-directory
-                   (make-pathname :name nil
-                                  :type nil
-                                  :defaults #.(or *compile-file-truename* *load-truename*))))))
-    (log:info "rlgl-root = ~A" root)
-    root))
+  *rlgl-root*)
 
 ;; ----------------------------------------------------------------------------
 ;; Default configuration.  Overridden by external config file.
@@ -75,8 +71,7 @@ rekor-server = \"https://rekor.sigstore.dev\"
 ;; Read the validation shell script template.
 
 (defvar *verify.sh-template*
-  (alexandria:read-file-into-string
-   (merge-pathnames #p"verify.sh.clt" (rlgl-root))
+  (alexandria:read-file-into-string #p"verify.sh.clt"
    :external-format :latin-1))
 
 ;; ----------------------------------------------------------------------------
@@ -1001,3 +996,38 @@ token claims and token header"
   "Stop the web application."
   (stop-server)
   (thread-pool:stop-pool *thread-pool*))
+
+
+;;── CLI ────────────────────────────────────────────────────────────────────────
+
+(defun make-app ()
+  (let ((r (clingon:make-option :filepath :short-name #\r :long-name "root"
+                                :description "Root directory"
+                                :initial-value "." :key :root-dir))
+        (n (clingon:make-option :flag :short-name #\n :long-name "no-auth" :key :no-auth
+                                      :description "Disable authorization")))
+    (clingon:make-command
+     :name    "rlgl-server"
+     :version +rlgl-version+
+     :description "Red Light Green Light"
+     :authors '("Anthony Green <green@moxielogic.com>")
+     :license "AGPL3"
+     :usage ""
+     :options (list r n)
+     :handler (lambda (cmd)
+                (let* ((root-dir (clingon:getopt cmd :root-dir))
+                       (no-auth  (clingon:getopt cmd :no-auth))
+                       (args (clingon:command-arguments cmd)))
+                  (if (eq (length args) 0)
+                      (progn
+                        (setf *rlgl-root* root-dir)
+                        (log:info "Root directory = ~A" *rlgl-root*)
+                        (start-server))
+                      (clingon:print-usage-and-exit cmd t)))))))
+
+(defun main ()
+  (handler-case
+      (clingon:run (make-app))
+    (error (e)
+      (format *error-output* "Error: ~A~%" e)
+      (uiop:quit 1))))

@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Package: RLGL-SERVER; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018, 2019, 2020, 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018, 2019, 2020, 2021, 2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -35,7 +35,7 @@
 (defpackage #:rlgl-server
   (:use #:snooze #:cl #:matcher #:policy #:spinneret)
   (:shadow #:package)
-  (:export #:start-rlgl-server #:stop-rlgl-server
+  (:export #:start-rlgl-server #:stop-rlgl-server #:main
 	   #:db
 	   #:db/sqlite
 	   #:db/postgresql

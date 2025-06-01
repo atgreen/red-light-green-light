@@ -30,7 +30,7 @@
                (:file "rlgl-server"))
   :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
                :metabang-bind :markup :cl-template
-               :misc-extensions
+               :misc-extensions :clingon
                :cl-toml :snooze :cl-json :plump :lquery :ironclad
                :inferior-shell :hunchentoot :spinneret
                :jsown-utils :cl-fad :str :log4cl :cl-ppcre
@@ -41,7 +41,7 @@
                :split-sequence :thread-pool)
   :build-operation "program-op"
   :build-pathname "rlgl-server"
-  :entry-point "rlgl-server:start-rlgl-server"
+  :entry-point "rlgl-server:main"
   :description "Red Light Green Light Server")
 
 #+sb-core-compression

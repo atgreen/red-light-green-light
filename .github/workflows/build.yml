@@ -153,3 +153,24 @@ jobs:
             podman logs ci_rlgl-server_1
             exit 1
           fi
+
+      - name: Buildah Action
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: rlgl-server
+          tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
+          dockerfiles: |
+            Dockerfile
+          build-args: |
+            RLGL_VERSION=${{ steps.version.outputs.version }}
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/moxielogic
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
