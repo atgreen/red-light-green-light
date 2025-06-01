@@ -67,6 +67,7 @@ jobs:
           mv build/* ../cli/
 
       - name: Build container image
+        id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: rlgl-server
@@ -75,25 +76,6 @@ jobs:
             ${{ steps.hash.outputs.hash }}
             ${{ steps.version.outputs.version }}
           dockerfiles: .ci/Containerfile
-
-      - name: Generate test keys
-        run: |
-          openssl ecparam -name prime256v1 -genkey -noout -out .ci/private_key.pem
-          openssl ec -in .ci/private_key.pem -pubout -out .ci/public_key.pem
-
-      - name: Setup test environment
-        run: |
-          pip3 install podman-compose
-          podman-compose -f .ci/docker-compose.yml up -d
-
-      - name: Buildah Action
-        id: build-image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: rlgl-server
-          tags: latest ${{ steps.hash.outputs.hash }} ${{ steps.version.outputs.version }}
-          dockerfiles: |
-            Dockerfile
           build-args: |
             RLGL_VERSION=${{ steps.version.outputs.version }}
 
