@@ -50,7 +50,7 @@ jobs:
       - name: Build binary
         run: |
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          make binary
+          make rlgl-server
 
       - name: Setup Go
         uses: actions/setup-go@v4
