@@ -774,7 +774,7 @@ token claims and token header"
       stream))))
 
 ;;; HTTP SERVER CONTROL: ------------------------------------------------------
-(defparameter *handler* nil)
+(defvar *handler* nil)
 
 (defun rlgl-dispatch-table ()
   (list
@@ -813,7 +813,6 @@ token claims and token header"
      (log:info "About to start hunchentoot")
      (setf ,handler (hunchentoot:start (make-instance 'application
 						                                          :document-root #p"./"
-                                                      :address "0.0.0.0"
 						                                          :port ,port)))))
 
 (defmacro stop-server (&key (handler '*handler*))
