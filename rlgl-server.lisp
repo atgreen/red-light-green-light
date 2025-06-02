@@ -813,7 +813,8 @@ token claims and token header"
      (log:info "About to start hunchentoot")
      (setf ,handler (hunchentoot:start (make-instance 'application
 						                                          :document-root #p"./"
-						                                          :port ,port)))))
+						                                          :port ,port)))
+     (log:info ,handler)))
 
 (defmacro stop-server (&key (handler '*handler*))
   "Shutdown the HTTP handler"
@@ -990,6 +991,10 @@ token claims and token header"
 
     (thread-pool:start-pool *thread-pool*)
 
+    (log:info "Thread pool started")
+
+    (log:info *rlgl-root*)
+
     (start-server)
 
     (log:info "Server started"))
@@ -1022,14 +1027,16 @@ token claims and token header"
                 (let* ((root-dir (clingon:getopt cmd :root-dir))
                        (no-auth  (clingon:getopt cmd :no-auth))
                        (args (clingon:command-arguments cmd)))
+                  (log:info "IN HANDLER")
                   (if (eq (length args) 0)
                       (progn
                         (setf *rlgl-root* root-dir)
                         (log:info "Root directory = ~A" *rlgl-root*)
-                        (start-server))
+                        (start-rlgl-server))
                       (clingon:print-usage-and-exit cmd t)))))))
 
 (defun main ()
+  (print "MAIN!")
   (handler-case
       (clingon:run (make-app))
     (error (e)
