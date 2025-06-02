@@ -17,6 +17,9 @@ RUN useradd -r -u 1000  -m -d /opt/rlgl -s /bin/bash rlgl
 WORKDIR /opt/rlgl
 COPY rlgl-server /opt/rlgl
 COPY cli /opt/rlgl/cli
+COPY css /opt/rlgl/css
+COPY js /opt/rlgl/js
+COPY images /opt/rlgl/images
 COPY recog.d /opt/rlgl/recog.d
 RUN chown -R rlgl /opt/rlgl
 RUN mkdir -p /var/rlgl/docs /var/rlgl/policy && chown -R 1000:0 /var/rlgl && chmod -R go+rwx /var/rlgl
