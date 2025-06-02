@@ -981,13 +981,18 @@ token claims and token header"
   (unless (initialize-policy-dir *policy-dir*)
     (sb-ext:quit))
 
-  (log:info "About to start server")
+  (handler-bind
+      ((error (lambda (e)
+                (format *error-output* "Fatal error during startup: ~A~%" e)
+                (sb-debug:backtrace)
+                (sb-ext:exit :code 1))))
+    (log:info "About to start server")
 
-  (thread-pool:start-pool *thread-pool*)
+    (thread-pool:start-pool *thread-pool*)
 
-  (start-server)
+    (start-server)
 
-  (log:info "Server started")
+    (log:info "Server started"))
 
   (loop do (sleep 1000)))
 
