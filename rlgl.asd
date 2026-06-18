@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl
   :description "Red Light Green Light - a client-side policy enforcement tool."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "9"
+  :version "2.0.0"
   :serial t
   :components ((:file "package")
                (:file "matcher")
@@ -29,7 +29,7 @@
                :alexandria :bordeaux-threads :clingon :markup
                :cl-json :jsown-utils :cl-fad :str :log4cl :cl-ppcre
                :ironclad :flexi-streams :inferior-shell :metabang-bind
-               :cl-date-time-parser :quri :legit)
+               :cl-date-time-parser :quri :version-string)
   :build-operation "program-op"
   :build-pathname "rlgl"
   :entry-point "rlgl:main")

@@ -1,0 +1,6 @@
+rlgl (2.0.0-1) unstable; urgency=medium
+
+  * First release of rlgl as a standalone client-side tool (dropped the
+    client-server architecture).
+
+ -- Anthony Green <green@moxielogic.com>  Thu, 18 Jun 2026 12:00:00 -0500
