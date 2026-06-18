@@ -444,6 +444,9 @@ jobs:
   build-macos-amd64:
     needs: [fetch-deps, extract-version]
     runs-on: macos-13
+    # Intel macOS runners are scarce/being deprecated; never let this block
+    # the release.  Downstream jobs do not depend on it, and it is best-effort.
+    continue-on-error: true
     env:
       VERSION: ${{ needs.extract-version.outputs.version }}
     steps:
@@ -490,7 +493,7 @@ jobs:
   # Sign release tarballs with Cosign
   # ========================================
   sign-artifacts:
-    needs: [build-linux-tarball, build-linux-arm64, build-macos-arm64, build-macos-amd64, extract-version]
+    needs: [build-linux-tarball, build-linux-arm64, build-macos-arm64, extract-version]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -517,6 +520,8 @@ jobs:
 
       - name: Download macOS AMD64 tarball
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        # Best-effort: the Intel-mac build is non-blocking and may not exist.
+        continue-on-error: true
         with:
           name: darwin-amd64-package
           path: ./artifacts
@@ -541,7 +546,7 @@ jobs:
   # Generate SLSA Level 3 provenance
   # ========================================
   generate-provenance-subjects:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, extract-version]
     runs-on: ubuntu-latest
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}
@@ -576,7 +581,7 @@ jobs:
   # Create GitHub Release
   # ========================================
   release:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, sign-artifacts, slsa-provenance, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, sign-artifacts, slsa-provenance, extract-version]
     permissions:
       contents: write
     runs-on: ubuntu-latest
