@@ -70,19 +70,19 @@ based on URL."
 			  (log:info "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
 				    url policy-dirname)
 			  (inferior-shell:run
-			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
+			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone --quiet ~A ~A"
 				   url policy-dirname)))
 			(progn
 			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull --ff-only)\""
 				    policy-dirname)
 			  (inferior-shell:run
-			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull --ff-only)\""
+			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull --quiet --ff-only)\""
 				   policy-dirname))))))
 	(dolist (line output)
 	  (log:info line)))
 
       (let ((policy-pathname
-	     (fad:pathname-as-directory (make-pathname :name policy-dirname))))
+	     (uiop:ensure-directory-pathname policy-dirname)))
 
 	(let ((xfail-file (merge-pathnames-as-file policy-pathname #p"XFAIL"))
 	      (pass-file (merge-pathnames-as-file policy-pathname #p"PASS"))

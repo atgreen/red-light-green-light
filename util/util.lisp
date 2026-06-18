@@ -21,7 +21,6 @@
   (:shadow #:package)
   (:export #:random-base36-string
 	   #:valid-url?
-	   #:make-absolute-pathname
            #:jsonify-labels
 	   #:escape-json-string))
 
@@ -35,15 +34,6 @@
   "Return a random base36 (0-9A-Z) string of 8 characters."
   (bt:with-lock-held (*random-state-lock*)
     (format nil "~:@(~36,8,'0R~)" (random (expt 36 8) *random-state*))))
-
-(defparameter +root-path+ (asdf:component-pathname (asdf:find-system "rlgl-server")))
-
-(defun make-absolute-pathname (pathname)
-  "Return an absolute pathname.  If PATHNAME is relative, make it
-   relative to the rlgl-server system (provided by asdf)."
-  (if (cl-fad:pathname-absolute-p pathname)
-      pathname
-      (merge-pathnames +root-path+ pathname)))
 
 (defun valid-url? (string)
   "Returns T if STRING is a valid http or https url."

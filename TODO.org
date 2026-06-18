@@ -1,9 +1,8 @@
 * Export command
   Implement an export command that would generate a zip file
-  containing report results, original report, policy, hash signature
-  and public key.
+  containing the report results, the original report, and the policy
+  used for evaluation.
 
-* Document Compression
-
-  Compress all documents before hitting the storage driver, then serve
-  the stored content up directly.
+* External parser support
+  Allow report parsers to be invoked through a simple external API so
+  that new report types can be added without modifying the Lisp code.

@@ -5,11 +5,11 @@
 
 [![Build Status](https://github.com/atgreen/red-light-green-light/actions/workflows/build.yml/badge.svg)](https://github.com/atgreen/red-light-green-light/actions)
 
-Quick Start
-------------
-
-Try out the hosted version at [https://rl.gl](https://rl.gl).  Note
-that documents expire after 30 days.
+`rlgl` is a self-contained, client-side command-line tool.  It
+evaluates a test report against a git-hosted policy entirely on your
+local machine — there is no server, account, or network service to log
+into.  Policies live in ordinary git repositories, and `rlgl` clones
+them on demand.
 
 For an example of real-world rlgl policy in action, check out the
 policy used to validate unit test reports for
@@ -17,25 +17,8 @@ policy used to validate unit test reports for
 [Github Actions](https://github.com/libffi/libffi/actions) builds:
 [https://github.com/libffi/rlgl-policy](https://github.com/libffi/rlgl-policy).
 
-Download and install one of the cli tools hosted at https://rl.gl.
-Now login to the server like so...
-
-    $ rlgl login https://rl.gl
-
-You'll get a message back asking you to create a personal API key.
-Follow those instructions, and try again...
-
-    $ rlgl login --key=MY_PERSONAL_KEY https://rl.gl
-
-If you require the use of a proxy, specify like so:
-
-    $ rlgl login --proxy=https://myproxy.example.com:8080 --key=MY_PERSONAL_KEY https://rl.gl
-
-You can also specify a proxy username and password for basic proxy authentication:
-
-    $ rlgl login --proxy=https://myproxy.example.com:8080 \
-                 --proxy-auth=USERNAME:PASSWORD \
-                 --key=MY_PERSONAL_KEY https://rl.gl
+Quick Start
+------------
 
 Generate an OpenSCAP report, or grab one from here:
 
@@ -44,10 +27,19 @@ Generate an OpenSCAP report, or grab one from here:
 Evaluate the report against a sample policy:
 
     $ rlgl evaluate --label id=sample-test --policy=https://github.com/atgreen/test-policy report.html
+    GREEN
+    Report written to /current/dir/rlgl-report.html
 
-The `--label id=sample-test` option adds the id=sample-test key/value
-pair to the report.  This is helpful when you want to query the report
-archive later.  You can add any number of labels to a report.
+The `--label id=sample-test` option adds the `id=sample-test`
+key/value pair to the report.  You can add any number of labels; they
+become fields in the normalized test results and are available for
+pattern matching in policy.
+
+`rlgl` writes a self-contained HTML report (default
+`rlgl-report.html`, override with `-o/--output`) alongside a copy of
+the original report.  Open it in a browser to explore the annotated
+evaluation results, complete with links to the git-hosted policy
+commits responsible for each result.
 
 To use a private repository, generate a personal access token at
 github.com with appropriate private repo access, and reference your
@@ -55,25 +47,9 @@ policy repo like so:
 
     $ rlgl evaluate -l id=sample-test --policy=https://${TOKEN}@github.com/atgreen/test-policy report.html
 
-Be sure to click on the resulting URL and explore.  You'll find the
-evaluation report, complete with links to git-hosted policy for
-specific results, as well as a link to the full, original report.
-
-Produce a log of reports for this player ID:
-
-    $ rlgl log -l id=sample-test
-
-The report is signed by both the server and your client.  The server's
-signature is recorded in the pubic
-[rekor](https://github.com/sigstore/rekor) transparency log managed by
-the [sigstore](https://sigstore.dev) project.  You can verify these
-signatures and the log entry like so:
-
-    $ rlgl verify RLGL-[report ID] | sh
-
-The verification script is provided in source form for transparency
-reasons.
-
+Standard exit codes make it easy to integrate `rlgl` into your CI/CD
+pipeline scripts.  `GREEN` lights have an exit code of 0.  `RED`
+lights have an exit code of 1.  Any other exit code is an error.
 
 Problem Statement
 ----------------
@@ -103,186 +79,35 @@ The main idea behind Red Light Green Light is to decouple the process
 of evaluating test results away from the underlying testing tools
 themselves, in a way that is:
 
- - centrally managed
  - version controlled
  - auditable
  - customizeable
- - protected with authentication/authorization mechanisms
 
-![alt text](images/rlgl-workflow.png "Red Light Green Light workflow")
-
-The goal of all of this is to enable auditors to easily answer the
-following questions as they relate to any artifact promoted through a
-CI/CD pipeline:
-
- - who presented test results for evaluation?
- - what were those test results?
- - what policies were they evaluated against?
- - who defined the policies and when?
-
-The Red Light Green Light service is invoked via the `rlgl`
-command-line tool, typically within some other pipeline
+The `rlgl` tool is typically invoked within some other pipeline
 automation framework, such as a [jenkins](https://jenkins.io)
-pipeline.  Here's an example workflow:
-
-- First, we must log into our Red Light Green Light server with `rlgl`
-cli tool like so:
-```
-$ rlgl login --key MY_API_KEY http://rlgl-server.example.com
-```
-- As the pipeline proceeds, test results are generated (scans, unit
-  tests, etc).  For each test report generated, `rlgl` evaluates the
-  report against the stated git-hosted policy, resulting in a **Red
-  Light**, meaning stop the pipeline, or **Green Light**, meaning
-  proceed with the pipeline.  It also produces a URL that links to a
-  report showing annotated evaluation results.  Annotations, include,
-  for example, the git logs for policies defining exceptions resulting
-  in green lights.
+pipeline.  As the pipeline proceeds, test results are generated
+(scans, unit tests, etc).  For each test report generated, `rlgl`
+evaluates the report against the stated git-hosted policy, resulting
+in a **Red Light**, meaning stop the pipeline, or **Green Light**,
+meaning proceed with the pipeline.  It also produces an HTML report
+showing annotated evaluation results.  Annotations include, for
+example, the git logs for policies defining exceptions resulting in
+green lights.
 
 ```shell
-$ rlgl evaluate --policy https://git.example.com/policy/dev.git --id $ID my-test-report.html
-GREEN: http://rlgl-server.example.com/doc?id=RLGL-BC7DB3F (sha3/256: 35da0de414ec6eaaa5c758e1b6b364ab7cad20b39bdfce5b15b44570e0f62ef8)
+$ rlgl evaluate --policy https://git.example.com/policy/dev.git -l id=$ID my-test-report.html
+GREEN
+Report written to /current/dir/rlgl-report.html
 ```
 
 ```shell
-$ rlgl evaluate --policy https://git.example.com/policy/prod.git --id $ID oval-scan.xml
-RED: http://rlgl-server.example.com/doc?id=RLGL-1CF5B3A (sha3/256: eb7cad20b64ec6f8758ea4a62e15b439bdfce5b35da0de41aa5c4570e0f1b6b3)
+$ rlgl evaluate --policy https://git.example.com/policy/prod.git -l id=$ID -o scan.html oval-scan.xml
+RED
+Report written to /current/dir/scan.html
 ```
 
-```shell
-$ rlgl evaluate --policy https://git.example.com/policy/rel.git --id $ID gcc.log
-GREEN: http://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 (sha3/256: f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4)
-```
-
-Standard exit codes make it easy to integrate `rlgl` into your CI/CD
-pipeline scripts. `GREEN` lights have an exit code of 0. `RED` lights
-have an exit code of 1. Any other exit code is an error. The output
-also includes the sha3/256 checksum of the report for future
-reference.   You can validate the report with openssl like so...
-
-```shell
-$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 | openssl dgst -sha3-256
-(stdin)= f8758e1b6b364ab7cad20b39bdfce5b35da0de414ec6eaaa5c4570e0f62e15b4
-```
-
-The report also includes a link to the original document, which is
-archived, along with its sha3/256 checksum.
-
-In addition to recording the report for future reference, the Red
-Light Green Light server signs the sha3/256 checksum with a private
-signing key. The base64-encoded signature is always available via curl
-by appending `.sig` to the report URL like so:
-
-```shell
-$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2.sig
-MGQCMBM/nx+jEdu2RVEwSPCYTqWF/bP/3FlX2FPFRGrRZjOgq/tQj0Eg5XDBO0vC1KLnFwIwVFtMPxsrv3DljSrD422qeA4zqz5JDA/PT3NpM91hI/sehmqJgmkAMQjJB/mkn0xl
-```
-
-You can validate this signature against the public signing key like so:
-
-```shell
-$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2 | openssl dgst -sha3-256 - | awk '{ printf $2 }' > digest
-$ curl -s https://rlgl-server.example.com/doc?id=RLGL-AFC7DB2.sig | base64 -d > digest.sig
-$ openssl dgst -sha256 -verify rlgl-public.pem -signature digest.sig digest
-Verified OK
-```
-
-The `rlgl` client also signs the report, and uploads the signature to
-the server.  You can retrieve the base64-encoded client signature via
-curl by appending `.csig` to the report URL as above.
-
-Each `rlgl login` produces a new private/public keypair.  More
-commonly, however, you would generate your own keypair and provide the
-private key at login time like so:
-
-```shell
-$ rlgl login --key MY_API_KEY --signing-key MY_PRIVATE_KEY_FILE.pem http://rlgl-server.example.com
-```
-
-The Red Light Green Light server also uploads the signed digest to
-sigstore for non-repudiation of the results.
-
-The `rlgl` tool can generate a simple shell script to verify
-signatures and search for the sigstore log entry.  View the shell
-script like so:
-
-```shell
-$ rlgl verify RLGL-AFC7DB2
-```
-
-You can execute the verification script simply by feeding the output to a shell program:
-
-```shell
-$ rlgl verify RLGL-AFC7DB2 | sh
-Checking document signature: Verified OK
-Checking client signature  : Verified OK
-
-Searching for sigstore record:
-LogID: c0d23d6ad406973f9559f3ba2d1ca01f84147d8ffc5b8445c224f98b9591801d
-Index: 5740
-IntegratedTime: 2021-07-13T22:06:51Z
-UUID: d5cb372f2067cbf2f9eb9edace960ad9ca51994a26d6450d044ed24ceffc204c
-Body: {
-  "RekordObj": {
-    "data": {
-      "hash": {
-        "algorithm": "sha256",
-        "value": "c9693cfbd2c371e30a012e42140e6127171cb25d435d0646c941f190b4a21f7c"
-      }
-    },
-    "signature": {
-      "content": "MGQCMBVJyQi5HseSBqyXa8dXQFb6P2h1FHjFesQRPBqDhMik+NfplFG7bt41K5rE8ywyKAIwLtIvwn/DGJSzBTvD7evBMnUzGOHopXtqxUTZhPo2skKaohV69nOPBy+y5YuJzpJb",
-      "format": "x509",
-      "publicKey": {
-        "content": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUhZd0VBWUhLb1pJemowQ0FRWUZLNEVFQUNJRFlnQUU4ZG8rQVFwbm5tanBwK1J1Y05tTy8zN04xVWpGNzZNZwpXd01Jcm1odlZvTjExajZXL0krSitQdk5NbDZiWHdvQnh0dk53V3dLbzFSdEZ3dGFXMWpWZnNCNEV6SkErb05PCkdEUDlNTmdCQW5uN3JiKzgrTm1XUW1IUllQeEJtbmFJCi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
-      }
-    }
-  }
-}
-```
-
-In order to verify client signatures, you must set the
-`RLGL_CLIENT_PUBKEY` environment variable to tell the script where to
-find your client's public key.  Normally this is found in
-`~/.config/rlgl/public_key.pem`, and so:
-
-```shell
-$ rlgl verify RLGL-AFC7DB2 | RLGL_CLIENT_PUBKEY=~/.config/rlgl/public_key.pem sh
-```
-
-Verification gives auditors confidence that the server owning the
-private key associated with the given public key was responsible for
-generating the given report.  It also tells us that the evaluation was
-initiated by the client associated with the client public key.  The
-rekor record provides a timestamp telling us what time this happened
-at.  Since the report references the original test report, as well as
-the sha3/256 digest of that original report, we also can be certain
-that it is the actual report that was used for the policy
-evaluation. And since the report includes the git commit hash of the
-policy used to evaluate the report, we can be certain that it is in
-fact the version of the policy that was used to generate the report.
-
-Your API key is tied to your personal account.  It is personal and
-secret, and you should treat it accordingly.  You may, however, be in
-a situation where you want to share an API key with others.  For
-instance, if you are using public CI testing infrastructure for an
-open source project, it may not be practical or even possible to
-secure the API key. In situations like these, you can create what is
-called a 'policy bound API key'.  This is an API key that is not
-associated with any user.  Rather, it is bound to a specific policy
-URL.
-
-```shell
-$ rlgl new-policy-bound-api-key https://github.com/libffi/rlgl-policy
-78GN98B-QUCN87V-09UN45X-AAQ89BB
-```
-
-You can now share this API key with others, but it will only work with
-the policy found at `https://github.com/libffi/rlgl-policy`.
-
-That's it!   The client side is very easy.
-
-The server side, where policy is evaluated, is where the magic is.
+How evaluation works
+---------------------
 
 The first step is to identify the type of report we're evaluating and
 convert it into a normalized form.  The normalized form is defined
@@ -304,7 +129,7 @@ This is useful for pattern matching, as described below.
 Policies are maintained in git repos, and consist of three plain text
 files: `XFAIL`, `FAIL`, and `PASS`.  Each of these files contains a
 list of JSON matchmaking expressions to match against the canonical
-test results.  They are evaluated this order: `XFAIL`, `FAIL`, `PASS`.
+test results.  They are evaluated in this order: `XFAIL`, `FAIL`, `PASS`.
 
 `XFAIL` contains matchmakers for test results we are expecting to
 fail, but allowing to pass anyway.  These are your exceptions.  Any
@@ -319,39 +144,27 @@ results before processing with `PASS`.
 
 Any remaining entries in the test results are recorded as `UNKNOWN`.
 `rlgl` interprets these as red, but they are reported as `UNKNOWN` in
-order aim for 100% coverage of the `PASS`/`FAIL` scans.
+order to aim for 100% coverage of the `PASS`/`FAIL` scans.
 
 The `XFAIL`, `FAIL`, `PASS` files are maintained in a git
 repo. Changing policy requires modifying the policy in git, which is
 logged and auditable.
 
-In addition to this simple test evaluation service, the server can
-report reports based on user-provided labels.  Reports submitted to
-and generated by Red Light Green Light are currently archived forever.
+Baseline Policy
+---------------
+
+Red Light Green Light can generate baseline XFAIL policy in cases
+where you want to track regressions from an already imperfect test
+run.
 
 ```shell
-$ rlgl log --label id=test-report
-Tue, 29 Jan 2019 13:15:29 -0500 Green: 00430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-AFC7DB2
-Tue, 29 Jan 2019 13:16:31 -0500 Green: 10430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-CFB5DB3
-Tue, 29 Jan 2019 13:16:50 -0500 Green: 20430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-DFC55B6
-Tue, 29 Jan 2019 13:16:55 -0500   Red: 30430cf0324532aab032423 http://rlgl-server.example.com/doc?id=RLGL-8FB75B4
+$ rlgl baseline --policy https://git.example.com/policy/dev.git my-test-report.html
 ```
 
-The format of this log is:
-
-`TIMESTAMP` `RED-OR-GREEN`: `GIT-POLICY-HASH` `REPORT-URL`
-
-Red Light Green Light also has the ability to generate baseline XFAIL
-policy in cases where you want to track regressions from an already
-imperfect test run.
-
-```shell
-$ rlgl baseline RLGL-01234567
-```
-
-This command will generate XFAIL policy output to the console for
-every FAIL in the report RLGL-01234567 (the "RLGL-" prefix is
-optional).
+This command writes XFAIL policy to the console — one matcher for
+every `FAIL` in the report — which you can redirect into the `XFAIL`
+file of your policy repo to excuse the current set of failures and
+catch future regressions.
 
 
 Policy in Detail
@@ -445,57 +258,37 @@ example, this CSV file...
 
     { "filesize": "0..1000000" }
 
-While the `rlgl` command-line tool is written in
-[Go](https://golang.org/), the server side is written in [Common
-Lisp](https://github.com/container-lisp), and adding additional report
-types requires modifying the `rlgl-server` lisp code.  External parser
-support is planned, allowing you to invoke report parsers through a
-simple API.
+Report recognition is driven by the small shell scripts in `recog.d/`,
+and report parsing by the Common Lisp code in `parsers/`.  Adding a new
+report type means adding a recognizer script and a parser.
 
-Monitoring & Observability
---------------------------
+Building
+--------
 
-The Red Light Green Light server exports Prometheus metrics on port 9101.
+`rlgl` is written in [Common Lisp](https://lisp-lang.org/) and built
+with [SBCL](https://www.sbcl.org/) and
+[ocicl](https://github.com/ocicl/ocicl) for dependency management.
 
-Red Light Green Light can optionally transmit usage info to a
-[Matomo](https://matomo.org) instance.
+```shell
+$ ocicl install      # fetch dependencies
+$ make rlgl          # build the ./rlgl binary
+$ make check         # run the test suite
+```
 
+The build produces a standalone `rlgl` executable.  At runtime `rlgl`
+needs the `recog.d/` report recognizers; it locates them via (in
+order) the `--root` option, the `RLGL_ROOT` environment variable, the
+directory of the running executable, or the current working directory.
 
 Configuration
 -------------
 
-The Red Light Green Light server is customized through a number of
-configuration settings.  Every configuration item is settable through
-either environment variables or a [TOML](https://toml.io) formatted
-configuration file, `/etc/rlgl/config.ini`. Environment variables
-override settings found in the config file.
+`rlgl` is configured entirely through optional environment variables:
 
-| Environment Variable               | Config File Setting                | Description                                  |
-|------------------------------------|------------------------------------|----------------------------------------------|
-| `RLGL_SERVER_URI`                  | `server-uri`                       | URI for the rlgl server                      |
-|                                    | `db`                               | Either `sqlite` or `postgresql`              |
-|                                    | `sqlite-db-filename`               | File name for sqlite DB                      |
-| `POSTGRESQL_PASSWORD`              | `postgresql-password`              | Database password                            |
-|                                    | `postgresql-host`                  | Host for postgresql server                   |
-|                                    | `postgresql-port`                  | Port for postgresql server                   |
-|                                    | `storage-driver`                   | Either `local` or `s3`                       |
-|                                    | `local-dir`                        | Local directory for local storage driver     |
-|                                    | `s3-endpoint`                      | API endpoint for s3 storage                  |
-|                                    | `s3-bucket`                        | s3 bucket name for s3 storage                |
-|                                    | `policy-dir`                       | Local directory for storing policy git repos |
-| `PUBLIC_KEY_FILE`                  | `public-key-file`                  | Public signing key for sigstore records      |
-| `PRIVATE_KEY_FILE`                 | `private-key-file`                 | Private signing key for sigstore records     |
-| `MATOMO_URI`                       | `matomo-uri`                       | URI for a Matomo sever (optional)            |
-| `MATOMO_IDSITE`                    | `matomo-idsite`                    | Site ID for Matomo tracking (optional)       |
-| `MATOMO_TOKEN_AUTH`                | `matomo-token-auth`                | Auth token for Matomo tracking (optional)    |
-| `KEYCLOAK_OIDC_CLIENT_ID`          | `keycloak-oidc-client-id`          | Keycloak client ID (optional)                |
-| `KEYCLOAK_OIDC_CLIENT_SECRET`      | `keycloak-oidc-client-secret`      | Keycloak client secret (optional)            |
-| `KEYCLOAK_OIDC_REALM_REDIRECT_URI` | `keycloak-oidc-realm-redirect-uri` | Keycloak realm redirect URI (optional)       |
-| `KEYCLOAK_OIDC_REALM_URI`          | `keycloak-oidc-realm-uri`          | Keycloak realm URI (optional)                |
-|                                    | `test-api-key`                     | Used for testing                             |
-| `REKOR_SERVER`                     | `rekor-server`                     | Defaults to `https://rekor.sigstore.dev`     |
-| `AWS_ACCESS_KEY`                   |                                    | Required when using s3 storage               |
-| `AWS_SECRET_KEY`                   |                                    | Required when using s3 storage               |
+| Environment Variable | Description                                                              |
+|----------------------|--------------------------------------------------------------------------|
+| `RLGL_ROOT`          | Installation directory containing `recog.d/` report recognizers          |
+| `RLGL_POLICY_DIR`    | Directory where policy git repos are cloned (default: `$XDG_CACHE_HOME/rlgl/policies`) |
 
 Author and License
 -------------------
