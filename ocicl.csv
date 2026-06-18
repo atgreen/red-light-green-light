@@ -128,8 +128,8 @@ mgl-pax.asdf, ghcr.io/ocicl/mgl-pax-bootstrap@sha256:42e99a0c4f35124650a63ca3ff8
 misc-extensions, ghcr.io/ocicl/misc-extensions@sha256:ff9142e340adce70b2c1a42eb7801798827c219d4c98282f6cfbcb1906ca718b, misc-extensions-20250427-1f70028/misc-extensions.asd
 mt19937, ghcr.io/ocicl/mt19937@sha256:49c0a25a535cd22212343c67e17635b8e05675ad9cc20aa75ce75e35e842bbe3, MT19937-20240503-78f0419/mt19937.asd
 multilang-documentation-utils, ghcr.io/ocicl/documentation-utils@sha256:b2a1b3f3bcd1a738af85ae2b0168d408c177661eab6d6bbebb254e394d983f54, documentation-utils-20230511-98630dd/multilang-documentation-utils.asd
-named-readtables, ghcr.io/ocicl/named-readtables@sha256:c6380ffa68acf18ba97ef7b88e84ea174fc5605c8a9b23d80ef2583b44f68017, named-readtables-20250524-8bd0045/named-readtables.asd
-named-readtables-test, ghcr.io/ocicl/named-readtables@sha256:c6380ffa68acf18ba97ef7b88e84ea174fc5605c8a9b23d80ef2583b44f68017, named-readtables-20250524-8bd0045/named-readtables-test.asd
+named-readtables, ghcr.io/ocicl/named-readtables@sha256:8fcaff38960701e5e23c29a22c625ab6c43393d53101c5d3f69466af8e840407, named-readtables-20260324-fb2aa15/named-readtables.asd
+named-readtables-test, ghcr.io/ocicl/named-readtables@sha256:8fcaff38960701e5e23c29a22c625ab6c43393d53101c5d3f69466af8e840407, named-readtables-20260324-fb2aa15/named-readtables-test.asd
 parenscript, ghcr.io/ocicl/parenscript@sha256:b4d667abac5092a849871d58d504412e6e1e401fab3fef8f8ac2542a6dfcaa54, parenscript-20240503-1fd720b/parenscript.asd
 parenscript.tests, ghcr.io/ocicl/parenscript@sha256:b4d667abac5092a849871d58d504412e6e1e401fab3fef8f8ac2542a6dfcaa54, parenscript-20240503-1fd720b/parenscript.tests.asd
 parse-declarations-1.0, ghcr.io/ocicl/parse-declarations-1.0@sha256:9305fa9624205b16fd1fc51cb1cc4282a18e50eee9ac75b66a14f6f2c5df9518, parse-declarations-20240503-549aebb/parse-declarations-1.0.asd
