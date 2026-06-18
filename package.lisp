@@ -35,4 +35,4 @@
 (defpackage #:rlgl
   (:use #:cl #:matcher #:policy)
   (:shadow #:package)
-  (:export #:main #:evaluate #:generate-baseline #:*rlgl-root* #:rlgl-root))
+  (:export #:main #:evaluate #:generate-baseline #:recognize-report))

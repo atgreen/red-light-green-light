@@ -50,8 +50,6 @@ and XFAIL file contents.  Return its path as a namestring."
     (namestring dir)))
 
 (defun run ()
-  ;; Recognizers (recog.d) live in the working directory when tests run.
-  (setf rlgl:*rlgl-root* (namestring (uiop:getcwd)))
   (plan nil)
 
   (let ((green-policy (make-temp-policy "{ \"report\": \"junit\" }" "# none" "# none"))

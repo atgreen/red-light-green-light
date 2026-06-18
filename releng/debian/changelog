@@ -1,3 +1,10 @@
+rlgl (2.0.1-1) unstable; urgency=medium
+
+  * Built-in (pure-Lisp) report recognition; portable git invocation; no
+    external recog.d/shell/grep dependency.
+
+ -- Anthony Green <green@moxielogic.com>  Thu, 18 Jun 2026 13:00:00 -0500
+
 rlgl (2.0.0-1) unstable; urgency=medium
 
   * First release of rlgl as a standalone client-side tool (dropped the

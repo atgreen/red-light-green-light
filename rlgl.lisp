@@ -31,49 +31,6 @@
 (version-string:define-version-parameter +rlgl-version+ :rlgl)
 
 ;; ----------------------------------------------------------------------------
-;; Installation root.  This is the directory containing the recog.d
-;; report-recognition scripts.  At runtime we pick the first of a list of
-;; candidate directories that actually contains recog.d: the --root option,
-;; the RLGL_ROOT environment variable, the directory of the running
-;; executable (running from a build tree), the data directory of a system
-;; install (e.g. /usr/share/rlgl when the binary is /usr/bin/rlgl), and
-;; finally the current working directory.
-
-(defvar *rlgl-root* nil)
-
-(defun rlgl-root ()
-  *rlgl-root*)
-
-(defun directory-has-recog.d? (dir)
-  (and dir (ignore-errors (fad:directory-exists-p (merge-pathnames "recog.d/" dir)))))
-
-(defun rlgl-root-candidates (override)
-  (let ((argv0-dir (ignore-errors
-                     (uiop:pathname-directory-pathname
-                      (uiop:ensure-absolute-pathname (uiop:argv0) (uiop:getcwd))))))
-    (remove nil
-            (list
-             (and override (uiop:ensure-directory-pathname override))
-             (let ((env (uiop:getenv "RLGL_ROOT")))
-               (and env (uiop:ensure-directory-pathname env)))
-             argv0-dir
-             ;; /usr/bin/rlgl -> /usr/share/rlgl, /usr/local/bin -> /usr/local/share
-             (and argv0-dir (merge-pathnames #p"../share/rlgl/" argv0-dir))
-             #p"/usr/share/rlgl/"
-             #p"/usr/local/share/rlgl/"
-             (uiop:getcwd)))))
-
-(defun resolve-rlgl-root (&optional override)
-  "Determine and set *RLGL-ROOT*."
-  (let* ((candidates (rlgl-root-candidates override))
-         (root (find-if #'directory-has-recog.d? candidates)))
-    (unless root
-      (error "Can't find report recognizers (recog.d).  Looked in:~%~{  ~A~%~}~
-              Set RLGL_ROOT or pass --root to point at the rlgl installation directory."
-             (mapcar #'namestring candidates)))
-    (setf *rlgl-root* (namestring root))))
-
-;; ----------------------------------------------------------------------------
 ;; Policy checkout directory.  Policies are git repositories that we
 ;; clone/pull into a local cache.
 
@@ -112,36 +69,58 @@
                            *default-pathname-defaults*)))))
 
 ;; ----------------------------------------------------------------------------
-;; Report recognition.  Run each script in recog.d until one claims the
-;; document, then instantiate the matching parser.
+;; Report recognition.  Recognition is done entirely in Lisp (no external
+;; shell/grep), so the binary is self-contained and portable, including
+;; native Windows.  Each recognizer is a predicate over the decoded document;
+;; the first match (in order) wins.  This mirrors the historical recog.d
+;; shell recognizers.
+
+(defun %doc-string (doc)
+  "Decode the byte vector DOC into a string for pattern matching, mapping
+each byte 1:1 (latin-1) so binary input never signals."
+  (flexi-streams:octets-to-string doc :external-format :latin-1))
+
+(defun %first-lines (string n)
+  "Return the first N lines of STRING as a single string."
+  (let ((lines (uiop:split-string string :separator '(#\Newline))))
+    (format nil "~{~A~^~%~}" (subseq lines 0 (min n (length lines))))))
+
+(defparameter +report-recognizers+
+  ;; (parser-class . predicate-over-the-decoded-document-string)
+  (list
+   (cons 'rlgl-parsers:parser/anchore
+         (lambda (s) (search "imageDigest" (%first-lines s 3))))
+   (cons 'rlgl-parsers:parser/aqua
+         (lambda (s) (search "aqua_logo_" s)))
+   (cons 'rlgl-parsers:parser/clair
+         (lambda (s) (and (search "unapproved" s) (search "vulnerabilities" s))))
+   (cons 'rlgl-parsers:parser/dejagnu
+         (lambda (s) (and (cl-ppcre:scan "Test [Rr]un [Bb]y " s)
+                          (search "Schedule of variations" s))))
+   (cons 'rlgl-parsers:parser/junit
+         (lambda (s) (and (search "xml" s)
+                          (search "testsuite" s)
+                          (search "testcase" s))))
+   (cons 'rlgl-parsers:parser/oscap-oval
+         (lambda (s) (search "<title>OVAL Results</title>" s)))
+   (cons 'rlgl-parsers:parser/popeye
+         (lambda (s) (search "<title>Popeye Sanitizer Report</title>" s)))
+   (cons 'rlgl-parsers:parser/oscap-xccdf
+         (lambda (s) (search "OpenSCAP Evaluation Report</title>" s)))
+   ;; Tripwire PDF: a PDF whose report title is "PolicyReport".  (The full
+   ;; parser still relies on external PDF tooling on Unix.)
+   (cons 'rlgl-parsers:parser/tripwire-pdf
+         (lambda (s) (and (str:starts-with? "%PDF" s)
+                          (search "PolicyReport" s)))))
+  "Ordered list of (PARSER-CLASS . PREDICATE) recognizers.")
 
 (defun recognize-report (doc)
   "Try to recognize the report type in the byte vector DOC.  If we
 recognize it, return an RLGL-PARSERS parser object, NIL otherwise."
-  (let ((fname
-          (cl-fad:with-output-to-temporary-file (stream
-                                                 :element-type '(unsigned-byte 8))
-            (write-sequence doc stream)))
-        (result nil))
-    (unwind-protect
-         (let ((scripts (cl-fad:list-directory
-                         (fad:pathname-as-directory
-                          (make-pathname :name "recog"
-                                         :type "d"
-                                         :defaults (rlgl-root))))))
-           (find-if (lambda (script)
-                      (let ((output (inferior-shell:run/ss
-                                     (str:concat
-                                      (namestring script) " "
-                                      (namestring fname)))))
-                        (setf result output)
-                        (> (length output) 0)))
-                    scripts))
-      (when fname
-        (delete-file fname)))
-    (when (> (length result) 0)
-      (make-instance (read-from-string
-                      (str:concat "rlgl-parsers:parser/" result))))))
+  (let* ((s (%doc-string doc))
+         (entry (find-if (lambda (e) (funcall (cdr e) s)) +report-recognizers+)))
+    (when entry
+      (make-instance (car entry)))))
 
 ;; ----------------------------------------------------------------------------
 ;; HTML rendering.
@@ -385,7 +364,6 @@ Each line is a JSON matcher suitable for an rlgl policy XFAIL file."
                         :initial-value "rlgl-report.html" :key :output)))
 
 (defun evaluate/handler (cmd)
-  (resolve-rlgl-root (clingon:getopt cmd :root))
   (let ((policy (clingon:getopt cmd :policy))
         (labels (parse-labels (clingon:getopt cmd :label)))
         (title (clingon:getopt cmd :title))
@@ -416,7 +394,6 @@ Each line is a JSON matcher suitable for an rlgl policy XFAIL file."
                         :description "set a report label KEY=VALUE" :key :label)))
 
 (defun baseline/handler (cmd)
-  (resolve-rlgl-root (clingon:getopt cmd :root))
   (let ((policy (clingon:getopt cmd :policy))
         (labels (parse-labels (clingon:getopt cmd :label)))
         (report (report-argument cmd)))
@@ -434,12 +411,6 @@ Each line is a JSON matcher suitable for an rlgl policy XFAIL file."
    :options (baseline/options)
    :handler #'baseline/handler))
 
-(defun top/options ()
-  (list
-   (clingon:make-option :filepath :short-name #\r :long-name "root"
-                        :description "rlgl installation directory (contains recog.d)"
-                        :key :root)))
-
 (defun top/handler (cmd)
   ;; No subcommand given: show usage.
   (clingon:print-usage-and-exit cmd t))
@@ -451,7 +422,6 @@ Each line is a JSON matcher suitable for an rlgl policy XFAIL file."
    :description "Red Light Green Light - a git-centric policy enforcement tool"
    :authors '("Anthony Green <green@moxielogic.com>")
    :license "AGPL3"
-   :options (top/options)
    :handler #'top/handler
    :sub-commands (list (evaluate/command)
                        (baseline/command))))

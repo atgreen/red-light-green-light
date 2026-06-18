@@ -27,6 +27,24 @@
 (defvar *git-log-table* (make-hash-table :test 'equal))
 (defvar *git-commit-table* (make-hash-table :test 'equal))
 
+(defun git (directory &rest args)
+  "Run git with ARGS inside DIRECTORY (via -C; pass NIL for no directory) and
+return its standard output as a string.  Invokes git directly (no shell), so
+it is portable across platforms.  Signals on non-zero exit."
+  (uiop:run-program
+   (list* "git"
+          (append (when directory (list "-C" (namestring directory)))
+                  args))
+   :output :string
+   :error-output :output
+   :ignore-error-status nil))
+
+(defun git-lines (directory &rest args)
+  "Like GIT, but return the output as a list of non-empty lines."
+  (remove "" (uiop:split-string (apply #'git directory args)
+                                :separator '(#\Newline #\Return))
+          :test #'string=))
+
 (define-condition policy-repo-error (error)
   ((description :reader policy-repo-error-description :initarg :description))
   (:report (lambda (condition stream)
@@ -65,21 +83,13 @@ based on URL."
 					       0 8))))
 
       ;; Update the policy
-      (let ((output (if (not (fad:directory-exists-p policy-dirname))
-			(progn
-			  (log:info "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone ~A ~A"
-				    url policy-dirname)
-			  (inferior-shell:run
-			   (format nil "GIT_TERMINAL_PROMPT=0 /usr/bin/git clone --quiet ~A ~A"
-				   url policy-dirname)))
-			(progn
-			  (log:info "bash -c \"(cd ~A; /usr/bin/git pull --ff-only)\""
-				    policy-dirname)
-			  (inferior-shell:run
-			   (format nil "bash -c \"(cd ~A; /usr/bin/git pull --quiet --ff-only)\""
-				   policy-dirname))))))
-	(dolist (line output)
-	  (log:info line)))
+      (if (not (fad:directory-exists-p policy-dirname))
+	  (progn
+	    (log:info "git clone ~A ~A" url policy-dirname)
+	    (git nil "clone" "--quiet" url policy-dirname))
+	  (progn
+	    (log:info "git -C ~A pull --quiet --ff-only" policy-dirname)
+	    (git policy-dirname "pull" "--quiet" "--ff-only")))
 
       (let ((policy-pathname
 	     (uiop:ensure-directory-pathname policy-dirname)))
@@ -95,9 +105,8 @@ based on URL."
 
 	  (let ((p (make-instance 'policy)))
 	    (setf (slot-value p 'version)
-		  (inferior-shell:run/ss
-		   (format nil "bash -c \"(cd ~A; git rev-parse HEAD)\""
-			   policy-dirname)))
+		  (string-trim '(#\Newline #\Return #\Space)
+			       (git policy-dirname "rev-parse" "HEAD")))
 	    (setf (slot-value p 'commit-url-format) commit-url-format)
 	    (setf (slot-value p 'xfail-matchers) (read-json-patterns :XFAIL xfail-file))
 	    (setf (slot-value p 'pass-matchers) (read-json-patterns :PASS pass-file))
@@ -105,9 +114,7 @@ based on URL."
 
 	    ;; Map all of the commit hashes to this policy for future
 	    ;; reference.
-	    (let ((hash-log (inferior-shell:run/lines
-			     (format nil "bash -c \"(cd ~A; git log --pretty=%H)\""
-				     policy-dirname))))
+	    (let ((hash-log (git-lines policy-dirname "log" "--pretty=%H")))
 	      (dolist (key hash-log)
 		(setf (gethash key *git-commit-table*) p)))
 
@@ -176,11 +183,16 @@ exists after the JSON object, or NIL otherwise."
 
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
-    (let ((matcher-lines (inferior-shell:run/lines
-			  (format nil "bash -c \"(cd $(dirname ~A); git blame -s -l $(basename ~A))\""
-				  filename filename))))
+    (let ((matcher-lines (git-lines (directory-namestring filename)
+				    "blame" "-s" "-l" (file-namestring filename))))
       (dolist (matcher-line matcher-lines)
-	(let ((githash (subseq (remove #\^ matcher-line) 0 40)))
+	;; For boundary (e.g. root) commits, git blame prefixes the line with
+	;; "^" and drops one hash digit to keep the column width, so the 40-char
+	;; field can hold a 39-char hash plus a trailing space.  Trim it: an
+	;; abbreviated hash still resolves, and a trailing space would otherwise
+	;; be passed verbatim to git as part of the revision argument.
+	(let ((githash (string-trim '(#\Space #\Tab)
+				    (subseq (remove #\^ matcher-line) 0 40))))
 	  (multiple-value-bind (lineno location)
 	      (read-from-string (subseq matcher-line 40))
 	    (let ((line (string-trim '(#\Space #\Tab)
@@ -206,9 +218,9 @@ exists after the JSON object, or NIL otherwise."
 		     (not (string= githash ; check for local change
 				   "0000000000000000000000000000000000000000")))
 	    (progn
-	      (setf log-entry (inferior-shell:run/lines
-			       (format nil "bash -c \"(cd $(dirname ~A); git log -n 1 -r ~A $(basename ~A))\""
-				       filename githash filename)))
+	      (setf log-entry (git-lines (directory-namestring filename)
+					 "log" "-n" "1" "-r" githash
+					 (file-namestring filename)))
 	      (setf (gethash githash *git-log-table*) log-entry)))
 	  (setf (slot-value matcher 'log-entry) log-entry))))
 

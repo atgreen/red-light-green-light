@@ -280,7 +280,6 @@ jobs:
         run: |
           mkdir -p dist
           cp rlgl README.md COPYING dist/
-          cp -r recog.d dist/
           cd dist && tar czf ../rlgl-${VERSION}-linux-amd64.tar.gz *
 
       - name: Upload Linux tarball
@@ -288,6 +287,111 @@ jobs:
         with:
           name: linux-tarball
           path: ./*.tar.gz
+
+  # ========================================
+  # Build Linux arm64 tarball
+  # ========================================
+  build-linux-arm64:
+    needs: [fetch-deps, extract-version]
+    runs-on: ubuntu-24.04-arm
+    env:
+      VERSION: ${{ needs.extract-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Download ocicl dependencies
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ocicl-deps
+          path: ocicl
+
+      - name: Remove .git to prevent dirty version detection
+        run: rm -rf .git
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sbcl gcc make
+
+      - name: Build
+        run: make rlgl
+
+      - name: Verify version is not dirty
+        run: |
+          VERSION=$(./rlgl --version 2>&1 || true)
+          echo "rlgl version: $VERSION"
+          if echo "$VERSION" | grep -qi dirty; then
+            echo "::error::Version string contains 'dirty': $VERSION"
+            exit 1
+          fi
+
+      - name: Package Linux binary
+        run: |
+          mkdir -p dist
+          cp rlgl README.md COPYING dist/
+          cd dist && tar czf ../rlgl-${VERSION}-linux-arm64.tar.gz *
+
+      - name: Upload Linux arm64 tarball
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: linux-arm64-tarball
+          path: ./*.tar.gz
+
+  # ========================================
+  # Build Windows executable (zip)
+  # ========================================
+  build-windows:
+    needs: [fetch-deps, extract-version]
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.extract-version.outputs.version }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Download ocicl dependencies
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ocicl-deps
+          path: ocicl
+
+      - name: Remove .git to prevent dirty version detection
+        run: rm -rf .git
+
+      - name: Install SBCL
+        shell: powershell
+        run: |
+          choco install -y sbcl make
+          $sbclPath = (Get-Command sbcl).Source | Split-Path
+          echo "$sbclPath" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      - name: Build
+        run: make rlgl
+
+      - name: Verify version is not dirty
+        run: |
+          VERSION=$(./rlgl.exe --version 2>&1 || true)
+          echo "rlgl version: $VERSION"
+          if echo "$VERSION" | grep -qi dirty; then
+            echo "::error::Version string contains 'dirty': $VERSION"
+            exit 1
+          fi
+
+      - name: Package Windows binary
+        run: |
+          mkdir -p dist
+          cp rlgl.exe README.md COPYING dist/
+          cd dist && 7z a "../rlgl-${VERSION}-windows-amd64.zip" *
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: windows-package
+          path: ./*.zip
 
   # ========================================
   # Build macOS executables
@@ -329,7 +433,6 @@ jobs:
         run: |
           mkdir -p dist
           cp rlgl README.md COPYING dist/
-          cp -r recog.d dist/
           cd dist && tar czf ../rlgl-${VERSION}-darwin-arm64.tar.gz *
 
       - name: Upload macOS artifact
@@ -375,7 +478,6 @@ jobs:
         run: |
           mkdir -p dist
           cp rlgl README.md COPYING dist/
-          cp -r recog.d dist/
           cd dist && tar czf ../rlgl-${VERSION}-darwin-amd64.tar.gz *
 
       - name: Upload macOS artifact
@@ -388,7 +490,7 @@ jobs:
   # Sign release tarballs with Cosign
   # ========================================
   sign-artifacts:
-    needs: [build-linux-tarball, build-macos-arm64, build-macos-amd64, extract-version]
+    needs: [build-linux-tarball, build-linux-arm64, build-macos-arm64, build-macos-amd64, extract-version]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -399,6 +501,12 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: linux-tarball
+          path: ./artifacts
+
+      - name: Download Linux arm64 tarball
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: linux-arm64-tarball
           path: ./artifacts
 
       - name: Download macOS ARM64 tarball
@@ -433,7 +541,7 @@ jobs:
   # Generate SLSA Level 3 provenance
   # ========================================
   generate-provenance-subjects:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-macos-arm64, build-macos-amd64, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, extract-version]
     runs-on: ubuntu-latest
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}
@@ -447,7 +555,7 @@ jobs:
         id: hash
         run: |
           cd artifacts
-          find . -type f \( -name '*.rpm' -o -name '*.deb' -o -name '*.tar.gz' \) -exec sha256sum {} \; | sed 's|  \./[^/]*/|  |' > checksums.txt
+          find . -type f \( -name '*.rpm' -o -name '*.deb' -o -name '*.tar.gz' -o -name '*.zip' \) -exec sha256sum {} \; | sed 's|  \./[^/]*/|  |' > checksums.txt
           cat checksums.txt
           echo "hashes=$(cat checksums.txt | base64 -w0)" >> "$GITHUB_OUTPUT"
 
@@ -468,7 +576,7 @@ jobs:
   # Create GitHub Release
   # ========================================
   release:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-macos-arm64, build-macos-amd64, sign-artifacts, slsa-provenance, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, sign-artifacts, slsa-provenance, extract-version]
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -503,6 +611,8 @@ jobs:
             artifacts/deb-packages/*.buildinfo
             artifacts/deb-packages/*.changes
             artifacts/linux-tarball/*.tar.gz
+            artifacts/linux-arm64-tarball/*.tar.gz
+            artifacts/windows-package/*.zip
             artifacts/darwin-arm64-package/*.tar.gz
             artifacts/darwin-amd64-package/*.tar.gz
             artifacts/cosign-bundles/*.bundle
