@@ -200,5 +200,6 @@ usocket, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc8
 usocket-server, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc87916904cf0d0670b3f4a68, usocket-0.8.8/usocket-server.asd
 usocket-test, ghcr.io/ocicl/usocket@sha256:015b8cdb91cdc25aefd08054e8ede6a5d054d10bc87916904cf0d0670b3f4a68, usocket-0.8.8/usocket-test.asd
 uuid, ghcr.io/ocicl/uuid@sha256:a32feac67562b09ece6a4d6debc6fefa40009231cd061042bc8939d3fab3c89e, uuid-20240503-f0052f3/uuid.asd
+version-string, ghcr.io/ocicl/version-string@sha256:eb8f45786af7fd6f792aecada1f905870f1d79abfaee0ceb774a94824ad9b14f, cl-version-string-20251228-668f2fa/version-string.asd
 with-user-abort, ghcr.io/ocicl/with-user-abort@sha256:c19560034f9909a7afb4110b5efd939a9f1e829d9ef9887797b98679f290c480, with-user-abort-20240503-a3db02e/with-user-abort.asd
 zs3, ghcr.io/ocicl/zs3@sha256:6ae320e2ca7feda5cd04b6ac84293764ea420c3e4354a21c325b46a3b7894b90, zs3-1.3.3/zs3.asd

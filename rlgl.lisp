@@ -25,19 +25,19 @@
 ;; ----------------------------------------------------------------------------
 ;; Version.  Pull from git when available, otherwise fall back.
 
-(defparameter +rlgl-version+
-  (or (ignore-errors
-        (string-trim '(#\Newline #\Space)
-                     (with-output-to-string (legit:*git-output*)
-                       (legit:git-describe :tags t))))
-      "unknown"))
+;; +RLGL-VERSION+ is the base version from rlgl.asd at load time, and is
+;; updated to include git information (tag/hash, "+dirty" suffix) when the
+;; standalone binary is built via program-op.
+(version-string:define-version-parameter +rlgl-version+ :rlgl)
 
 ;; ----------------------------------------------------------------------------
 ;; Installation root.  This is the directory containing the recog.d
-;; report-recognition scripts.  Resolved at runtime from (in order):
-;; the --root option, the RLGL_ROOT environment variable, the directory
-;; of the running executable (if it contains recog.d), or the current
-;; working directory.
+;; report-recognition scripts.  At runtime we pick the first of a list of
+;; candidate directories that actually contains recog.d: the --root option,
+;; the RLGL_ROOT environment variable, the directory of the running
+;; executable (running from a build tree), the data directory of a system
+;; install (e.g. /usr/share/rlgl when the binary is /usr/bin/rlgl), and
+;; finally the current working directory.
 
 (defvar *rlgl-root* nil)
 
@@ -45,26 +45,33 @@
   *rlgl-root*)
 
 (defun directory-has-recog.d? (dir)
-  (and dir (fad:directory-exists-p (merge-pathnames "recog.d/" dir))))
+  (and dir (ignore-errors (fad:directory-exists-p (merge-pathnames "recog.d/" dir)))))
+
+(defun rlgl-root-candidates (override)
+  (let ((argv0-dir (ignore-errors
+                     (uiop:pathname-directory-pathname
+                      (uiop:ensure-absolute-pathname (uiop:argv0) (uiop:getcwd))))))
+    (remove nil
+            (list
+             (and override (uiop:ensure-directory-pathname override))
+             (let ((env (uiop:getenv "RLGL_ROOT")))
+               (and env (uiop:ensure-directory-pathname env)))
+             argv0-dir
+             ;; /usr/bin/rlgl -> /usr/share/rlgl, /usr/local/bin -> /usr/local/share
+             (and argv0-dir (merge-pathnames #p"../share/rlgl/" argv0-dir))
+             #p"/usr/share/rlgl/"
+             #p"/usr/local/share/rlgl/"
+             (uiop:getcwd)))))
 
 (defun resolve-rlgl-root (&optional override)
   "Determine and set *RLGL-ROOT*."
-  (let ((root
-          (or (and override (uiop:ensure-directory-pathname override))
-              (let ((env (uiop:getenv "RLGL_ROOT")))
-                (and env (uiop:ensure-directory-pathname env)))
-              (let ((argv0-dir (ignore-errors
-                                 (uiop:pathname-directory-pathname
-                                  (uiop:ensure-absolute-pathname
-                                   (uiop:argv0) (uiop:getcwd))))))
-                (and (directory-has-recog.d? argv0-dir) argv0-dir))
-              (uiop:getcwd))))
-    (setf *rlgl-root* (namestring root))
-    (unless (directory-has-recog.d? root)
-      (error "Can't find report recognizers (recog.d) under ~A.~%~
+  (let* ((candidates (rlgl-root-candidates override))
+         (root (find-if #'directory-has-recog.d? candidates)))
+    (unless root
+      (error "Can't find report recognizers (recog.d).  Looked in:~%~{  ~A~%~}~
               Set RLGL_ROOT or pass --root to point at the rlgl installation directory."
-             *rlgl-root*))
-    *rlgl-root*))
+             (mapcar #'namestring candidates)))
+    (setf *rlgl-root* (namestring root))))
 
 ;; ----------------------------------------------------------------------------
 ;; Policy checkout directory.  Policies are git repositories that we
