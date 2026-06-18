@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2023, 2025  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -17,92 +17,68 @@
 ;;; <http://www.gnu.org/licenses/>.
 
 (in-package #:cl-user)
-(defpackage #:test-rlgl-server
-  (:use #:common-lisp #:rlgl-server #:prove #:matcher #:policy)
+(defpackage #:test-rlgl
+  (:use #:common-lisp #:prove #:matcher #:policy)
   (:export #:run))
-(in-package #:test-rlgl-server)
+(in-package #:test-rlgl)
 
 (setf prove:*default-reporter* :fiveam)
-(setf prove:*debug-on-error* t)
 
-(defvar *upload-ref* nil)
+(defparameter *junit-report* "test/sample-junit.xml")
 
-(defun test-eval (report)
-
-  (print (pathname report))
-  (subtest (format nil "upload ~A" report)
-	   (let* ((params `((file . (,(pathname report)
-                                     :content-type "application/octet-stream"
-                                     :filename ,(pathname report)))))
-                  (upload-ref
-		    (drakma:http-request "http://localhost:8080/upload"
-					 :method :post
-                                         :form-data t
-                                         :parameters params)))
-             (setf *upload-ref* upload-ref)
-	     (like upload-ref "RLGL-[A-Z0-9]+")))
-
-  (subtest (format nil "evaluate ~A" report)
-           (let* ((result (drakma:http-request "http://localhost:8080/evaluate"
-				               :method :post
-				               :content-type "application/json"
-				               :content (format nil "{ \"id\": \"~A\", \"policy\": \"~A\", \"ref\": \"~A\" }"
-						                (rlgl-util:random-base36-string)
-						                "http://github.com/moxielogic/rlgl-toolchain-policy"
-						                *upload-ref*)))
-                  (junk (progn
-                          (format t "====================================================~%")
-                          (print result)g
-                          (format t "====================================================~%")))
-                  (json (json:decode-json-from-string result)))
-             (setf *json* json)
-             (like (cdr (assoc :CALLBACK json)) "[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+[A-Z0-9]+")))
-
-  (subtest (format nil "callback ~A" report)
-           (let ((result (nth-value 1 (drakma:http-request "http://localhost:8080/callback"
-				                           :method :post
-				                           :content-type "application/json"
-				                           :content (format nil "{ \"id\": \"~A\", \"signature\": \"MGUCMEYUlcrqJlgR+p8AKNP1hOTZqspNbOnXMssK3xDq2q0Z9J/y0owNCaNz5gWu/NTjMAIxAPpztPFIbjtWugP0cyqhe6L3mtrzUjZazLEcTOnThJmEWPni1COga+wIUtqvgN3VxQ==\" }"
-						                            (cdr (assoc :CALLBACK *json*)))))))
-             (is result 200)))
-  )
-
+(defun make-temp-policy (pass fail xfail)
+  "Create a temporary git policy repository with the given PASS, FAIL,
+and XFAIL file contents.  Return its path as a namestring."
+  (let ((dir (uiop:ensure-directory-pathname
+              (merge-pathnames
+               (format nil "rlgl-test-policy-~A/" (rlgl-util:random-base36-string))
+               (uiop:temporary-directory)))))
+    (ensure-directories-exist dir)
+    (loop for (name . contents) in `(("PASS" . ,pass) ("FAIL" . ,fail) ("XFAIL" . ,xfail))
+          do (with-open-file (s (merge-pathnames name dir)
+                                :direction :output :if-exists :supersede
+                                :if-does-not-exist :create)
+               (write-string contents s)
+               (terpri s)))
+    (flet ((git (&rest args)
+             (uiop:run-program (list* "git" "-C" (namestring dir) args)
+                               :output :string :error-output :string)))
+      (git "init")
+      (git "add" ".")
+      (git "-c" "user.email=test@example.com" "-c" "user.name=Test"
+           "commit" "-m" "test policy"))
+    (namestring dir)))
 
 (defun run ()
+  ;; Recognizers (recog.d) live in the working directory when tests run.
+  (setf rlgl:*rlgl-root* (namestring (uiop:getcwd)))
+  (plan nil)
 
-  (plan 1)
+  (let ((green-policy (make-temp-policy "{ \"report\": \"junit\" }" "# none" "# none"))
+        (red-policy   (make-temp-policy "# none" "{ \"report\": \"junit\" }" "# none"))
+        (out (namestring (merge-pathnames "rlgl-test-report.html"
+                                          (uiop:temporary-directory)))))
 
-  (start-rlgl-server t "test/config.ini")
+    (subtest "GREEN evaluation"
+      (multiple-value-bind (colour path)
+          (rlgl:evaluate *junit-report* green-policy
+                         :title "Test" :output out)
+        (is colour :GREEN "everything passes -> GREEN")
+        (ok (probe-file path) "an HTML report is written")
+        (ok (search "<!DOCTYPE html>"
+                    (uiop:read-file-string path))
+            "report is HTML")))
 
-  ;; ---------------------------------------------------------------------------
-  ;; API tests
-  ;; ---------------------------------------------------------------------------
+    (subtest "RED evaluation"
+      (multiple-value-bind (colour path)
+          (rlgl:evaluate *junit-report* red-policy
+                         :title "Test" :output out)
+        (is colour :RED "matching FAIL pattern -> RED")
+        (ok (probe-file path) "an HTML report is written")))
 
-  (subtest "start test"
-	   (loop for i from 0 to 10
-	      do
-		(let ((id (drakma:http-request "http://localhost:8080/start")))
-		  (is (length id) 8))))
+    (subtest "baseline generation"
+      (let ((baseline (rlgl:generate-baseline *junit-report* red-policy)))
+        (ok (> (length baseline) 0) "baseline policy is non-empty")
+        (ok (search "junit" baseline) "baseline contains junit matchers"))))
 
-  (test-eval "test/report.html")
-  (test-eval "test/sample-junit.xml")
-  (test-eval "test/mysql-aqua.html")
-  (test-eval "test/clair-report.json")
-  (test-eval "test/empty-clair-report.json")
-
-  (let* ((result (nth-value 1 (drakma:http-request "http://localhost:8080/evaluate"
-				                   :method :post
-				                   :content-type "application/json"
-				                   :content (format nil "{ \"id\": \"~A\", \"policy\": \"http://github.com/atgreen/red-light-green-light\", \"ref\": \"~A\" }"
-						                    (rlgl-util:random-base36-string)
-                                                                    *upload-ref*)))))
-    (log:info result))
-
-  (finalize)
-
-  (if (uiop:getenv "RLGL_WAIT4EVER")
-      (progn
-	(format t "Waiting forever.  Hit CTRL-C to exit.")
-	(loop (sleep 3000))))
-
-  )
+  (finalize))

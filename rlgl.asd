@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2018-2022, 2024, 2025  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,33 +16,23 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(asdf:defsystem #:rlgl-server
-  :description "The Red Light Green Light server."
+(asdf:defsystem #:rlgl
+  :description "Red Light Green Light - a client-side policy enforcement tool."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "8"
+  :version "9"
   :serial t
   :components ((:file "package")
-               (:file "api-key")
                (:file "matcher")
                (:file "policy")
-               (:file "storage-local")
-               (:file "storage-s3")
-               (:file "rlgl-server"))
-  :depends-on (:rlgl-parsers :rlgl-util :rlgl-db :rlgl-user
-               :metabang-bind :markup :cl-template
-               :misc-extensions :clingon
-               :cl-toml :snooze :cl-json :plump :lquery :ironclad
-               :inferior-shell :hunchentoot :spinneret
-               :jsown-utils :cl-fad :str :log4cl :cl-ppcre
-               :cxml :cl-dbi :cl-date-time-parser :quri
-               :local-time :cl-csv :cl-postgres
-               :dbd-sqlite3 :dbd-postgres :zs3 :simple-date-time
-               :drakma :uuid :cl-base32 :legit
-               :split-sequence :thread-pool)
+               (:file "rlgl"))
+  :depends-on (:rlgl-parsers :rlgl-util
+               :alexandria :bordeaux-threads :clingon :markup
+               :cl-json :jsown-utils :cl-fad :str :log4cl :cl-ppcre
+               :ironclad :flexi-streams :inferior-shell :metabang-bind
+               :cl-date-time-parser :quri :legit)
   :build-operation "program-op"
-  :build-pathname "rlgl-server"
-  :entry-point "rlgl-server:main"
-  :description "Red Light Green Light Server")
+  :build-pathname "rlgl"
+  :entry-point "rlgl:main")
 
 #+sb-core-compression
 (defmethod asdf:perform ((o asdf:image-op) (c asdf:system))

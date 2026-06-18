@@ -32,12 +32,7 @@
 	   #:commit-url-format #:version #:compile-scanners
            #:policy-repo-error #:policy-repo-error-description))
 
-(defpackage #:rlgl-server
-  (:use #:snooze #:cl #:matcher #:policy #:spinneret)
+(defpackage #:rlgl
+  (:use #:cl #:matcher #:policy)
   (:shadow #:package)
-  (:export #:start-rlgl-server #:stop-rlgl-server #:main
-	   #:db
-	   #:db/sqlite
-	   #:db/postgresql
-	   #:storage/local
-	   #:storage/s3))
+  (:export #:main #:evaluate #:generate-baseline #:*rlgl-root* #:rlgl-root))

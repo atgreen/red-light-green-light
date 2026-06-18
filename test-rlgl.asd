@@ -1,6 +1,6 @@
 ;;; -*- Mode: LISP; Syntax: COMMON-LISP; Base: 10 -*-
 ;;;
-;;; Copyright (C) 2021  Anthony Green <green@moxielogic.com>
+;;; Copyright (C) 2018-2025  Anthony Green <green@moxielogic.com>
 ;;;
 ;;; This program is free software: you can redistribute it and/or
 ;;; modify it under the terms of the GNU Affero General Public License
@@ -16,11 +16,17 @@
 ;;; License along with this program.  If not, see
 ;;; <http://www.gnu.org/licenses/>.
 
-(asdf:defsystem #:rlgl-user
-  :description "User functions"
-  :author "Anthony Green <green@moxielogic.com>"
-  :version "0"
-  :serial t
-  :components ((:file "package")
-               (:file "user"))
-  :depends-on (:rlgl-db))
+(asdf:defsystem #:test-rlgl
+  :description "Tests for the Red Light Green Light client-side tool."
+  :depends-on (:rlgl :prove)
+  :components
+  ((:module "test"
+    :serial t
+    :components
+    ((:file "test")))))
+
+(defmethod perform ((o test-op) (c (eql (find-system :test-rlgl))))
+  (funcall (intern (string '#:run) '#:test-rlgl)))
+
+(defmethod operation-done-p ((o test-op) (c (eql (find-system :test-rlgl))))
+  nil)
