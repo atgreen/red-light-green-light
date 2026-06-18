@@ -258,9 +258,11 @@ example, this CSV file...
 
     { "filesize": "0..1000000" }
 
-Report recognition is driven by the small shell scripts in `recog.d/`,
-and report parsing by the Common Lisp code in `parsers/`.  Adding a new
-report type means adding a recognizer script and a parser.
+Report recognition and parsing are both implemented in Common Lisp (see
+the recognizers in `rlgl.lisp` and the parsers in `parsers/`), so the
+binary is self-contained and portable — it shells out only to `git` (to
+fetch policy repositories).  Adding a new report type means adding a
+recognizer predicate and a parser.
 
 Building
 --------
@@ -275,10 +277,9 @@ $ make rlgl          # build the ./rlgl binary
 $ make check         # run the test suite
 ```
 
-The build produces a standalone `rlgl` executable.  At runtime `rlgl`
-needs the `recog.d/` report recognizers; it locates them via (in
-order) the `--root` option, the `RLGL_ROOT` environment variable, the
-directory of the running executable, or the current working directory.
+The build produces a single, self-contained `rlgl` executable with no
+runtime data files.  It requires `git` on `PATH` to fetch policy
+repositories.
 
 Configuration
 -------------
@@ -287,7 +288,6 @@ Configuration
 
 | Environment Variable | Description                                                              |
 |----------------------|--------------------------------------------------------------------------|
-| `RLGL_ROOT`          | Installation directory containing `recog.d/` report recognizers          |
 | `RLGL_POLICY_DIR`    | Directory where policy git repos are cloned (default: `$XDG_CACHE_HOME/rlgl/policies`) |
 
 Author and License
