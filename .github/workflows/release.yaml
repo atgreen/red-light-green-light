@@ -443,10 +443,10 @@ jobs:
 
   build-macos-amd64:
     needs: [fetch-deps, extract-version]
-    runs-on: macos-13
-    # Intel macOS runners are scarce/being deprecated; never let this block
-    # the release.  Downstream jobs do not depend on it, and it is best-effort.
-    continue-on-error: true
+    # GitHub's free Intel (macos-13) runners never schedule for this repo, so
+    # build the x86_64 binary on an Apple-Silicon runner via Rosetta + an
+    # x86_64 Homebrew SBCL.
+    runs-on: macos-14
     env:
       VERSION: ${{ needs.extract-version.outputs.version }}
     steps:
@@ -462,15 +462,23 @@ jobs:
       - name: Remove .git to prevent dirty version detection
         run: rm -rf .git
 
-      - name: Install dependencies
-        run: brew install sbcl
-
-      - name: Build
-        run: make rlgl
-
-      - name: Verify version is not dirty
+      - name: Install Rosetta and x86_64 SBCL
         run: |
-          VERSION=$(./rlgl --version 2>&1 || true)
+          softwareupdate --install-rosetta --agree-to-license || true
+          if ! arch -x86_64 /usr/local/bin/brew --version >/dev/null 2>&1; then
+            arch -x86_64 /bin/bash -c 'NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+          fi
+          arch -x86_64 /usr/local/bin/brew install sbcl
+
+      - name: Build (x86_64 under Rosetta)
+        run: |
+          arch -x86_64 /bin/bash -c 'eval "$(/usr/local/bin/brew shellenv)"; sbcl --version; make rlgl'
+
+      - name: Verify architecture and version
+        run: |
+          file ./rlgl
+          file ./rlgl | grep -q x86_64 || { echo "::error::rlgl is not x86_64"; exit 1; }
+          VERSION=$(arch -x86_64 ./rlgl --version 2>&1 || true)
           echo "rlgl version: $VERSION"
           if echo "$VERSION" | grep -qi dirty; then
             echo "::error::Version string contains 'dirty': $VERSION"
@@ -493,7 +501,7 @@ jobs:
   # Sign release tarballs with Cosign
   # ========================================
   sign-artifacts:
-    needs: [build-linux-tarball, build-linux-arm64, build-macos-arm64, extract-version]
+    needs: [build-linux-tarball, build-linux-arm64, build-macos-arm64, build-macos-amd64, extract-version]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -546,7 +554,7 @@ jobs:
   # Generate SLSA Level 3 provenance
   # ========================================
   generate-provenance-subjects:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, extract-version]
     runs-on: ubuntu-latest
     outputs:
       hashes: ${{ steps.hash.outputs.hashes }}
@@ -581,7 +589,7 @@ jobs:
   # Create GitHub Release
   # ========================================
   release:
-    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, sign-artifacts, slsa-provenance, extract-version]
+    needs: [build-rpm, build-deb, build-linux-tarball, build-linux-arm64, build-windows, build-macos-arm64, build-macos-amd64, sign-artifacts, slsa-provenance, extract-version]
     permissions:
       contents: write
     runs-on: ubuntu-latest
