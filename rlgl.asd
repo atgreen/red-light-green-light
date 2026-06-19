@@ -19,7 +19,7 @@
 (asdf:defsystem #:rlgl
   :description "Red Light Green Light - a client-side policy enforcement tool."
   :author "Anthony Green <green@moxielogic.com>"
-  :version "2.0.1"
+  :version "2.0.2"
   :serial t
   :components ((:file "package")
                (:file "matcher")

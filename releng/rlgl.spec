@@ -1,5 +1,5 @@
 Name:           rlgl
-Version:        2.0.1
+Version:        2.0.2
 Release:        1%{?dist}
 Summary:        Git-centric policy management and enforcement tool
 
@@ -55,6 +55,8 @@ fi
 %{_datadir}/sbom/rlgl-%{version}.spdx.json
 
 %changelog
+* Thu Jun 18 2026 Anthony Green <green@moxielogic.com> - 2.0.2-1
+- Use OS-native paths when invoking git so policy clone/blame work on Windows
 * Thu Jun 18 2026 Anthony Green <green@moxielogic.com> - 2.0.1-1
 - Built-in (pure-Lisp) report recognition; portable git invocation; no
   external recog.d/shell/grep dependency

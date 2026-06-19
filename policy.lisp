@@ -30,13 +30,16 @@
 (defun git (directory &rest args)
   "Run git with ARGS inside DIRECTORY (via -C; pass NIL for no directory) and
 return its standard output as a string.  Invokes git directly (no shell), so
-it is portable across platforms.  Signals on non-zero exit."
+it is portable across platforms.  DIRECTORY is passed to git as an OS-native
+path so it resolves correctly on Windows (drive letter, backslashes).  git's
+stderr is left attached so any failure is visible in the log.  Signals on
+non-zero exit."
   (uiop:run-program
    (list* "git"
-          (append (when directory (list "-C" (namestring directory)))
+          (append (when directory (list "-C" (uiop:native-namestring directory)))
                   args))
    :output :string
-   :error-output :output
+   :error-output t
    :ignore-error-status nil))
 
 (defun git-lines (directory &rest args)
