@@ -35,13 +35,20 @@
 ;; clone/pull into a local cache.
 
 (defun ensure-policy-dir ()
-  "Initialize POLICY:*POLICY-DIR* (where policy repos are cloned)."
-  (let ((dir (uiop:ensure-directory-pathname
-              (or (uiop:getenv "RLGL_POLICY_DIR")
-                  (merge-pathnames "rlgl/policies/"
-                                   (uiop:xdg-cache-home))))))
+  "Initialize POLICY:*POLICY-DIR* (where policy repos are cloned).  Resolve to
+an OS-native absolute path so git receives a drive-qualified directory on
+Windows (uiop:xdg-cache-home there yields a drive-less path that git
+misresolves).  LOCALAPPDATA is only set on Windows, so this is a no-op
+elsewhere."
+  (let* ((base (or (uiop:getenv "RLGL_POLICY_DIR")
+                   (let ((localappdata (uiop:getenv "LOCALAPPDATA")))
+                     (and localappdata
+                          (merge-pathnames "rlgl/policies/"
+                                           (uiop:ensure-directory-pathname localappdata))))
+                   (merge-pathnames "rlgl/policies/" (uiop:xdg-cache-home))))
+         (dir (uiop:ensure-directory-pathname base)))
     (ensure-directories-exist dir)
-    (setf policy:*policy-dir* (namestring dir))))
+    (setf policy:*policy-dir* (uiop:native-namestring dir))))
 
 ;; ----------------------------------------------------------------------------
 ;; Self-contained report assets.  The CSS (with the logo inlined as a
