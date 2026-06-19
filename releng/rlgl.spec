@@ -1,5 +1,5 @@
 Name:           rlgl
-Version:        2.0.2
+Version:        2.0.3
 Release:        1%{?dist}
 Summary:        Git-centric policy management and enforcement tool
 
@@ -55,6 +55,9 @@ fi
 %{_datadir}/sbom/rlgl-%{version}.spdx.json
 
 %changelog
+* Fri Jun 19 2026 Anthony Green <green@moxielogic.com> - 2.0.3-1
+- Preserve the Windows drive letter when deriving git -C paths (use
+  native-namestring of the directory pathname, not directory-namestring)
 * Thu Jun 18 2026 Anthony Green <green@moxielogic.com> - 2.0.2-1
 - Use OS-native paths when invoking git so policy clone/blame work on Windows
 * Thu Jun 18 2026 Anthony Green <green@moxielogic.com> - 2.0.1-1

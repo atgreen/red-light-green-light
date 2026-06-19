@@ -79,7 +79,10 @@ based on URL."
   ;; Hold one big lock, just in case...
   (bt:with-lock-held (*policy-lock*)
 
-    (let* ((policy-dirname (str:concat (namestring *policy-dir*)
+    ;; *POLICY-DIR* is already an OS-native namestring; concatenate directly.
+    ;; (Round-tripping through NAMESTRING/DIRECTORY-NAMESTRING on Windows drops
+    ;; the drive letter, since the device is a separate pathname component.)
+    (let* ((policy-dirname (str:concat *policy-dir*
 				       (subseq (ironclad:byte-array-to-hex-string
 						(ironclad:digest-sequence
 						 :sha1 (flexi-streams:string-to-octets url)))
@@ -186,7 +189,8 @@ exists after the JSON object, or NIL otherwise."
 
 (defun read-json-patterns (kind filename)
   (let ((patterns (list)))
-    (let ((matcher-lines (git-lines (directory-namestring filename)
+    (let ((matcher-lines (git-lines (uiop:native-namestring
+				     (uiop:pathname-directory-pathname filename))
 				    "blame" "-s" "-l" (file-namestring filename))))
       (dolist (matcher-line matcher-lines)
 	;; For boundary (e.g. root) commits, git blame prefixes the line with
@@ -221,7 +225,8 @@ exists after the JSON object, or NIL otherwise."
 		     (not (string= githash ; check for local change
 				   "0000000000000000000000000000000000000000")))
 	    (progn
-	      (setf log-entry (git-lines (directory-namestring filename)
+	      (setf log-entry (git-lines (uiop:native-namestring
+					  (uiop:pathname-directory-pathname filename))
 					 "log" "-n" "1" "-r" githash
 					 (file-namestring filename)))
 	      (setf (gethash githash *git-log-table*) log-entry)))
